@@ -7916,7 +7916,7 @@ pronouns = "he/him"
 traits = "Witty, funny"
 
 [node name="Player" parent="." instance=ExtResource("2_bx2vm")]
-position = Vector2(-772, 341)
+position = Vector2(-959, 304)
 agent_name = "Dostee"
 
 [node name="Amelia" parent="." instance=ExtResource("6_hpwxx")]
