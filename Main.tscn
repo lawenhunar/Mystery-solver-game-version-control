@@ -7904,7 +7904,7 @@ animation_texture = ExtResource("13_ek000")
 agent_name = "Luna"
 age = 22
 pronouns = "she/her"
-traits = "Quiet, determined"
+traits = "Hot and mysterious"
 
 [node name="Alex" parent="." instance=ExtResource("6_hpwxx")]
 position = Vector2(972, 261)
@@ -7932,8 +7932,8 @@ traits = "Sweet, kind, caring"
 position = Vector2(-724, -198)
 icon = ExtResource("13_db34c")
 animation_texture = ExtResource("14_gjcts")
-agent_name = "Bob"
-age = 20
+agent_name = "Charles"
+age = 22
 pronouns = "he/him"
 traits = "Analytical, harsh"
 

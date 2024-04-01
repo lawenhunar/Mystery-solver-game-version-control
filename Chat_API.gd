@@ -9,7 +9,7 @@ var temperature : float = 1
 var max_tokens : int
 var headers = ["Content-type: application/json", "Authorization: Bearer " + api_key]
 var model : String = "gpt-3.5-turbo"
-var messages = []
+var messages : Array
 var output
 signal response_recieved
 
@@ -36,7 +36,7 @@ func send_request (prompt, request, get_token_count=false):
 	})
 	
 	if request.request(url, headers, HTTPClient.METHOD_POST, body) != OK:
-		print("There was an error!")
+		print("There was an error in the chat api!")
 	
 	await response_recieved
 

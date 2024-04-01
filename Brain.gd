@@ -36,10 +36,17 @@ var lock : Mutex = Mutex.new()
 var responses = []
 
 var can_trigger : bool = false
-var time_since_last_trigger = 0
-var time_since_last_plan = 0
-var planning_duration = 60 # in seconds
-var trigger_duration = 10 # in seconds
+var time_since_last_trigger : int
+var time_since_last_plan : int
+var planning_duration : int = 60 # in seconds
+var trigger_duration : int = 10 # in seconds
+
+# These variables are used for the relfection process
+var recent_importance_threshold : int = 100
+var oldest_memory_index : int = 0
+var is_reflecting : bool = false
+var num_reflection_questions : int = 3
+var num_insights_per_reflection_question : int = 5
 
 @onready var conversation_panel = $"Conversation Panel"
 
@@ -69,6 +76,14 @@ func _ready():
 
 func _physics_process(delta):
 	as_entity.set_location(game_manager.get_location(global_position))
+	
+	if !memories.is_empty() && !is_reflecting:
+		var total_recent_importance = 0
+		for i in range(oldest_memory_index, len(memories)):
+			total_recent_importance += memories[i].importance
+		
+		if total_recent_importance >= recent_importance_threshold:
+			_reflect()
 	
 	var current_time = Time.get_unix_time_from_system()
 	if can_trigger && (current_time-time_since_last_trigger) >= trigger_duration:
@@ -108,7 +123,7 @@ func _physics_process(delta):
 		elif facing_direction.y > 0: 
 			animated_sprite_2d.animation = "idle down"
 
-func makepath(chosen_node):
+func _set_destination(chosen_node):
 	destination = chosen_node
 
 func _collect_responses(num_expected_responses):
@@ -341,9 +356,9 @@ func _trigger_brain():
 			var node = new_observations[index]
 			as_entity.set_interactable(node.as_entity)
 			if node.is_in_group("Item"):
-				makepath(node.find_child("Interaction Zone"))
+				_set_destination(node.find_child("Interaction Zone"))
 			else:
-				makepath(node)
+				_set_destination(node)
 	
 	if dialogue_partner != null:
 		return
@@ -442,7 +457,51 @@ func _pick_location():
 	
 	if chosen_node == null:
 		return
-	makepath(chosen_node)	
+	_set_destination(chosen_node)	
+
+func _reflect():
+	is_reflecting = true
+	var questions_prompt : String = "Consider the following memories:\n"
+	
+	# Make sure we don't consider more than 100 memories
+	oldest_memory_index = max(oldest_memory_index, len(memories)-101)
+	
+	var current_token_count : int = 0
+	for i in range(len(memories)-1, oldest_memory_index, -1):
+		var memory : Memory = memories[i]
+		if current_token_count + memory.token_count < 2040:
+			questions_prompt += "- "+memory.content+"\n"
+			current_token_count += memory.token_count
+	
+	questions_prompt += "Given only the information above, what are "+str(num_reflection_questions)+" most salient highlevel questions we can ask about the subjects in the statements. "
+	questions_prompt += "Respond with only the questions, each on a new line starting with a dash (-) and then the question itself"
+	
+	var questions = (await game_manager.chat_request(questions_prompt, 0, 150)).split("\n")
+	for question in questions:
+		if question.strip_edges() == "":
+			continue
+		_reflection_coroutine(question)
+	
+	await _collect_responses(num_reflection_questions * num_insights_per_reflection_question)
+	
+	oldest_memory_index = len(memories)
+	is_reflecting = false
+
+func _reflection_coroutine(question):
+	var relevant_memories = await _retrieve_memories(question, 10)
+	
+	var insights_prompt = "Statements about "+agent_name+"\n"
+	for memory in relevant_memories:
+		insights_prompt += "- "+memory.content+"\n"
+	insights_prompt += "What are "+str(num_insights_per_reflection_question)+" high level insights you can infer from the above statements? "
+	insights_prompt += "Respond only with the insights, each on a new line starting with a dash (-) and then the insight itself"
+
+	var insights = (await game_manager.chat_request(insights_prompt, 0, 150)).split("\n")
+	for insight in insights:
+		if insight.strip_edges() == "":
+			continue
+		_add_memory(insight)
+		callback_signal.emit()
 
 func dialogue_setup(partner):
 	dialogue_history.clear()
@@ -479,6 +538,10 @@ func initiate_dialogue(partner):
 
 func receive_dialogue(partner_statement):
 	dialogue_history.append({"agent":dialogue_partner.agent_name, "statement":partner_statement})
+	
+	if partner_statement.contains("[end]"):
+		self.end_dialogue()
+		return
 	
 	conversation_panel.find_child("Label").text += dialogue_partner.agent_name+": "+partner_statement+"\n\n"
 	
@@ -524,17 +587,20 @@ func receive_dialogue(partner_statement):
 	dialogue_history.append({"agent":agent_name, "statement":next_dialogue})
 	
 	if dialogue_partner.is_in_group("Agent"):
+		dialogue_partner.receive_dialogue(next_dialogue)
 		if next_dialogue.contains("[end]"):
-			dialogue_partner.end_dialogue()
 			self.end_dialogue()
-		else:
-			dialogue_partner.receive_dialogue(next_dialogue)
 	else:
 		game_manager.set_dialogue_text(next_dialogue)
 
 func end_dialogue():
 	conversation_panel.visible = false
 	as_entity.set_action("idle")
+	if dialogue_partner == null:
+		print("The following conversation crashed:\n")
+		for text in dialogue_history:
+			print(text)
+		return
 	var full_dialogue = "Dialogue between "+agent_name+" and "+dialogue_partner.agent_name+" on "+game_manager.get_current_datetime_string()+"\n"
 	for line in dialogue_history:
 		full_dialogue += line["agent"] + ": " + line["statement"]+"\n"

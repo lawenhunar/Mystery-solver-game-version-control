@@ -19,7 +19,7 @@ func send_request(input_text, request):
 	})
 
 	if request.request(url, headers, HTTPClient.METHOD_POST, body) != OK:
-		print("There was an error!")
+		print("There was an error in the embeddings api!")
 	
 	await response_recieved
 
