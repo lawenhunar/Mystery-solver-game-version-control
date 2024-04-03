@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cod81ldpd4dn1"]
+
+[node name="Inventory panel" type="Panel"]
+offset_left = 154.0
+offset_top = 20.0
+offset_right = 1041.0
+offset_bottom = 158.0
