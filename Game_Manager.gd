@@ -104,6 +104,10 @@ func get_sub_locations(parent_node: Node = layout) -> Array:
 	for node in sub_locations:
 		if !(node is Area2D) and !(node is StaticBody2D):
 			sub_locations.erase(node)
+			continue
+		if node.is_in_group("Item"):
+			if node.as_entity.interactable != null:
+				sub_locations.erase(node)
 	
 	return sub_locations
 

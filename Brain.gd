@@ -345,6 +345,8 @@ func _trigger_brain():
 		print("Reaction failed: ", reaction)
 		return
 		
+	if as_entity.interactable != null:
+		as_entity.interactable.set_interactable(null)
 	as_entity.set_action(reaction_parts[1].strip_edges())
 	
 	if "Update" in reaction_parts[0].strip_edges():
@@ -615,13 +617,15 @@ func end_dialogue():
 	var reaction : String = await game_manager.chat_request(reaction_prompt, 0, 40)
 	
 	destination = null
+	as_entity.set_interactable(null)
 	if "React" in reaction:
 		as_entity.set_action(reaction.split("|")[1].strip_edges())
-		as_entity.set_interactable(null)
 		
 		var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
 		_generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
 		await _pick_location()	
+	else:
+		as_entity.set_action("idle")
 	
 	_add_memory(full_dialogue)
 	dialogue_history.clear()
@@ -635,14 +639,26 @@ func _on_interaction_zone_body_entered(body):
 	if body.is_in_group("Player"):
 		game_manager.enter_new_dialogue(self)
 		initiate_dialogue(body)	
+	
 	elif body.is_in_group("Agent"):
 		body.dialogue_setup(self)
 		initiate_dialogue(body)
 		conversation_panel.visible = true
 		conversation_panel.find_child("Label").text = ""
-	elif body.get_name() == "Interaction Zone":
-		pass
+
+func _on_interaction_zone_area_entered(area):
+	if area.get_name() == "Interaction Zone" and area == destination:
+		var item_entity : Entity = area.get_parent().as_entity
+		item_entity.set_interactable(as_entity)
+		as_entity.set_interactable(item_entity)
+		
+		var status_update_prompt = "If someone is "+as_entity.action+" and wants to interact with "+item_entity.entity_name+", what would be the new status of "+item_entity.entity_name+"?"
+		status_update_prompt += "Respond only with the status, for example:\nbaking a pie\nburning some wood\nopen"
+		var status_update = await game_manager.chat_request(status_update_prompt, 0, 30)
+		
+		item_entity.set_action(status_update)
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 	move_and_slide()
+
