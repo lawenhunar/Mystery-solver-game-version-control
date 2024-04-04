@@ -463,9 +463,6 @@ func _reflect():
 	is_reflecting = true
 	var questions_prompt : String = "Consider the following memories:\n"
 	
-	# Make sure we don't consider more than 100 memories
-	oldest_memory_index = max(oldest_memory_index, len(memories)-101)
-	
 	var current_token_count : int = 0
 	for i in range(len(memories)-1, oldest_memory_index, -1):
 		var memory : Memory = memories[i]
@@ -574,7 +571,7 @@ func receive_dialogue(partner_statement):
 	next_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits
 	
 	if !dialogue_partner.is_in_group("Player"):
-		next_dialogue_prompt += "If the conversation is nearing its end, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
+		next_dialogue_prompt += "If the conversation is nearing its end or becoming repetitive, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
 	
 	var next_dialogue = await game_manager.chat_request(next_dialogue_prompt)
 	
@@ -596,18 +593,39 @@ func receive_dialogue(partner_statement):
 func end_dialogue():
 	conversation_panel.visible = false
 	as_entity.set_action("idle")
+	
 	if dialogue_partner == null:
 		print("The following conversation crashed:\n")
 		for text in dialogue_history:
 			print(text)
 		return
+		
 	var full_dialogue = "Dialogue between "+agent_name+" and "+dialogue_partner.agent_name+" on "+game_manager.get_current_datetime_string()+"\n"
 	for line in dialogue_history:
 		full_dialogue += line["agent"] + ": " + line["statement"]+"\n"
+		
+	var reaction_prompt = agent_summary + "\n"
+	reaction_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
+	reaction_prompt += agent_name+"'s current action: "+as_entity.description+"\n"
+	reaction_prompt += full_dialogue
+	reaction_prompt += "Considering the conversation above, should "+agent_name+" react in a certain way or continue with the current action?\n"
+	reaction_prompt += "If "+agent_name+" should continue, respond only with \"Continue\".\n" 
+	reaction_prompt += "If "+agent_name+" should react, respond only in the following format: React|[new action to take]. For example:\nContinue\nReact|turning off the oven\nContinue\nReact|looking for John"
+	
+	var reaction : String = await game_manager.chat_request(reaction_prompt, 0, 40)
+	
+	destination = null
+	if "React" in reaction:
+		as_entity.set_action(reaction.split("|")[1].strip_edges())
+		as_entity.set_interactable(null)
+		
+		var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
+		_generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
+		await _pick_location()	
+	
 	_add_memory(full_dialogue)
 	dialogue_history.clear()
 	dialogue_partner = null
-	destination = null
 	can_trigger = true
 
 func _on_interaction_zone_body_entered(body):
