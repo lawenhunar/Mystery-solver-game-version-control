@@ -80,4 +80,5 @@ Agent: Hello this is a sample text
 
 [connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]
 [connection signal="area_entered" from="Interaction Zone" to="." method="_on_interaction_zone_area_entered"]
+[connection signal="area_exited" from="Interaction Zone" to="." method="_on_interaction_zone_area_exited"]
 [connection signal="body_entered" from="Interaction Zone" to="." method="_on_interaction_zone_body_entered"]

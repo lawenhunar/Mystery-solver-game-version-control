@@ -345,8 +345,6 @@ func _trigger_brain():
 		print("Reaction failed: ", reaction)
 		return
 		
-	if as_entity.interactable != null:
-		as_entity.interactable.set_interactable(null)
 	as_entity.set_action(reaction_parts[1].strip_edges())
 	
 	if "Update" in reaction_parts[0].strip_edges():
@@ -649,16 +647,31 @@ func _on_interaction_zone_body_entered(body):
 func _on_interaction_zone_area_entered(area):
 	if area.get_name() == "Interaction Zone" and area == destination:
 		var item_entity : Entity = area.get_parent().as_entity
+		
+		# If someone was already interacting with the destination item, don't interact
+		if item_entity.interactable != null and item_entity.interactable != as_entity:
+			destination = null
+			navigation_agent_2d.set_velocity(Vector2.ZERO)
+			return
+		
 		item_entity.set_interactable(as_entity)
 		as_entity.set_interactable(item_entity)
 		
-		var status_update_prompt = "If someone is "+as_entity.action+" and wants to interact with "+item_entity.entity_name+", what would be the new status of "+item_entity.entity_name+"?"
+		var status_update_prompt = "If someone is "+as_entity.action+" and wants to interact with "+item_entity.entity_name+", what would be the new status of "+item_entity.entity_name+"?\n"
+		status_update_prompt += "For example, if John wants to make some coffee and he's interacting with a coffee mixer, the mixer's new status should be \"mixing coffee\"."
 		status_update_prompt += "Respond only with the status, for example:\nbaking a pie\nburning some wood\nopen"
 		var status_update = await game_manager.chat_request(status_update_prompt, 0, 30)
 		
 		item_entity.set_action(status_update)
+	
+func _on_interaction_zone_area_exited(area):
+	# If the agent left an item it was interacting with, say the item isn't interacting with anything
+	if area.get_name() == "Interaction Zone":
+		var item_entity : Entity = area.get_parent().as_entity
+		
+		if item_entity.interactable == as_entity:
+			item_entity.set_interactable(null)
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 	move_and_slide()
-

@@ -101,13 +101,10 @@ func get_sub_locations(parent_node: Node = layout) -> Array:
 		
 	var sub_locations = parent_node.get_children()
 	
-	for node in sub_locations:
+	for i in range(len(sub_locations)-1,-1,-1):
+		var node = sub_locations[i]
 		if !(node is Area2D) and !(node is StaticBody2D):
 			sub_locations.erase(node)
-			continue
-		if node.is_in_group("Item"):
-			if node.as_entity.interactable != null:
-				sub_locations.erase(node)
 	
 	return sub_locations
 
@@ -203,6 +200,7 @@ func setup_item_panel(item):
 	item_panel.initialize_with_item(item)
 
 func close_item_panel():
+	current_item.as_entity.set_interactable(null)
 	current_item = null
 	player.as_entity.set_action("idle")
 
