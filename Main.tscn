@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://ctn24y5h1lrue"]
+[gd_scene load_steps=46 format=3 uid="uid://ctn24y5h1lrue"]
 
 [ext_resource type="Script" path="res://Game_Manager.gd" id="1_c5fke"]
 [ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Player.tscn" id="2_bx2vm"]
@@ -6,15 +6,11 @@
 [ext_resource type="Texture2D" uid="uid://ro4tl3yp0wfr" path="res://32x32/Room_Builder_free_16x16.png" id="3_eqno6"]
 [ext_resource type="Texture2D" uid="uid://bw5dgxcf1ykpe" path="res://32x32/roguelikeIndoor_transparent.png" id="3_uhp3p"]
 [ext_resource type="Texture2D" uid="uid://0pjugd0acigq" path="res://32x32/Interiors_free_16x16.png" id="4_7cklo"]
-[ext_resource type="Texture2D" uid="uid://bgm1vcus1jp87" path="res://32x32/Alex_icon.png" id="5_wtj02"]
 [ext_resource type="PackedScene" uid="uid://r3b617omh2a0" path="res://Dialogue Panel.tscn" id="6_1861e"]
 [ext_resource type="PackedScene" uid="uid://mo2pu8d80ruj" path="res://Agent.tscn" id="6_hpwxx"]
 [ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://32x32/Alex_16x16.png" id="7_0wr0u"]
 [ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Item Panel.tscn" id="7_8j2nl"]
 [ext_resource type="PackedScene" uid="uid://cod81ldpd4dn1" path="res://inventory_panel.tscn" id="8_th4bj"]
-[ext_resource type="Texture2D" uid="uid://bqtf8cquwqay7" path="res://32x32/Luna_icon.png" id="12_jjtt8"]
-[ext_resource type="Texture2D" uid="uid://bblpndkf0v87s" path="res://32x32/Amelia_icon.png" id="13_2bat4"]
-[ext_resource type="Texture2D" uid="uid://dnqyxempabsht" path="res://32x32/Bob_icon.png" id="13_db34c"]
 [ext_resource type="Texture2D" uid="uid://22c4d16uuqgh" path="res://32x32/Luna_16x16.png" id="13_ek000"]
 [ext_resource type="Texture2D" uid="uid://dk2mhb5jn8mwl" path="res://32x32/Bob_16x16.png" id="14_gjcts"]
 [ext_resource type="Texture2D" uid="uid://dfq21c61fbykm" path="res://32x32/Amelia_16x16.png" id="14_q7qy3"]
@@ -7908,18 +7904,16 @@ offset_bottom = 501.0
 
 [node name="Inventory panel" parent="UI" instance=ExtResource("8_th4bj")]
 
-[node name="Luna" parent="." instance=ExtResource("6_hpwxx")]
+[node name="Agent 1" parent="." instance=ExtResource("6_hpwxx")]
 position = Vector2(-11, 370)
-icon = ExtResource("12_jjtt8")
 animation_texture = ExtResource("13_ek000")
 agent_name = "Luna"
 age = 22
 pronouns = "she/her"
 traits = "Hot and mysterious"
 
-[node name="Alex" parent="." instance=ExtResource("6_hpwxx")]
+[node name="Agent 2" parent="." instance=ExtResource("6_hpwxx")]
 position = Vector2(972, 261)
-icon = ExtResource("5_wtj02")
 animation_texture = ExtResource("7_0wr0u")
 agent_name = "Alex"
 age = 20
@@ -7930,18 +7924,16 @@ traits = "Witty, funny"
 position = Vector2(-959, 304)
 agent_name = "Dostee"
 
-[node name="Amelia" parent="." instance=ExtResource("6_hpwxx")]
+[node name="Agent 3" parent="." instance=ExtResource("6_hpwxx")]
 position = Vector2(145, -235)
-icon = ExtResource("13_2bat4")
 animation_texture = ExtResource("14_q7qy3")
 agent_name = "Amelia"
 age = 19
 pronouns = "she/her"
 traits = "Sweet, kind, caring"
 
-[node name="Bob" parent="." instance=ExtResource("6_hpwxx")]
+[node name="Agent 4" parent="." instance=ExtResource("6_hpwxx")]
 position = Vector2(-724, -198)
-icon = ExtResource("13_db34c")
 animation_texture = ExtResource("14_gjcts")
 agent_name = "Charles"
 age = 22

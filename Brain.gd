@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 @onready var game_manager : Node = get_node("/root/Main/GameManager")
 
-@export var icon : Texture
+var icon : Texture
 @export var animation_texture : Texture
 @onready var animated_sprite_2d = $AnimatedSprite2D
 
