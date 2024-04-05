@@ -385,7 +385,7 @@ func _observe():
 		
 		var query = PhysicsRayQueryParameters2D.create(global_position, global_position+direction)
 		query.exclude = [self]
-		query.collision_mask = 1
+		query.collision_mask = 3
 		var result = space_state.intersect_ray(query)
 		
 		if result.is_empty():
@@ -506,7 +506,7 @@ func dialogue_setup(partner):
 	dialogue_history.clear()
 	dialogue_partner = partner
 	can_trigger = false
-	as_entity.set_action("talking with "+partner.as_entity.entity_name)
+	as_entity.set_action("busy talking with "+partner.as_entity.entity_name)
 	destination = null
 	navigation_agent_2d.set_velocity(Vector2.ZERO)
 

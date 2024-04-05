@@ -28,6 +28,7 @@ radius = 81.0247
 
 [node name="Agent" type="CharacterBody2D" groups=["Agent", "Entity"]]
 z_index = 5
+collision_layer = 2
 motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("3_7g08s")
@@ -43,10 +44,12 @@ script = ExtResource("2_jhw7g")
 shape = SubResource("RectangleShape2D_1no1h")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-path_desired_distance = 8.0
+path_desired_distance = 3.0
+target_desired_distance = 6.0
 path_postprocessing = 1
 avoidance_enabled = true
-max_neighbors = 4
+radius = 0.01
+max_neighbors = 1
 
 [node name="Interaction Zone" type="Area2D" parent="."]
 collision_mask = 3
