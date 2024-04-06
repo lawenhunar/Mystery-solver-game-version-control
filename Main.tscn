@@ -7485,35 +7485,20 @@ position = Vector2(361.538, -111.538)
 scale = Vector2(6.12, 4.84)
 actions_string = "is empty; contains logs; contains logs and is burning slowly;"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Living room/Fireplace" index="1"]
-position = Vector2(0, 18.3884)
-scale = Vector2(1, 0.652893)
-
 [node name="Couch 1" parent="Layout/Mansion/Living room" instance=ExtResource("3_d4o1f")]
 position = Vector2(-280.769, -138.462)
 scale = Vector2(8.96, 4.52)
 actions_string = "unoccupied and clean; occupied and clean; unoccupied and dirty; occupied and dirty;"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Living room/Couch 1" index="1"]
-position = Vector2(0, 19.2478)
-scale = Vector2(1, 0.707965)
 
 [node name="Couch 2" parent="Layout/Mansion/Living room" instance=ExtResource("3_d4o1f")]
 position = Vector2(380.769, 200)
 scale = Vector2(4.32, 6.96)
 actions_string = "unoccupied and clean; occupied and clean; unoccupied and dirty; occupied and dirty;"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Living room/Couch 2" index="1"]
-position = Vector2(-19.4444, 4.41074e-06)
-scale = Vector2(0.577435, 0.920608)
-
 [node name="Plant" parent="Layout/Mansion/Living room" instance=ExtResource("3_d4o1f")]
 position = Vector2(-407.692, -153.846)
 scale = Vector2(2.88, 3.16)
 actions_string = "alive and hydrated; alive and thirsty; withering; dead"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Living room/Plant" index="1"]
-position = Vector2(0, 22.4683)
 
 [node name="Standing Zone 1" type="Area2D" parent="Layout/Mansion/Living room"]
 position = Vector2(243, 39)
@@ -7537,39 +7522,23 @@ shape = SubResource("RectangleShape2D_5kexf")
 
 [node name="Book Stand 1" parent="Layout/Mansion/Library" instance=ExtResource("3_d4o1f")]
 position = Vector2(272.74, -146.346)
-scale = Vector2(5.95421, 5.96)
+scale = Vector2(5.07643, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Library/Book Stand 1" index="1"]
-position = Vector2(-8.8508e-07, 17.9183)
-scale = Vector2(0.831517, 0.601815)
 
 [node name="Book Stand 2" parent="Layout/Mansion/Library" instance=ExtResource("3_d4o1f")]
 position = Vector2(-329.169, -146.346)
-scale = Vector2(5.95421, 5.96)
+scale = Vector2(4.98238, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Library/Book Stand 2" index="1"]
-position = Vector2(-8.8508e-07, 17.9183)
-scale = Vector2(0.831517, 0.601815)
 
 [node name="Book Stand 3" parent="Layout/Mansion/Library" instance=ExtResource("3_d4o1f")]
-position = Vector2(269.605, 233.363)
-scale = Vector2(4.70023, 5.96)
+position = Vector2(272.74, 233.363)
+scale = Vector2(5.10777, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Library/Book Stand 3" index="1"]
-position = Vector2(0.666975, -19.2456)
-scale = Vector2(1, 0.543624)
 
 [node name="Book Stand 4" parent="Layout/Mansion/Library" instance=ExtResource("3_d4o1f")]
 position = Vector2(-329.169, 233.363)
-scale = Vector2(4.70023, 5.96)
+scale = Vector2(4.85698, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Library/Book Stand 4" index="1"]
-position = Vector2(0.666975, -19.2456)
-scale = Vector2(1, 0.543624)
 
 [node name="Kitchen" type="Area2D" parent="Layout/Mansion"]
 position = Vector2(-255, -81)
@@ -7584,96 +7553,55 @@ position = Vector2(121.874, -207.142)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains food; on and cooking food; on and empty;"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Oven 1" index="1"]
-position = Vector2(0, 21.8391)
-
 [node name="Oven 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-178.124, -199.999)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains food; on and cooking food; on and empty;"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Oven 2" index="1"]
-position = Vector2(0, 22.4138)
 
 [node name="Sink" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-28.1249, -203.571)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains dishes; on and contains dishes; on and doesn't contain dishes"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Sink" index="1"]
-position = Vector2(0, 22.4138)
-
 [node name="Table Chair 1" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(21.8748, -10.7142)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 1" index="1"]
-position = Vector2(6.74767e-05, -25.0435)
-scale = Vector2(1, 0.595096)
 
 [node name="Table Chair 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-28.1249, -10.7143)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 2" index="1"]
-position = Vector2(6.74767e-05, -25.0435)
-scale = Vector2(1, 0.595096)
-
 [node name="Table Chair 3" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-78.1247, -10.7143)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 3" index="1"]
-position = Vector2(6.74767e-05, -25.0435)
-scale = Vector2(1, 0.595096)
 
 [node name="Table Chair 4" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-128.125, -10.7143)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 4" index="1"]
-position = Vector2(6.74767e-05, -25.0435)
-scale = Vector2(1, 0.595096)
-
 [node name="Table Chair 5" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(21.8748, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 5" index="1"]
-position = Vector2(6.74767e-05, 22.8658)
-scale = Vector2(1, 0.595096)
 
 [node name="Table Chair 6" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-28.1249, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 6" index="1"]
-position = Vector2(6.74767e-05, 22.8658)
-scale = Vector2(1, 0.595096)
-
 [node name="Table Chair 7" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-78.1247, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 7" index="1"]
-position = Vector2(6.74767e-05, 22.8658)
-scale = Vector2(1, 0.595096)
-
 [node name="Table Chair 8" parent="Layout/Mansion/Kitchen" instance=ExtResource("3_d4o1f")]
 position = Vector2(-128.125, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Kitchen/Table Chair 8" index="1"]
-position = Vector2(6.74767e-05, 22.8658)
-scale = Vector2(1, 0.595096)
 
 [node name="Standing Zone 1" type="Area2D" parent="Layout/Mansion/Kitchen"]
 position = Vector2(234.374, -78.5711)
@@ -7712,27 +7640,15 @@ position = Vector2(-269.231, -232)
 scale = Vector2(4.04, 1)
 actions_string = "closed and tied up;closed and untied;open"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Meeting room/Curtain 1" index="1"]
-position = Vector2(-9.08971e-06, 76)
-scale = Vector2(1, 1.96)
-
 [node name="Curtain 2" parent="Layout/Mansion/Meeting room" instance=ExtResource("3_d4o1f")]
 position = Vector2(280.769, -232)
 scale = Vector2(4.04, 1)
 actions_string = "closed and tied up;closed and untied;open"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Meeting room/Curtain 2" index="1"]
-position = Vector2(-9.08971e-06, 76)
-scale = Vector2(1, 1.96)
-
 [node name="Candle Lamp" parent="Layout/Mansion/Meeting room" instance=ExtResource("3_d4o1f")]
 position = Vector2(403.846, 156)
 scale = Vector2(1.15648, 6.85509)
 actions_string = "off;on"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Meeting room/Candle Lamp" index="1"]
-position = Vector2(-63.1891, -1.75052)
-scale = Vector2(1.93387, 1)
 
 [node name="Standing Zone 1" type="Area2D" parent="Layout/Mansion/Meeting room"]
 position = Vector2(336, -124)
@@ -7771,27 +7687,15 @@ position = Vector2(281.481, -96.2963)
 scale = Vector2(8.16, 9.8)
 actions_string = "empty and unoccupied;on and occupied"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Bathroom/Bathtub" index="1"]
-position = Vector2(-17.6471, 0)
-scale = Vector2(0.529412, 1)
-
 [node name="Skincare Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("3_d4o1f")]
 position = Vector2(-285.185, -207.407)
 scale = Vector2(5.7185, 5.49926)
 actions_string = "contains facewash and mouthwash;contains facewash;contains mouthwash;empty"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Bathroom/Skincare Cabinet" index="1"]
-position = Vector2(0.0892841, 15.7051)
-scale = Vector2(1.02584, 0.480769)
-
 [node name="Medical Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("3_d4o1f")]
 position = Vector2(-162.963, -192.593)
 scale = Vector2(5.92133, 4.72269)
 actions_string = "contains acne pills;empty"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Bathroom/Medical Cabinet" index="1"]
-position = Vector2(0.0892841, 16.3461)
-scale = Vector2(1.02584, 0.58174)
 
 [node name="Standing Zone 1" type="Area2D" parent="Layout/Mansion/Bathroom"]
 position = Vector2(148.148, 129.63)
@@ -7818,48 +7722,25 @@ position = Vector2(-3.57144, 188.462)
 scale = Vector2(5.16423, 5.54351)
 actions_string = "unoccupied and closed;occupied and open;unoccupied and open"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Bedroom/Piano" index="1"]
-position = Vector2(0, 20.4755)
-scale = Vector2(1, 0.757327)
-
-[node name="CollisionShape2D" parent="Layout/Mansion/Bedroom/Piano/Interaction Zone" index="0"]
-position = Vector2(0, -52.1684)
-
 [node name="Bed" parent="Layout/Mansion/Bedroom" instance=ExtResource("3_d4o1f")]
 position = Vector2(339.286, 15.3846)
 scale = Vector2(6.05085, -6.71594)
 actions_string = "clean and unoccupied; occupied; messy and unoccupied"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Bedroom/Bed" index="1"]
-position = Vector2(-18.6751, -0.297798)
-scale = Vector2(0.6893, 1.10277)
 
 [node name="Mirror" parent="Layout/Mansion/Bedroom" instance=ExtResource("3_d4o1f")]
 position = Vector2(339.286, -134.615)
 scale = Vector2(3.4051, -6.23786)
 actions_string = "clean;dirty;broken"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Bedroom/Mirror" index="1"]
-position = Vector2(-34.612, 1.84975)
-scale = Vector2(1.34714, -0.758812)
-
 [node name="Wardrobe" parent="Layout/Mansion/Bedroom" instance=ExtResource("3_d4o1f")]
 position = Vector2(-346.429, -130.769)
 scale = Vector2(5.40511, -6.23786)
 actions_string = "contains clothes;empty"
 
-[node name="Interaction Zone" parent="Layout/Mansion/Bedroom/Wardrobe" index="1"]
-position = Vector2(-1.33514e-05, -16.6724)
-scale = Vector2(1.08072, 0.474353)
-
 [node name="Desk" parent="Layout/Mansion/Bedroom" instance=ExtResource("3_d4o1f")]
 position = Vector2(-328.571, 180.769)
 scale = Vector2(4.26225, -6.23786)
 actions_string = "contains a laptop that's turned off;contains a laptop that's on"
-
-[node name="Interaction Zone" parent="Layout/Mansion/Bedroom/Desk" index="1"]
-position = Vector2(18.4343, 0.616582)
-scale = Vector2(0.57855, 0.918292)
 
 [node name="Standing Zone 1" type="Area2D" parent="Layout/Mansion/Bedroom"]
 position = Vector2(128.571, -7.69232)
@@ -7981,34 +7862,3 @@ texture = ExtResource("19_jcekw")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Pick ups/Mug"]
 position = Vector2(11, 87)
 shape = SubResource("RectangleShape2D_bt2rf")
-
-[editable path="Layout/Mansion/Living room/Fireplace"]
-[editable path="Layout/Mansion/Living room/Couch 1"]
-[editable path="Layout/Mansion/Living room/Couch 2"]
-[editable path="Layout/Mansion/Living room/Plant"]
-[editable path="Layout/Mansion/Library/Book Stand 1"]
-[editable path="Layout/Mansion/Library/Book Stand 2"]
-[editable path="Layout/Mansion/Library/Book Stand 3"]
-[editable path="Layout/Mansion/Library/Book Stand 4"]
-[editable path="Layout/Mansion/Kitchen/Oven 1"]
-[editable path="Layout/Mansion/Kitchen/Oven 2"]
-[editable path="Layout/Mansion/Kitchen/Sink"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 1"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 2"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 3"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 4"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 5"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 6"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 7"]
-[editable path="Layout/Mansion/Kitchen/Table Chair 8"]
-[editable path="Layout/Mansion/Meeting room/Curtain 1"]
-[editable path="Layout/Mansion/Meeting room/Curtain 2"]
-[editable path="Layout/Mansion/Meeting room/Candle Lamp"]
-[editable path="Layout/Mansion/Bathroom/Bathtub"]
-[editable path="Layout/Mansion/Bathroom/Skincare Cabinet"]
-[editable path="Layout/Mansion/Bathroom/Medical Cabinet"]
-[editable path="Layout/Mansion/Bedroom/Piano"]
-[editable path="Layout/Mansion/Bedroom/Bed"]
-[editable path="Layout/Mansion/Bedroom/Mirror"]
-[editable path="Layout/Mansion/Bedroom/Wardrobe"]
-[editable path="Layout/Mansion/Bedroom/Desk"]

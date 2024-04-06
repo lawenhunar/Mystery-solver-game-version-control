@@ -46,12 +46,12 @@ shape = SubResource("RectangleShape2D_1no1h")
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 path_desired_distance = 3.0
 target_desired_distance = 6.0
-path_postprocessing = 1
 avoidance_enabled = true
 radius = 0.01
 max_neighbors = 1
 
 [node name="Interaction Zone" type="Area2D" parent="."]
+scale = Vector2(0.8, 0.8)
 collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interaction Zone"]
@@ -79,6 +79,5 @@ Agent: Hello this is a sample text
 "
 
 [connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]
-[connection signal="area_entered" from="Interaction Zone" to="." method="_on_interaction_zone_area_entered"]
-[connection signal="area_exited" from="Interaction Zone" to="." method="_on_interaction_zone_area_exited"]
 [connection signal="body_entered" from="Interaction Zone" to="." method="_on_interaction_zone_body_entered"]
+[connection signal="body_exited" from="Interaction Zone" to="." method="_on_interaction_zone_body_exited"]
