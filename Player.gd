@@ -5,6 +5,9 @@ extends CharacterBody2D
 @export var agent_name : String
 @export var animation_texture : Texture
 @onready var animated_sprite_2d = $AnimatedSprite2D
+
+@export var inventory: Inv
+
 var previous_velocity : Vector2
 
 var dialogue_history : Array

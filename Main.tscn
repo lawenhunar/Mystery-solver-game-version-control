@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://mo2pu8d80ruj" path="res://Agent.tscn" id="6_hpwxx"]
 [ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://32x32/Alex_16x16.png" id="7_0wr0u"]
 [ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Item Panel.tscn" id="7_8j2nl"]
-[ext_resource type="PackedScene" uid="uid://cod81ldpd4dn1" path="res://inventory_panel.tscn" id="8_th4bj"]
+[ext_resource type="PackedScene" uid="uid://bbri1r4ojv16a" path="res://inventory_gui.tscn" id="8_udfra"]
 [ext_resource type="Texture2D" uid="uid://bqtf8cquwqay7" path="res://32x32/Luna_icon.png" id="12_jjtt8"]
 [ext_resource type="Texture2D" uid="uid://bblpndkf0v87s" path="res://32x32/Amelia_icon.png" id="13_2bat4"]
 [ext_resource type="Texture2D" uid="uid://dnqyxempabsht" path="res://32x32/Bob_icon.png" id="13_db34c"]
@@ -7906,7 +7906,13 @@ offset_bottom = 501.0
 
 [node name="Item Panel" parent="UI" instance=ExtResource("7_8j2nl")]
 
-[node name="Inventory panel" parent="UI" instance=ExtResource("8_th4bj")]
+[node name="Inventory GUI" parent="UI" instance=ExtResource("8_udfra")]
+offset_left = -20.584
+offset_top = 26.0
+offset_right = 929.416
+offset_bottom = 210.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="Luna" parent="." instance=ExtResource("6_hpwxx")]
 position = Vector2(-11, 370)
@@ -8008,3 +8014,4 @@ shape = SubResource("RectangleShape2D_bt2rf")
 [editable path="Layout/Mansion/Bedroom/Mirror"]
 [editable path="Layout/Mansion/Bedroom/Wardrobe"]
 [editable path="Layout/Mansion/Bedroom/Desk"]
+[editable path="UI/Inventory GUI"]
