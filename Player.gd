@@ -88,6 +88,7 @@ func _input(_event):
 		elif nearby_entity.is_in_group("Item"):
 			game_manager.setup_item_panel(nearby_entity)
 			as_entity.set_interactable(nearby_entity.as_entity)
+			nearby_entity.as_entity.set_interactable(as_entity)
 
 func _on_interaction_zone_body_entered(body):
 	if body == self:

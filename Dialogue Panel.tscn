@@ -27,10 +27,11 @@ vertical_alignment = 1
 
 [node name="Agent Icon" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = 55.0
-offset_top = 67.0
-offset_right = 171.0
-offset_bottom = 214.0
+offset_left = 69.0
+offset_top = 38.0
+offset_right = 185.0
+offset_bottom = 185.0
+scale = Vector2(0.778224, 1.22491)
 texture = SubResource("PlaceholderTexture2D_xfduq")
 
 [node name="Player Input Box" type="TextEdit" parent="."]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://bix2o4aqo01a7"]
 
-[ext_resource type="Script" path="res://Item Panel.gd" id="1_rkg8i"]
+[ext_resource type="Script" path="res://Item_Panel.gd" id="1_rkg8i"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_l2wna"]
 font_size = 40

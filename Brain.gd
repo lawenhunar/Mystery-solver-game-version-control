@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 @onready var game_manager : Node = get_node("/root/Main/GameManager")
 
-@export var icon : Texture
+var icon : Texture
 @export var animation_texture : Texture
 @onready var animated_sprite_2d = $AnimatedSprite2D
 
@@ -16,9 +16,11 @@ extends CharacterBody2D
 @export_range(0, 1) var relevance_weight : float = 1
 
 @onready var navigation_agent_2d = $NavigationAgent2D
+@onready var interaction_zone = $"Interaction Zone"
 var acceleration=7
 var speed=150
 var destination:Node
+var previous_destination:Node
 var facing_direction : Vector2 = Vector2.DOWN
 
 var agent_summary : String
@@ -57,7 +59,7 @@ func _ready():
 	game_manager.can_record = true
 	conversation_panel.visible = false
 	
-	var existing_memories_prompt = "I have a video game character called "+agent_name+" (pronouns: "+pronouns+"). "
+	var existing_memories_prompt = "I have a video game character called "+agent_name+" (pronouns: "+pronouns+", age: "+str(age)+", traits: "+traits+"). "
 	existing_memories_prompt += "Write me 10 short sentences that describe "+agent_name+"'s character, history, and current state. Imagine this character lives a pretty routine life. "
 	existing_memories_prompt += "Your response should be a single paragraph, with statements separated by semi-colons. Examples of statements are as follows:\nJohn likes to go for walks;\nEmily has three dogs that she adores;\nStacy loves her job at the family restaurant;"
 	
@@ -90,13 +92,16 @@ func _physics_process(delta):
 		_trigger_brain()
 
 	if destination != null and dialogue_partner == null:
-		var direction=Vector3()
-		navigation_agent_2d.target_position=destination.global_position
-		direction=navigation_agent_2d.get_next_path_position()-global_position
-		direction=direction.normalized()
-		
-		var intended_velocity=velocity.lerp(direction*speed,acceleration*delta)
-		navigation_agent_2d.set_velocity(intended_velocity)
+		if interaction_zone.overlaps_body(destination):
+			_end_navigation()
+		else:
+			var direction=Vector3()
+			navigation_agent_2d.target_position=destination.global_position
+			direction=navigation_agent_2d.get_next_path_position()-global_position
+			direction=direction.normalized()
+			
+			var intended_velocity=velocity.lerp(direction*speed,acceleration*delta)
+			navigation_agent_2d.set_velocity(intended_velocity)
 	
 	if navigation_agent_2d.distance_to_target()<3 or destination == null:
 		velocity = Vector2.ZERO
@@ -124,7 +129,13 @@ func _physics_process(delta):
 			animated_sprite_2d.animation = "idle down"
 
 func _set_destination(chosen_node):
+	previous_destination = destination
 	destination = chosen_node
+
+func _end_navigation():
+	destination = null
+	navigation_agent_2d.set_velocity(Vector2.ZERO)
+	navigation_agent_2d.target_position = global_position
 
 func _collect_responses(num_expected_responses):
 	var num_responses_recieved = 0
@@ -345,8 +356,6 @@ func _trigger_brain():
 		print("Reaction failed: ", reaction)
 		return
 		
-	if as_entity.interactable != null:
-		as_entity.interactable.set_interactable(null)
 	as_entity.set_action(reaction_parts[1].strip_edges())
 	
 	if "Update" in reaction_parts[0].strip_edges():
@@ -356,10 +365,8 @@ func _trigger_brain():
 		var index = int(reaction_parts[0])-1
 		if index < new_observations.size():
 			var node = new_observations[index]
-			as_entity.set_interactable(node.as_entity)
-			if node.is_in_group("Item"):
-				_set_destination(node.find_child("Interaction Zone"))
-			else:
+			if node != previous_destination:
+				as_entity.set_interactable(node.as_entity)
 				_set_destination(node)
 	
 	if dialogue_partner != null:
@@ -385,7 +392,7 @@ func _observe():
 		
 		var query = PhysicsRayQueryParameters2D.create(global_position, global_position+direction)
 		query.exclude = [self]
-		query.collision_mask = 1
+		query.collision_mask = 3
 		var result = space_state.intersect_ray(query)
 		
 		if result.is_empty():
@@ -457,7 +464,7 @@ func _pick_location():
 		chosen_node = available_locations[chosen_index]
 		available_locations = game_manager.get_sub_locations(chosen_node)
 	
-	if chosen_node == null:
+	if chosen_node == null || chosen_node == previous_destination:
 		return
 	_set_destination(chosen_node)	
 
@@ -506,9 +513,8 @@ func dialogue_setup(partner):
 	dialogue_history.clear()
 	dialogue_partner = partner
 	can_trigger = false
-	as_entity.set_action("talking with "+partner.as_entity.entity_name)
-	destination = null
-	navigation_agent_2d.set_velocity(Vector2.ZERO)
+	as_entity.set_action("busy talking with "+partner.as_entity.entity_name)
+	_end_navigation()
 
 func initiate_dialogue(partner):
 	dialogue_setup(partner)
@@ -636,6 +642,9 @@ func _on_interaction_zone_body_entered(body):
 	if destination != body:
 		return
 	
+	facing_direction = body.global_position - global_position
+	facing_direction.normalized()
+	
 	if body.is_in_group("Player"):
 		game_manager.enter_new_dialogue(self)
 		initiate_dialogue(body)	
@@ -645,18 +654,53 @@ func _on_interaction_zone_body_entered(body):
 		initiate_dialogue(body)
 		conversation_panel.visible = true
 		conversation_panel.find_child("Label").text = ""
-
-func _on_interaction_zone_area_entered(area):
-	if area.get_name() == "Interaction Zone" and area == destination:
-		var item_entity : Entity = area.get_parent().as_entity
+	
+	elif body.is_in_group("Item"):
+		var item_entity : Entity = body.as_entity
+		
+		# If someone was already interacting with the destination item, find a similar item to interact with
+		if item_entity.interactable != null and item_entity.interactable != as_entity:
+			_end_navigation()
+			
+			# The name of the target item without the number
+			var destination_name : String = " ".join(body.get_name().split(" ").slice(0, -1))
+			
+			# All the items in the target room
+			var sibling_nodes : Array = game_manager.get_sub_locations(body.get_parent())
+			for node in sibling_nodes:
+				# If the current node is not one of the other items in the room, leave
+				if node == body or !node.is_in_group("Item"):
+					continue
+				
+				# If the current item is interacting with somebody
+				if node.as_entity.interactable != null:
+					continue
+				
+				# If the names of the node and the destination match, set it as the new destination
+				var node_name = " ".join(node.get_name().split(" ").slice(0, -1))
+				if node_name == destination_name:
+					_set_destination(node)
+					break
+			return
+		
 		item_entity.set_interactable(as_entity)
 		as_entity.set_interactable(item_entity)
 		
-		var status_update_prompt = "If someone is "+as_entity.action+" and wants to interact with "+item_entity.entity_name+", what would be the new status of "+item_entity.entity_name+"?"
+		var status_update_prompt = "If someone is "+as_entity.action+" and wants to interact with "+item_entity.entity_name+", what would be the new status of "+item_entity.entity_name+"?\n"
+		status_update_prompt += "For example, if John wants to make some coffee and he's interacting with a coffee mixer, the mixer's new status should be \"mixing coffee\"."
 		status_update_prompt += "Respond only with the status, for example:\nbaking a pie\nburning some wood\nopen"
 		var status_update = await game_manager.chat_request(status_update_prompt, 0, 30)
 		
 		item_entity.set_action(status_update)
+	
+	_end_navigation()
+	
+func _on_interaction_zone_body_exited(body):
+	if body.is_in_group("Item"):
+		var item_entity : Entity = body.as_entity
+		
+		if item_entity.interactable == as_entity:
+			item_entity.set_interactable(null)
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
