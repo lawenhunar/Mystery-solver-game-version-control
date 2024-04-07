@@ -7,6 +7,8 @@ extends CharacterBody2D
 @onready var animated_sprite_2d = $AnimatedSprite2D
 var previous_velocity : Vector2
 
+#@export var inventory: Inv
+
 var dialogue_history : Array
 var dialogue_partner : Node2D
 

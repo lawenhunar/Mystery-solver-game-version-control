@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://ctn24y5h1lrue"]
+[gd_scene load_steps=45 format=3 uid="uid://ctn24y5h1lrue"]
 
 [ext_resource type="Script" path="res://Game_Manager.gd" id="1_c5fke"]
 [ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Player.tscn" id="2_bx2vm"]
@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://mo2pu8d80ruj" path="res://Agent.tscn" id="6_hpwxx"]
 [ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://32x32/Alex_16x16.png" id="7_0wr0u"]
 [ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Item Panel.tscn" id="7_8j2nl"]
-[ext_resource type="PackedScene" uid="uid://cod81ldpd4dn1" path="res://inventory_panel.tscn" id="8_th4bj"]
 [ext_resource type="Texture2D" uid="uid://22c4d16uuqgh" path="res://32x32/Luna_16x16.png" id="13_ek000"]
 [ext_resource type="Texture2D" uid="uid://dk2mhb5jn8mwl" path="res://32x32/Bob_16x16.png" id="14_gjcts"]
 [ext_resource type="Texture2D" uid="uid://dfq21c61fbykm" path="res://32x32/Amelia_16x16.png" id="14_q7qy3"]
@@ -7794,8 +7793,6 @@ offset_right = 952.0
 offset_bottom = 501.0
 
 [node name="Item Panel" parent="UI" instance=ExtResource("7_8j2nl")]
-
-[node name="Inventory panel" parent="UI" instance=ExtResource("8_th4bj")]
 
 [node name="Agent 1" parent="." instance=ExtResource("6_hpwxx")]
 position = Vector2(-28, 370)
