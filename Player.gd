@@ -24,7 +24,7 @@ var popup_alpha : float
 var nearby_entity : Node
 
 func _ready():
-	as_entity = Entity.new(agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
+	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
 	
 
 func _physics_process(_delta):
@@ -83,9 +83,11 @@ func _input(_event):
 				return
 			game_manager.enter_new_dialogue(nearby_entity)
 			as_entity.set_action("talking with "+nearby_entity.as_entity.entity_name)
+			as_entity.set_interactable(nearby_entity.as_entity)
 			nearby_entity.receive_dialogue("")
 		elif nearby_entity.is_in_group("Item"):
 			game_manager.setup_item_panel(nearby_entity)
+			as_entity.set_action("interacting with "+nearby_entity.as_entity.entity_name)
 			as_entity.set_interactable(nearby_entity.as_entity)
 			nearby_entity.as_entity.set_interactable(as_entity)
 

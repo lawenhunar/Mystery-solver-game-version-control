@@ -10,4 +10,4 @@ var all_actions : Array
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	all_actions = actions_string.split(";")
-	as_entity = Entity.new(get_name(), game_manager.get_location(global_position), all_actions[0], null)
+	as_entity = Entity.new(self, get_name(), game_manager.get_location(global_position), all_actions[0], null)
