@@ -25,7 +25,7 @@ var facing_direction : Vector2 = Vector2.DOWN
 
 var agent_summary : String
 var memories : Array
-var new_observations : Array
+var new_observations : Array[Entity]
 var dialogue_history : Array
 var dialogue_partner : Node2D
 var current_plan : String
@@ -54,8 +54,7 @@ var num_insights_per_reflection_question : int = 5
 
 
 func _ready():
-	print("Initializing " + agent_name)
-	as_entity = Entity.new(agent_name, game_manager.get_location(global_position), "wants to talk to somebody", null)
+	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "wants to talk to somebody", null)
 	game_manager.can_record = true
 	conversation_panel.visible = false
 	
@@ -77,8 +76,16 @@ func _ready():
 	can_trigger = true
 
 func _physics_process(delta):
-	as_entity.set_location(game_manager.get_location(global_position))
+	_navigate(delta)
 	
+	as_entity.set_location(game_manager.get_location(global_position))
+	_observe()
+	_check_reflection()
+	_check_trigger()
+	
+	_animate()
+
+func _check_reflection():
 	if !memories.is_empty() && !is_reflecting:
 		var total_recent_importance = 0
 		for i in range(oldest_memory_index, len(memories)):
@@ -86,47 +93,38 @@ func _physics_process(delta):
 		
 		if total_recent_importance >= recent_importance_threshold:
 			_reflect()
-	
+
+func _check_trigger():
 	var current_time = Time.get_unix_time_from_system()
 	if can_trigger && (current_time-time_since_last_trigger) >= trigger_duration:
 		_trigger_brain()
 
-	if destination != null and dialogue_partner == null:
-		if interaction_zone.overlaps_body(destination):
-			_end_navigation()
-		else:
-			var direction=Vector3()
-			navigation_agent_2d.target_position=destination.global_position
-			direction=navigation_agent_2d.get_next_path_position()-global_position
-			direction=direction.normalized()
-			
-			var intended_velocity=velocity.lerp(direction*speed,acceleration*delta)
-			navigation_agent_2d.set_velocity(intended_velocity)
+func _navigate(delta):
+	if interaction_zone.overlaps_body(destination):
+		_end_navigation()
 	
-	if navigation_agent_2d.distance_to_target()<3 or destination == null:
-		velocity = Vector2.ZERO
-	else:
-		facing_direction = velocity
+	if destination != null:
+		var direction=Vector3()
+		navigation_agent_2d.target_position=destination.global_position
+		direction=navigation_agent_2d.get_next_path_position()-global_position
+		direction=direction.normalized()
+		
+		var intended_velocity=velocity.lerp(direction*speed,acceleration*delta)
+		navigation_agent_2d.set_velocity(intended_velocity)
+		
 		move_and_slide()
-	
-	if velocity != Vector2.ZERO:
-		if velocity.x < 0:
-			animated_sprite_2d.animation = "run left"
-		elif velocity.x > 0: 
-			animated_sprite_2d.animation = "run right"
-		elif velocity.y < 0:
-			animated_sprite_2d.animation = "run up"
-		elif velocity.y > 0: 
-			animated_sprite_2d.animation = "run down"
 	else:
-		if facing_direction.x < 0:
-			animated_sprite_2d.animation = "idle left"
-		elif facing_direction.x > 0: 
-			animated_sprite_2d.animation = "idle right"	
-		elif facing_direction.y < 0:
-			animated_sprite_2d.animation = "idle up"
-		elif facing_direction.y > 0: 
-			animated_sprite_2d.animation = "idle down"
+		# At this part of the program, the agent is idle, so face a random direction every now and then
+		if randf() < 0.001:
+			facing_direction = Vector2.from_angle(randi_range(0,3)*PI/2)
+
+func _animate():
+	var directions = ["up", "right", "down", "left"]
+	if velocity != Vector2.ZERO:
+		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
+		facing_direction = velocity
+	else:
+		animated_sprite_2d.animation = "idle "+directions[round(facing_direction.angle()/(PI/2))+1]
 
 func _set_destination(chosen_node):
 	previous_destination = destination
@@ -332,8 +330,6 @@ func _trigger_brain():
 	can_trigger = false
 	time_since_last_trigger = Time.get_unix_time_from_system()
 	
-	await _observe()
-	
 	if dialogue_partner != null:
 		return
 	
@@ -342,8 +338,8 @@ func _trigger_brain():
 	if dialogue_partner != null:
 		return
 		
-	for node in new_observations:
-		_add_memory(node.as_entity.description)
+	for entity in new_observations:
+		_add_memory(entity.description)
 	await _collect_responses(new_observations.size())
 	
 	if reaction == "Continue":
@@ -364,23 +360,22 @@ func _trigger_brain():
 	else:
 		var index = int(reaction_parts[0])-1
 		if index < new_observations.size():
-			var node = new_observations[index]
-			if node != previous_destination:
-				as_entity.set_interactable(node.as_entity)
-				_set_destination(node)
+			var entity : Entity = new_observations[index]
+			if entity.as_node != previous_destination:
+				self.as_entity.set_interactable(entity)
+				_set_destination(entity.as_node)
 	
 	if dialogue_partner != null:
 		return
 	
 	can_trigger = true
+	new_observations.clear()
 	
 	if Time.get_unix_time_from_system() - time_since_last_plan >= planning_duration:
 		var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
 		_generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
 
 func _observe():
-	new_observations.clear()
-	
 	# Scan nearby entity nodes
 	var space_state = get_world_2d().direct_space_state
 	var ray_length = 1000
@@ -395,12 +390,27 @@ func _observe():
 		query.collision_mask = 3
 		var result = space_state.intersect_ray(query)
 		
+		# If we haven't detected anything with this ray, move onto the next one
 		if result.is_empty():
 			continue
 		
-		if result.collider.is_in_group("Entity") and !result.collider in new_observations:
-			# Add the collided node to the list
-			new_observations.append(result.collider)
+		# If the current ray didn't hit an entity, move onto the next ray
+		if !result.collider.is_in_group("Entity"):
+			continue
+		
+		var new_entity : Entity = result.collider.as_entity
+		var already_exists : bool = false
+		for existing_observation in new_observations:
+			if new_entity.matches(existing_observation):
+				already_exists = true
+				break
+		
+		# If this is not a new observation, move onto the next ray
+		if already_exists:
+			continue
+			
+		# Add the new observation to the list
+		new_observations.append(new_entity.copy())
 
 func _react():
 	var reaction_prompt = agent_summary + "\n"
@@ -411,12 +421,12 @@ func _react():
 			reaction_prompt += agent_name+"'s current plan:"+task.task+"\n"
 			break
 	
-	reaction_prompt += "Observations: \n"
+	reaction_prompt += "Observations (sorted from oldest to newest): \n"
 	for i in len(new_observations):
-		reaction_prompt += str(i+1)+") "+new_observations[i].as_entity.description+"\n"
+		reaction_prompt += str(i+1)+") "+new_observations[i].description+"\n"
 	
-	for node in new_observations:
-		_generate_memory_summary("What does "+agent_name+" know about "+node.as_entity.entity_name+"?")
+	for entity in new_observations:
+		_generate_memory_summary("What does "+agent_name+" know about "+entity.entity_name+"?")
 	await _collect_responses(new_observations.size())
 	
 	var response_string = ""
@@ -643,7 +653,6 @@ func _on_interaction_zone_body_entered(body):
 		return
 	
 	facing_direction = body.global_position - global_position
-	facing_direction.normalized()
 	
 	if body.is_in_group("Player"):
 		game_manager.enter_new_dialogue(self)

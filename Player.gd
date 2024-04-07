@@ -24,7 +24,7 @@ var popup_alpha : float
 var nearby_entity : Node
 
 func _ready():
-	as_entity = Entity.new(agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
+	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
 	
 
 func _physics_process(_delta):
@@ -44,26 +44,12 @@ func _physics_process(_delta):
 	move_and_slide()
 		
 	
+	var directions = ["up", "right", "down", "left"]
 	if velocity != Vector2.ZERO:
-		if velocity.x < 0:
-			animated_sprite_2d.animation = "run left"
-		elif velocity.x > 0: 
-			animated_sprite_2d.animation = "run right"
-		elif velocity.y < 0:
-			animated_sprite_2d.animation = "run up"
-		elif velocity.y > 0: 
-			animated_sprite_2d.animation = "run down"
+		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
+		previous_velocity = velocity
 	else:
-		if previous_velocity.x < 0:
-			animated_sprite_2d.animation = "idle left"
-		elif previous_velocity.x > 0: 
-			animated_sprite_2d.animation = "idle right"	
-		elif previous_velocity.y < 0:
-			animated_sprite_2d.animation = "idle up"
-		elif previous_velocity.y > 0: 
-			animated_sprite_2d.animation = "idle down"
-	
-	previous_velocity = velocity
+		animated_sprite_2d.animation = "idle "+directions[round(previous_velocity.angle()/(PI/2))+1]
 	
 	as_entity.set_location(game_manager.get_location(global_position))
 	
@@ -83,9 +69,11 @@ func _input(_event):
 				return
 			game_manager.enter_new_dialogue(nearby_entity)
 			as_entity.set_action("talking with "+nearby_entity.as_entity.entity_name)
+			as_entity.set_interactable(nearby_entity.as_entity)
 			nearby_entity.receive_dialogue("")
 		elif nearby_entity.is_in_group("Item"):
 			game_manager.setup_item_panel(nearby_entity)
+			as_entity.set_action("interacting with "+nearby_entity.as_entity.entity_name)
 			as_entity.set_interactable(nearby_entity.as_entity)
 			nearby_entity.as_entity.set_interactable(as_entity)
 
