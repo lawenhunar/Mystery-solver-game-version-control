@@ -338,10 +338,6 @@ func _trigger_brain():
 	
 	if dialogue_partner != null:
 		return
-		
-	for entity in new_observations:
-		_add_memory(entity.description)
-	await _collect_responses(new_observations.size())
 	
 	if reaction == "Continue":
 		can_trigger = true
@@ -438,6 +434,7 @@ func _observe():
 			
 		# Add the new observation to the list
 		new_observations.append(new_entity.copy())
+		_add_memory(new_entity.description)
 
 func _react():
 	var reaction_prompt = agent_summary + "\n"
@@ -448,13 +445,25 @@ func _react():
 			reaction_prompt += agent_name+"'s current plan:"+task.task+"\n"
 			break
 	
-	reaction_prompt += "Observations (sorted from oldest to newest): \n"
-	for i in len(new_observations):
-		reaction_prompt += str(i+1)+") "+new_observations[i].description+"\n"
+	reaction_prompt += "Observations (sorted from newest to oldest): \n"
+	var current_token_count = 0
+	for i in range(len(new_observations)-1,-1,-1):
+		var description_token_count : int = game_manager.get_token_count(new_observations[i].description)
+		if current_token_count + description_token_count < 2040:
+			reaction_prompt += str(i+1)+") "+new_observations[i].description+"\n"
+			current_token_count += description_token_count
+		else:
+			break
 	
+	# There could be multiple observations of the same entity, so generate summaries only for unique entities, not each observation
+	var unique_new_nodes : Array[Node]
 	for entity in new_observations:
-		_generate_memory_summary("What does "+agent_name+" know about "+entity.entity_name+"?")
-	await _collect_responses(new_observations.size())
+		if !(entity.as_node in unique_new_nodes):
+			unique_new_nodes.append(entity.as_node)
+	
+	for node in unique_new_nodes:
+		_generate_memory_summary("What does "+agent_name+" know about "+node.as_entity.entity_name+"?")
+	await _collect_responses(unique_new_nodes.size())
 	
 	var response_string = ""
 	for response in responses:
