@@ -44,26 +44,12 @@ func _physics_process(_delta):
 	move_and_slide()
 		
 	
+	var directions = ["up", "right", "down", "left"]
 	if velocity != Vector2.ZERO:
-		if velocity.x < 0:
-			animated_sprite_2d.animation = "run left"
-		elif velocity.x > 0: 
-			animated_sprite_2d.animation = "run right"
-		elif velocity.y < 0:
-			animated_sprite_2d.animation = "run up"
-		elif velocity.y > 0: 
-			animated_sprite_2d.animation = "run down"
+		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
+		previous_velocity = velocity
 	else:
-		if previous_velocity.x < 0:
-			animated_sprite_2d.animation = "idle left"
-		elif previous_velocity.x > 0: 
-			animated_sprite_2d.animation = "idle right"	
-		elif previous_velocity.y < 0:
-			animated_sprite_2d.animation = "idle up"
-		elif previous_velocity.y > 0: 
-			animated_sprite_2d.animation = "idle down"
-	
-	previous_velocity = velocity
+		animated_sprite_2d.animation = "idle "+directions[round(previous_velocity.angle()/(PI/2))+1]
 	
 	as_entity.set_location(game_manager.get_location(global_position))
 	

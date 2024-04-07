@@ -76,6 +76,16 @@ func _ready():
 	can_trigger = true
 
 func _physics_process(delta):
+	_navigate(delta)
+	
+	as_entity.set_location(game_manager.get_location(global_position))
+	_observe()
+	_check_reflection()
+	_check_trigger()
+	
+	_animate()
+
+func _check_reflection():
 	if !memories.is_empty() && !is_reflecting:
 		var total_recent_importance = 0
 		for i in range(oldest_memory_index, len(memories)):
@@ -83,50 +93,38 @@ func _physics_process(delta):
 		
 		if total_recent_importance >= recent_importance_threshold:
 			_reflect()
-	
+
+func _check_trigger():
 	var current_time = Time.get_unix_time_from_system()
 	if can_trigger && (current_time-time_since_last_trigger) >= trigger_duration:
 		_trigger_brain()
 
-	if destination != null and dialogue_partner == null:
-		if interaction_zone.overlaps_body(destination):
-			_end_navigation()
-		else:
-			var direction=Vector3()
-			navigation_agent_2d.target_position=destination.global_position
-			direction=navigation_agent_2d.get_next_path_position()-global_position
-			direction=direction.normalized()
-			
-			var intended_velocity=velocity.lerp(direction*speed,acceleration*delta)
-			navigation_agent_2d.set_velocity(intended_velocity)
+func _navigate(delta):
+	if interaction_zone.overlaps_body(destination):
+		_end_navigation()
 	
-	if navigation_agent_2d.distance_to_target()<3 or destination == null:
-		velocity = Vector2.ZERO
-	else:
-		facing_direction = velocity
+	if destination != null:
+		var direction=Vector3()
+		navigation_agent_2d.target_position=destination.global_position
+		direction=navigation_agent_2d.get_next_path_position()-global_position
+		direction=direction.normalized()
+		
+		var intended_velocity=velocity.lerp(direction*speed,acceleration*delta)
+		navigation_agent_2d.set_velocity(intended_velocity)
+		
 		move_and_slide()
-	
-	as_entity.set_location(game_manager.get_location(global_position))
-	_observe()
-	
-	if velocity != Vector2.ZERO:
-		if velocity.x < 0:
-			animated_sprite_2d.animation = "run left"
-		elif velocity.x > 0: 
-			animated_sprite_2d.animation = "run right"
-		elif velocity.y < 0:
-			animated_sprite_2d.animation = "run up"
-		elif velocity.y > 0: 
-			animated_sprite_2d.animation = "run down"
 	else:
-		if facing_direction.x < 0:
-			animated_sprite_2d.animation = "idle left"
-		elif facing_direction.x > 0: 
-			animated_sprite_2d.animation = "idle right"	
-		elif facing_direction.y < 0:
-			animated_sprite_2d.animation = "idle up"
-		elif facing_direction.y > 0: 
-			animated_sprite_2d.animation = "idle down"
+		# At this part of the program, the agent is idle, so face a random direction every now and then
+		if randf() < 0.001:
+			facing_direction = Vector2.from_angle(randi_range(0,3)*PI/2)
+
+func _animate():
+	var directions = ["up", "right", "down", "left"]
+	if velocity != Vector2.ZERO:
+		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
+		facing_direction = velocity
+	else:
+		animated_sprite_2d.animation = "idle "+directions[round(facing_direction.angle()/(PI/2))+1]
 
 func _set_destination(chosen_node):
 	previous_destination = destination
@@ -655,7 +653,6 @@ func _on_interaction_zone_body_entered(body):
 		return
 	
 	facing_direction = body.global_position - global_position
-	facing_direction.normalized()
 	
 	if body.is_in_group("Player"):
 		game_manager.enter_new_dialogue(self)
