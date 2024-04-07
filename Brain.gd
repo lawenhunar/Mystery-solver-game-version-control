@@ -79,7 +79,8 @@ func _physics_process(delta):
 	_navigate(delta)
 	
 	as_entity.set_location(game_manager.get_location(global_position))
-	_observe()
+	if Engine.get_physics_frames() % 5 == 0:
+		_observe()
 	_check_reflection()
 	_check_trigger()
 	
@@ -100,9 +101,6 @@ func _check_trigger():
 		_trigger_brain()
 
 func _navigate(delta):
-	if interaction_zone.overlaps_body(destination):
-		_end_navigation()
-	
 	if destination != null:
 		var direction=Vector3()
 		navigation_agent_2d.target_position=destination.global_position
@@ -113,6 +111,9 @@ func _navigate(delta):
 		navigation_agent_2d.set_velocity(intended_velocity)
 		
 		move_and_slide()
+		
+		if interaction_zone.overlaps_body(destination):
+			_end_navigation()
 	else:
 		# At this part of the program, the agent is idle, so face a random direction every now and then
 		if randf() < 0.001:
@@ -399,6 +400,32 @@ func _observe():
 			continue
 		
 		var new_entity : Entity = result.collider.as_entity
+		var entity_node : Node = result.collider
+		
+		# If someone was already interacting with the destination item, find a similar item to interact with
+		if entity_node == destination and new_entity.interactable != null and new_entity.interactable != as_entity:
+			_end_navigation()
+			
+			# The name of the target item without the number
+			var destination_name : String = " ".join(entity_node.get_name().split(" ").slice(0, -1))
+			
+			# All the items in the target room
+			var sibling_nodes : Array = game_manager.get_sub_locations(entity_node.get_parent())
+			for node in sibling_nodes:
+				# If the current node is not one of the other items in the room, leave
+				if node == entity_node or !node.is_in_group("Item"):
+					continue
+				
+				# If the current item is interacting with somebody
+				if node.as_entity.interactable != null:
+					continue
+				
+				# If the names of the node and the destination match, set it as the new destination
+				var node_name = " ".join(node.get_name().split(" ").slice(0, -1))
+				if node_name == destination_name:
+					_set_destination(node)
+					break
+		
 		var already_exists : bool = false
 		for existing_observation in new_observations:
 			if new_entity.matches(existing_observation):
@@ -666,31 +693,6 @@ func _on_interaction_zone_body_entered(body):
 	
 	elif body.is_in_group("Item"):
 		var item_entity : Entity = body.as_entity
-		
-		# If someone was already interacting with the destination item, find a similar item to interact with
-		if item_entity.interactable != null and item_entity.interactable != as_entity:
-			_end_navigation()
-			
-			# The name of the target item without the number
-			var destination_name : String = " ".join(body.get_name().split(" ").slice(0, -1))
-			
-			# All the items in the target room
-			var sibling_nodes : Array = game_manager.get_sub_locations(body.get_parent())
-			for node in sibling_nodes:
-				# If the current node is not one of the other items in the room, leave
-				if node == body or !node.is_in_group("Item"):
-					continue
-				
-				# If the current item is interacting with somebody
-				if node.as_entity.interactable != null:
-					continue
-				
-				# If the names of the node and the destination match, set it as the new destination
-				var node_name = " ".join(node.get_name().split(" ").slice(0, -1))
-				if node_name == destination_name:
-					_set_destination(node)
-					break
-			return
 		
 		item_entity.set_interactable(as_entity)
 		as_entity.set_interactable(item_entity)
