@@ -79,7 +79,8 @@ func _physics_process(delta):
 	_navigate(delta)
 	
 	as_entity.set_location(game_manager.get_location(global_position))
-	_observe()
+	if Engine.get_physics_frames() % 5 == 0:
+		_observe()
 	_check_reflection()
 	_check_trigger()
 	
@@ -100,9 +101,6 @@ func _check_trigger():
 		_trigger_brain()
 
 func _navigate(delta):
-	if interaction_zone.overlaps_body(destination):
-		_end_navigation()
-	
 	if destination != null:
 		var direction=Vector3()
 		navigation_agent_2d.target_position=destination.global_position
@@ -113,6 +111,9 @@ func _navigate(delta):
 		navigation_agent_2d.set_velocity(intended_velocity)
 		
 		move_and_slide()
+		
+		if interaction_zone.overlaps_body(destination):
+			_end_navigation()
 	else:
 		# At this part of the program, the agent is idle, so face a random direction every now and then
 		if randf() < 0.001:
@@ -337,10 +338,6 @@ func _trigger_brain():
 	
 	if dialogue_partner != null:
 		return
-		
-	for entity in new_observations:
-		_add_memory(entity.description)
-	await _collect_responses(new_observations.size())
 	
 	if reaction == "Continue":
 		can_trigger = true
@@ -399,6 +396,32 @@ func _observe():
 			continue
 		
 		var new_entity : Entity = result.collider.as_entity
+		var entity_node : Node = result.collider
+		
+		# If someone was already interacting with the destination item, find a similar item to interact with
+		if entity_node == destination and new_entity.interactable != null and new_entity.interactable != as_entity:
+			_end_navigation()
+			
+			# The name of the target item without the number
+			var destination_name : String = " ".join(entity_node.get_name().split(" ").slice(0, -1))
+			
+			# All the items in the target room
+			var sibling_nodes : Array = game_manager.get_sub_locations(entity_node.get_parent())
+			for node in sibling_nodes:
+				# If the current node is not one of the other items in the room, leave
+				if node == entity_node or !node.is_in_group("Item"):
+					continue
+				
+				# If the current item is interacting with somebody
+				if node.as_entity.interactable != null:
+					continue
+				
+				# If the names of the node and the destination match, set it as the new destination
+				var node_name = " ".join(node.get_name().split(" ").slice(0, -1))
+				if node_name == destination_name:
+					_set_destination(node)
+					break
+		
 		var already_exists : bool = false
 		for existing_observation in new_observations:
 			if new_entity.matches(existing_observation):
@@ -411,6 +434,7 @@ func _observe():
 			
 		# Add the new observation to the list
 		new_observations.append(new_entity.copy())
+		_add_memory(new_entity.description)
 
 func _react():
 	var reaction_prompt = agent_summary + "\n"
@@ -421,13 +445,25 @@ func _react():
 			reaction_prompt += agent_name+"'s current plan:"+task.task+"\n"
 			break
 	
-	reaction_prompt += "Observations (sorted from oldest to newest): \n"
-	for i in len(new_observations):
-		reaction_prompt += str(i+1)+") "+new_observations[i].description+"\n"
+	reaction_prompt += "Observations (sorted from newest to oldest): \n"
+	var current_token_count = 0
+	for i in range(len(new_observations)-1,-1,-1):
+		var description_token_count : int = game_manager.get_token_count(new_observations[i].description)
+		if current_token_count + description_token_count < 2040:
+			reaction_prompt += str(i+1)+") "+new_observations[i].description+"\n"
+			current_token_count += description_token_count
+		else:
+			break
 	
+	# There could be multiple observations of the same entity, so generate summaries only for unique entities, not each observation
+	var unique_new_nodes : Array[Node]
 	for entity in new_observations:
-		_generate_memory_summary("What does "+agent_name+" know about "+entity.entity_name+"?")
-	await _collect_responses(new_observations.size())
+		if !(entity.as_node in unique_new_nodes):
+			unique_new_nodes.append(entity.as_node)
+	
+	for node in unique_new_nodes:
+		_generate_memory_summary("What does "+agent_name+" know about "+node.as_entity.entity_name+"?")
+	await _collect_responses(unique_new_nodes.size())
 	
 	var response_string = ""
 	for response in responses:
@@ -666,31 +702,6 @@ func _on_interaction_zone_body_entered(body):
 	
 	elif body.is_in_group("Item"):
 		var item_entity : Entity = body.as_entity
-		
-		# If someone was already interacting with the destination item, find a similar item to interact with
-		if item_entity.interactable != null and item_entity.interactable != as_entity:
-			_end_navigation()
-			
-			# The name of the target item without the number
-			var destination_name : String = " ".join(body.get_name().split(" ").slice(0, -1))
-			
-			# All the items in the target room
-			var sibling_nodes : Array = game_manager.get_sub_locations(body.get_parent())
-			for node in sibling_nodes:
-				# If the current node is not one of the other items in the room, leave
-				if node == body or !node.is_in_group("Item"):
-					continue
-				
-				# If the current item is interacting with somebody
-				if node.as_entity.interactable != null:
-					continue
-				
-				# If the names of the node and the destination match, set it as the new destination
-				var node_name = " ".join(node.get_name().split(" ").slice(0, -1))
-				if node_name == destination_name:
-					_set_destination(node)
-					break
-			return
 		
 		item_entity.set_interactable(as_entity)
 		as_entity.set_interactable(item_entity)
