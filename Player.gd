@@ -90,3 +90,9 @@ func _on_interaction_zone_body_exited(body):
 	if body.is_in_group("Entity") and body == nearby_entity:
 		nearby_entity = null
 		is_showing_popup = false
+
+func collect(item):
+	inv.insert(item)
+
+func player():
+	pass
