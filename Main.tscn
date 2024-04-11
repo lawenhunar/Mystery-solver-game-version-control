@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://ctn24y5h1lrue"]
+[gd_scene load_steps=46 format=3 uid="uid://ctn24y5h1lrue"]
 
 [ext_resource type="Script" path="res://Game_Manager.gd" id="1_c5fke"]
 [ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Player.tscn" id="2_bx2vm"]
@@ -15,12 +15,9 @@
 [ext_resource type="Texture2D" uid="uid://22c4d16uuqgh" path="res://32x32/Luna_16x16.png" id="13_ek000"]
 [ext_resource type="Texture2D" uid="uid://dk2mhb5jn8mwl" path="res://32x32/Bob_16x16.png" id="14_gjcts"]
 [ext_resource type="Texture2D" uid="uid://dfq21c61fbykm" path="res://32x32/Amelia_16x16.png" id="14_q7qy3"]
-[ext_resource type="Script" path="res://Pistol_pickup.gd" id="16_yubxu"]
-[ext_resource type="Resource" uid="uid://b37vjdr563x7k" path="res://inventory stuff/pistol.tres" id="17_jyahe"]
-[ext_resource type="Texture2D" uid="uid://or4iq6fxc2if" path="res://pistol_full.png" id="18_j6l0u"]
-[ext_resource type="Texture2D" uid="uid://3swvtl22ygx4" path="res://Coffee Mug 001 16x161.png" id="19_jcekw"]
-[ext_resource type="Script" path="res://Mug_pickup.gd" id="19_ltlup"]
-[ext_resource type="PackedScene" uid="uid://cdv66nv5ioipd" path="res://potion_collectible.tscn" id="21_tg2gf"]
+[ext_resource type="PackedScene" uid="uid://c0sgm1g77nk1l" path="res://pistol.tscn" id="16_jm5t3"]
+[ext_resource type="PackedScene" uid="uid://bxyculai2vide" path="res://mug.tscn" id="17_0jg1p"]
+[ext_resource type="PackedScene" uid="uid://dygbcg147a26u" path="res://potion.tscn" id="18_j7bu8"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_cm5wk"]
 vertices = PackedVector2Array(277, 149, 376, 151, 149, 151, 235, 149, -235, -43, -149, -53, -140, -53, -140, -21, -213, -21, 91, -69, 91, -21, 43, -21, 5, -43, 5, -85, 37, -107, 375, -151, 375, -21, 357, -75, 357, -149, 229, -151, 299, -149, 299, -21, 299, -75, -126, -69, -123, -53, -132, -53, -132, -69, -181, 61, -142, 91, -139, 107, -181, 107, -331, 61, 75, 11, 75, 69, -107, 107, -43, 53, 52, 11, -43, 11, 43, -5, 52, -5, -235, -101, -149, -69, 229, -107, -299, -21, -376, -21, -375, -123, -309, -43, -373, 151, -377, 151, -376, 11, -373, 107, 101, -123, 101, -151, 107, -151, 107, -101, 43, -123, 37, -149, 43, -151, -43, -151, -37, -149, -43, -123, -37, -107, 124, -101, 124, -117, 132, -117, 132, -101, 149, -101, 149, -151, 155, -151, 155, -107, 299, -5, 308, -5, 308, 11, 181, 69, 204, 11, 213, -5, 331, 101, 277, 107, 235, 107, 181, 91, 213, -21, 149, -21, 149, -69, 132, -69, 124, -69, 132, -53, 124, -53, -85, -85, -52, 11, -52, -5, -43, -5, -43, -21, -85, -43, -107, -21, -107, -69, -203, 11, -140, 11, -140, 17, -181, 17, -331, 17, -213, -5, -206, -5, -308, 11, -139, 61, -139, 59, -116, 59, -116, 91, -116, 53, -107, 53, -107, 46, -101, 46, -101, 53, 117, 69, 117, 59, 139, 59, 139, 69, 181, 11, 204, -5, 331, 11, 373, 101, 373, 11, 376, 11, 149, 149, 181, 149, 155, 91, 155, 107, 140, 107, 140, 91, 75, 91, 75, 117, 84, 117, 84, 149, -107, 151, 107, 149, 107, 151, -116, 107, -181, 151, -331, 151, -331, 107, -308, -5, -299, -5, -149, -123, -149, -101, -132, -101, -132, -117, -126, -117, -123, -101, -107, -101, -107, -151, -101, -151, -101, -123, -309, -101, -373, 61, -373, 17)
@@ -7443,12 +7440,6 @@ size = Vector2(929, 570)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0ix8t"]
 size = Vector2(919, 624.75)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_j3a6f"]
-size = Vector2(174, 123)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bt2rf"]
-size = Vector2(122, 156)
-
 [node name="Main" type="Node2D"]
 
 [node name="GameManager" type="Node" parent="."]
@@ -7850,44 +7841,12 @@ traits = "Analytical, harsh"
 
 [node name="Pick ups" type="Node" parent="."]
 
-[node name="Pistol" type="Node2D" parent="Pick ups"]
-script = ExtResource("16_yubxu")
-item = ExtResource("17_jyahe")
+[node name="Pistol" parent="Pick ups" instance=ExtResource("16_jm5t3")]
+position = Vector2(-408, 338)
 
-[node name="Pistol area" type="Area2D" parent="Pick ups/Pistol"]
-z_index = 2
-position = Vector2(1441, 593)
-metadata/_edit_group_ = true
+[node name="Mug" parent="Pick ups" instance=ExtResource("17_0jg1p")]
+position = Vector2(-728, -508)
 
-[node name="Sprite2D" type="Sprite2D" parent="Pick ups/Pistol/Pistol area"]
-position = Vector2(5.99998, -18)
-scale = Vector2(0.174805, 0.174805)
-texture = ExtResource("18_j6l0u")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Pick ups/Pistol/Pistol area"]
-position = Vector2(-1, -26)
-shape = SubResource("RectangleShape2D_j3a6f")
-
-[node name="Mug" type="Node2D" parent="Pick ups"]
-script = ExtResource("19_ltlup")
-
-[node name="Mug area" type="Area2D" parent="Pick ups/Mug"]
-z_index = 1
-position = Vector2(-682, -574)
-metadata/_edit_group_ = true
-
-[node name="Sprite2D" type="Sprite2D" parent="Pick ups/Mug/Mug area"]
-position = Vector2(8.5, 8.5)
-scale = Vector2(2.0625, 2.0625)
-texture = ExtResource("19_jcekw")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Pick ups/Mug/Mug area"]
-position = Vector2(11, 87)
-shape = SubResource("RectangleShape2D_bt2rf")
-
-[node name="potion_collectible" parent="Pick ups/Mug" instance=ExtResource("21_tg2gf")]
-position = Vector2(890, -265)
-scale = Vector2(4.74537, 4.74537)
-
-[connection signal="body_entered" from="Pick ups/Pistol/Pistol area" to="Pick ups/Pistol" method="_on_pistol_area_body_entered"]
-[connection signal="body_exited" from="Pick ups/Pistol/Pistol area" to="Pick ups/Pistol" method="_on_pistol_area_body_exited"]
+[node name="Potion" parent="Pick ups" instance=ExtResource("18_j7bu8")]
+position = Vector2(843, -212)
+scale = Vector2(5.81043, 5.81043)

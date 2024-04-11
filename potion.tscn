@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://dygbcg147a26u"]
+
+[ext_resource type="Script" path="res://pickup_script.gd" id="1_ito32"]
+[ext_resource type="Texture2D" uid="uid://c7088orrntbpf" path="res://posion_potion.png" id="1_woo58"]
+[ext_resource type="Resource" uid="uid://bln7wl6orci1t" path="res://inventory stuff/poison.tres" id="2_cwxyy"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ldsrn"]
+radius = 22.0227
+
+[node name="Potion" type="Node2D"]
+script = ExtResource("1_ito32")
+item = ExtResource("2_cwxyy")
+
+[node name="interactible_area" type="Area2D" parent="."]
+collision_layer = 3
+collision_mask = 3
+
+[node name="Sprite2D" type="Sprite2D" parent="interactible_area"]
+texture = ExtResource("1_woo58")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="interactible_area"]
+shape = SubResource("CircleShape2D_ldsrn")
+
+[connection signal="body_entered" from="interactible_area" to="." method="_on_interactible_area_body_entered"]

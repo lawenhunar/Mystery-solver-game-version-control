@@ -94,5 +94,5 @@ func _on_interaction_zone_body_exited(body):
 func collect(item):
 	inv.insert(item)
 
-func player():
+func Player():
 	pass
