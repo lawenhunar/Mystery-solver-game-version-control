@@ -1,7 +1,7 @@
 extends Panel
 
 
-@onready var item_visuals:Sprite2D=$CenterContainer/Panel/item_display
+@onready var item_visuals:Sprite2D=$CenterContainer/Panel/inside_slot
 @onready var amount_text:Label=$CenterContainer/Panel/Label
 
 func update(slot:InvSlot):
