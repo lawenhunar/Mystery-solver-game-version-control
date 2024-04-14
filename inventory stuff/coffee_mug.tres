@@ -1,7 +1,9 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://bwhjrrc2we7av"]
+[gd_resource type="Resource" script_class="InvItem" load_steps=3 format=3 uid="uid://bwhjrrc2we7av"]
 
-[ext_resource type="Script" path="res://pickup_script.gd" id="1_e01ek"]
+[ext_resource type="Script" path="res://inventory stuff/inventory_item.gd" id="1_8ai3g"]
+[ext_resource type="Texture2D" uid="uid://3swvtl22ygx4" path="res://Coffee Mug 001 16x161.png" id="2_xrnjq"]
 
 [resource]
-script = ExtResource("1_e01ek")
-item_name = ""
+script = ExtResource("1_8ai3g")
+name = "coffee mug"
+texture = ExtResource("2_xrnjq")
