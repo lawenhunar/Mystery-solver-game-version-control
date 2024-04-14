@@ -4,12 +4,15 @@ extends Node2D
 
 var player=null
 var player_in_area=false
+@onready var sprite_2d = $Area2D/Sprite2D
+
 
 func _ready():
-	pass
+	sprite_2d.texture=item.texture
 
 
-func _on_interactible_area_body_entered(body):
+
+func _on_area_2d_body_entered(body):
 	print("entered area")
 	if body.has_method("Player"):
 		player=body
@@ -17,18 +20,4 @@ func _on_interactible_area_body_entered(body):
 		player.collect(item)
 		await get_tree().create_timer(0.1).timeout
 		self.queue_free()
-
-
-
-#func _on_interactible_area_body_exited(body):
-	#print("entered area")
-	#if body.has_method("Player"):
-		#player=body
-		#player_in_area=true
-		#player.collect(item)
-		#await get_tree().create_timer(0.2).timeout
-		#self.queue_free()
-
-
-
 

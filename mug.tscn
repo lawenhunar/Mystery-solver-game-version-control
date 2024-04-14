@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bxyculai2vide"]
+[gd_scene load_steps=5 format=3 uid="uid://bhcpm4vdm6ymd"]
 
 [ext_resource type="Script" path="res://pickup_script.gd" id="1_csn4m"]
 [ext_resource type="Resource" uid="uid://bwhjrrc2we7av" path="res://inventory stuff/coffee_mug.tres" id="2_5awcn"]
