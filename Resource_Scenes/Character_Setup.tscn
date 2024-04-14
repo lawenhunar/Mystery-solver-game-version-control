@@ -1,0 +1,43 @@
+[gd_scene load_steps=4 format=3 uid="uid://benlbyxytql5g"]
+
+[ext_resource type="FontFile" uid="uid://bmr3debnqv0rs" path="res://Assets/Fonts/RobotoMono-Regular.ttf" id="1_pfs53"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_oru03"]
+size = Vector2(150, 150)
+
+[sub_resource type="LabelSettings" id="LabelSettings_11wmc"]
+font = ExtResource("1_pfs53")
+font_size = 36
+
+[node name="CharacterSetup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = -74.0
+offset_top = 2.0
+offset_right = 76.0
+offset_bottom = 346.0
+alignment = 1
+
+[node name="Sprite Button" type="TextureButton" parent="VBoxContainer"]
+layout_direction = 1
+layout_mode = 2
+texture_normal = SubResource("PlaceholderTexture2D_oru03")
+
+[node name="Name Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Name"
+label_settings = SubResource("LabelSettings_11wmc")
+
+[node name="History Label" type="RichTextLabel" parent="VBoxContainer"]
+layout_mode = 2
+text = "	History, here is some text for demo purposes. Here is some text for demo purposes.
+"
+fit_content = true

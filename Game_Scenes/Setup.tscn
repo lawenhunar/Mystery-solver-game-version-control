@@ -1,0 +1,56 @@
+[gd_scene load_steps=5 format=3 uid="uid://dl6lfqko4dw6s"]
+
+[ext_resource type="FontFile" uid="uid://bmr3debnqv0rs" path="res://Assets/Fonts/RobotoMono-Regular.ttf" id="1_3la5u"]
+[ext_resource type="Script" path="res://Scripts/Setup_Scene.gd" id="1_altm0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_by6qa"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ij7bd"]
+font = ExtResource("1_3la5u")
+font_size = 51
+
+[node name="Setup" type="Node2D"]
+
+[node name="GameManager" type="Node2D" parent="."]
+script = ExtResource("1_altm0")
+grid_columns = 5
+grid_h_spacing = 200
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Background" type="Panel" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_by6qa")
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -19.0
+offset_top = 30.0
+offset_right = 21.0
+offset_bottom = 53.0
+grow_horizontal = 2
+text = "Choose Your Character"
+label_settings = SubResource("LabelSettings_ij7bd")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer"]
+anchors_preset = -1
+anchor_left = 0.055
+anchor_top = 0.182
+anchor_right = 0.952
+anchor_bottom = 0.927
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+follow_focus = true
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_constants/h_separation = 250
