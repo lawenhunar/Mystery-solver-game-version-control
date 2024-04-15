@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 @onready var game_manager : Node = get_node("/root/Game/GameManager")
+var concurrency_handler : ConcurrencyHandler
 
 var icon : Texture
 @export var animation_texture : Texture
@@ -33,10 +34,6 @@ var all_tasks : Array
 
 var as_entity : Entity
 
-signal callback_signal
-var lock : Mutex = Mutex.new()
-var responses = []
-
 var can_trigger : bool = false
 var time_since_last_trigger : int
 var time_since_last_plan : int
@@ -54,6 +51,8 @@ var num_insights_per_reflection_question : int = 5
 
 
 func _ready():
+	concurrency_handler = ConcurrencyHandler.new()
+	
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "wants to talk to somebody", null)
 	game_manager.can_record = true
 	conversation_panel.visible = false
@@ -64,10 +63,11 @@ func _ready():
 	
 	var existing_memories = await game_manager.chat_request(existing_memories_prompt,92,200)
 	
-	for content in existing_memories.split(";"):
-		_add_memory(content.strip_edges())
 	
-	await _collect_responses(memories.size())
+	for content in existing_memories.split(";"):
+		_add_memory(content.strip_edges(), true)
+	
+	await concurrency_handler.wait_for_responses(existing_memories.split(";").size())
 	
 	await _generate_agent_summary()
 	var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
@@ -136,12 +136,6 @@ func _end_navigation():
 	navigation_agent_2d.set_velocity(Vector2.ZERO)
 	navigation_agent_2d.target_position = global_position
 
-func _collect_responses(num_expected_responses):
-	var num_responses_recieved = 0
-	while num_responses_recieved != num_expected_responses:
-		await callback_signal
-		num_responses_recieved += 1
-
 func _generate_memory_summary(query):
 	var relevant_memories = await _retrieve_memories(query, 5)
 	
@@ -157,24 +151,19 @@ func _generate_memory_summary(query):
 	var response = await game_manager.chat_request(summary_prompt, 0, 400)
 	if response.contains("[nothing]"):
 		response = ""
-	responses.append(response)
-	
-	lock.lock()
-	callback_signal.emit()
-	lock.unlock()
+	concurrency_handler.response_complete(response)
 
 func _generate_agent_summary():
 	agent_summary = "Name: " + agent_name + " (pronouns: "+pronouns+" | age:" + str(age) + ")\n"
 	agent_summary += "Innate traits: " + traits + "\n"
 	
+	
 	_generate_memory_summary(agent_name + "'s core characteristics")
 	_generate_memory_summary(agent_name + "'s current daily occupation")
 	_generate_memory_summary(agent_name + "'s feelings about his/her recent progress in life")
 	
-	await _collect_responses(3)
-	for response in responses:
-		agent_summary += response
-	responses.clear()
+	await concurrency_handler.wait_for_responses(3)
+	agent_summary += concurrency_handler.pop_responses_as_string()
 	print(agent_summary)
 
 func _get_general_plan_prompt(existing_plan):
@@ -251,11 +240,13 @@ func _print_memory(memory):
 	print("- Embeddings: ", memory.embedding.slice(0,5))
 	print()
 
-func _add_memory(content):
+func _add_memory(content, is_concurrent=false):
 	var time = game_manager.in_game_time
 
-	var memory = await Memory.new(time, content, game_manager, callback_signal, lock)
+	var memory = await Memory.new(time, content, game_manager)
 	
+	if is_concurrent:
+		memory.completed.connect(concurrency_handler.response_complete)
 	memories.append(memory)
 
 func _retrieve_memories(query, num_top_memories=len(memories)):
@@ -463,12 +454,8 @@ func _react():
 	
 	for node in unique_new_nodes:
 		_generate_memory_summary("What does "+agent_name+" know about "+node.as_entity.entity_name+"?")
-	await _collect_responses(unique_new_nodes.size())
-	
-	var response_string = ""
-	for response in responses:
-		response_string += response + " "
-	responses.clear()
+	await concurrency_handler.wait_for_responses(unique_new_nodes.size())
+	var response_string = concurrency_handler.pop_responses_as_string()
 	
 	if response_string.strip_edges() == "":
 		reaction_prompt += agent_name+" has no relevant memories about the given observations.\n"
@@ -534,7 +521,7 @@ func _reflect():
 			continue
 		_reflection_coroutine(question)
 	
-	await _collect_responses(num_reflection_questions * num_insights_per_reflection_question)
+	await concurrency_handler.wait_for_responses(num_reflection_questions * num_insights_per_reflection_question)
 	
 	oldest_memory_index = len(memories)
 	is_reflecting = false
@@ -553,7 +540,7 @@ func _reflection_coroutine(question):
 		if insight.strip_edges() == "":
 			continue
 		_add_memory(insight)
-		callback_signal.emit()
+		concurrency_handler.response_complete()
 
 func dialogue_setup(partner):
 	dialogue_history.clear()
@@ -571,8 +558,7 @@ func initiate_dialogue(partner):
 	
 	first_dialogue_prompt += "Summary of relevant context from "+agent_name+"’s memory:\n"
 	await _generate_memory_summary("What is "+agent_name+"'s relationship with "+ dialogue_partner.as_entity.entity_name)
-	first_dialogue_prompt += responses[0]
-	responses.clear()
+	first_dialogue_prompt += concurrency_handler.pop_responses_as_string()
 	first_dialogue_prompt += "\n"+as_entity.description+"\n. What would "+agent_name+" say to "+dialogue_partner.as_entity.entity_name+"?\n"
 	first_dialogue_prompt += "Respond only with the dialogue as if you are in character. Don't start with \""+agent_name+":\" or anything. "
 	first_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits
@@ -603,15 +589,13 @@ func receive_dialogue(partner_statement):
 	next_dialogue_prompt += "Summary of relevant context from "+agent_name+"’s memory:\n"
 	_generate_memory_summary("What is " + agent_name + "'s relationship with "+ dialogue_partner.as_entity.entity_name)
 	_generate_memory_summary(partner_statement)
-	await _collect_responses(2)
+	await concurrency_handler.wait_for_responses(2)
 	
 	if dialogue_partner == null:
 		end_dialogue()
 		return
 	
-	for response in responses:
-		next_dialogue_prompt += response + " "
-	responses.clear()
+	next_dialogue_prompt += concurrency_handler.pop_responses_as_string()
 	
 	if partner_statement == "" and len(dialogue_history) == 1:
 		next_dialogue_prompt += dialogue_partner.agent_name+" came over to initiate a conversation with "+agent_name+".\n"

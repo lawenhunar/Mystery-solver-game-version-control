@@ -44,7 +44,8 @@ func _ready():
 		new_setup.find_child("History Label").text = ""
 		slider.add_child(new_setup)
 		character_nodes.append(new_setup)
-		
+	
+# Called once the player clicks on a character to be their avatar
 func _character_selected(selected_node):
 	instruction_label.text = "What's Your Name?"
 	for node in character_nodes:
@@ -52,6 +53,7 @@ func _character_selected(selected_node):
 	
 	selected_node.find_child("Name TextBox").visible = true
 
+# Called once the player has entered their name into the text box
 func _character_name_entered(text, selected_node):
 	instruction_label.text = "Generating the Other Characters"
 	selected_node.find_child("Name Label").text = text
@@ -63,7 +65,7 @@ func _character_name_entered(text, selected_node):
 			continue
 		_generate_name(node, character_genders[i])
 
-
+# Generate a random name starting with a certain letter for the given character setup node
 func _generate_name(node, is_male):
 	var random_letter = char(randi_range(65,90))
 	var gender : String = "female"
