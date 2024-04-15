@@ -44,7 +44,6 @@ func _send_chat_request(prompt, token_count, get_tokens=false):
 	if(can_record):
 		num_chat_requests += 1
 		num_chat_tokens += response["usage"]["total_tokens"]
-		_update_time()
 	request.queue_free()
 	return response["choices"][0]["message"]["content"]
 
@@ -56,6 +55,5 @@ func embedding_request(input_text):
 	
 	if(can_record):
 		num_embedding_requests += 1
-		_update_time()
 	request.queue_free()
 	return response

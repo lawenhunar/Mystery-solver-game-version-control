@@ -7,6 +7,8 @@ extends Game_Manager
 @onready var layout = $"../Layout"
 
 @onready var player = get_node("/root/Game/Player")
+@onready var agents_root = $"../Agents"
+@onready var agent_scene = preload("res://Resource_Scenes/Agent.tscn")
 
 @onready var dialogue_panel = get_node("/root/Game/UI/Dialogue Panel")
 var current_agent
@@ -44,6 +46,20 @@ func _ready():
 	in_game_time = Time.get_unix_time_from_datetime_string("2024-03-11T08:00:00")
 	dialogue_panel.visible = false
 	item_panel.visible = false
+	
+	# Create all the agents using the information generated in the setup scene
+	for info in DataTransfer.agent_infos:
+		var new_agent = agent_scene.instantiate()
+		agents_root.add_child(new_agent)
+		
+		var all_standing_zones : Array = get_all_standing_zones()
+		var chosen_location = all_standing_zones.pick_random()
+		
+		new_agent.setup_intial_values(info, chosen_location.global_position)
+	
+	# Create the player using the information generated in the setup scene
+	player.agent_name = DataTransfer.player_info.name
+	player.animation_texture = DataTransfer.player_info.texture
 
 func _update_time():
 	super._update_time()
@@ -76,11 +92,6 @@ func get_location(point: Vector2) -> String:
 	
 	return result_path
 
-func get_all_locations() -> Array:
-	var all_paths = []
-	_add_location_path_to_list(all_paths, layout, "")
-	return all_paths
-
 func get_sub_locations(parent_node: Node = layout) -> Array:
 	if parent_node == layout:
 		return layout.get_children()
@@ -94,12 +105,33 @@ func get_sub_locations(parent_node: Node = layout) -> Array:
 	
 	return sub_locations
 
+func get_all_standing_zones() -> Array:
+	var all_paths = []
+	_add_standing_zones_to_list(all_paths, layout)
+	return all_paths
+
+func _add_standing_zones_to_list(list: Array, current_node: Node):
+	var new_area_found : bool = false
+	for node in current_node.get_children():
+		if node is Area2D:
+			_add_standing_zones_to_list(list, node)
+			new_area_found = true
+	
+	if !new_area_found and "Standing Zone" in current_node.get_name():
+		list.append(current_node)
+		return
+
+func get_all_locations() -> Array:
+	var all_paths = []
+	_add_location_path_to_list(all_paths, layout, "")
+	return all_paths
+
 func _add_location_path_to_list(list: Array, current_node: Node, current_path: String):
 	if current_node is Area2D and "Standing Zone" not in current_node.get_name():
 		if current_path != "":
 			current_path += ":"
 		current_path += current_node.get_name()
-	
+		
 	var new_area_found : bool = false
 	for node in current_node.get_children():
 		if node is Area2D:
@@ -109,7 +141,7 @@ func _add_location_path_to_list(list: Array, current_node: Node, current_path: S
 	if !new_area_found:
 		list.append(current_path)
 		return
-		
+
 func get_current_datetime_string():
 	var datetime = Time.get_datetime_dict_from_unix_time(in_game_time)
 	var result = weekday_conversions[datetime.weekday] + ", "

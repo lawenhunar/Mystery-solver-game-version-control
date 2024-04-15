@@ -1,29 +1,35 @@
 extends MarginContainer
 
-var age : int
 var character_name : String
+var texture_sheet : Texture
+var age : int
+var gender : String
 var traits : String
 var history : String
 var is_male : bool
 
-@onready var sprite_button : Button
-@onready var highlight_panel : Panel
-@onready var name_textbox : LineEdit
-@onready var name_label : Label
-@onready var description_label : RichTextLabel
+var sprite_button : Button
+var highlight_panel : Panel
+var name_textbox : LineEdit
+var name_label : Label
+var description_label : RichTextLabel
 
-func setup_initial_values(texture_sheet, _is_male):
+func _initialize_children():
+	sprite_button = $"Panel/Control/Sprite Button"
+	highlight_panel = $Panel/Control/Highlight
+	name_textbox = $"Panel/Name TextBox"
+	name_label = $"Panel/Name Label"
+	description_label = $"Panel/Description Label"
+
+func setup_initial_values(_texture_sheet, _is_male):
+	texture_sheet = _texture_sheet
 	var agent_image = texture_sheet.get_image()
 	var icon_image = _get_image_region(0, 3, agent_image)
 	var new_size = icon_image.get_size()*10
 	icon_image.resize(new_size.x,new_size.y,0)
 	is_male = _is_male
 	
-	sprite_button = find_child("Sprite Button")
-	highlight_panel = find_child("Highlight")
-	name_textbox = find_child("Name TextBox")
-	name_label = find_child("Name Label")
-	description_label = find_child("Description Label")
+	_initialize_children()
 	
 	sprite_button.icon = ImageTexture.create_from_image(icon_image)
 	name_textbox.visible = false
@@ -33,7 +39,7 @@ func setup_initial_values(texture_sheet, _is_male):
 
 func generate_info(game_manager, concurrency_handler):
 	var random_letter = char(randi_range(65,90))
-	var gender : String = "female"
+	gender = "female"
 	if is_male:
 		gender = "male"
 	character_name = await game_manager.chat_request("What's a random "+gender+" name that starts with "+random_letter)
@@ -48,12 +54,12 @@ func generate_info(game_manager, concurrency_handler):
 	traits = await game_manager.chat_request(traits_prompt)
 	description_label.text += "\n\nTraits: "+traits
 	
-	var existing_memories_prompt = "I have a video game character called "+character_name+" (gender: "+gender+", age: "+str(age)+", traits: "+traits+"). "
-	existing_memories_prompt += "Write me 10 short sentences that describe "+character_name+"'s character, history, and current state. Imagine this character lives a pretty routine life. "
-	existing_memories_prompt += "Your response should be a single paragraph, with statements separated by semi-colons. Examples of statements are as follows:\nJohn likes to go for walks;\nEmily has three dogs that she adores;\nStacy loves her job at the family restaurant;"
+	var history_prompt = "I have a video game character called "+character_name+" (gender: "+gender+", age: "+str(age)+", traits: "+traits+"). "
+	history_prompt += "Write me 10 short sentences that describe "+character_name+"'s character, history, and current state. Imagine this character lives a pretty routine life. "
+	history_prompt += "Your response should be a single paragraph, with statements separated by semi-colons. Examples of statements are as follows:\nJohn likes to go for walks;\nEmily has three dogs that she adores;\nStacy loves her job at the family restaurant;"
 	
-	var existing_memories = await game_manager.chat_request(existing_memories_prompt,92,200)
-	description_label.text += "\n\n"+existing_memories
+	history = await game_manager.chat_request(history_prompt,92,200)
+	description_label.text += "\n\n"+history
 	
 	concurrency_handler.response_complete()
 

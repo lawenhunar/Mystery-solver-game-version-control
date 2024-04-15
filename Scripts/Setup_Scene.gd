@@ -9,10 +9,9 @@ var concurrency_handler : ConcurrencyHandler
 
 @export_file("*.tscn") var next_scene
 
-var character_nodes : Array[Control]
+var character_nodes : Array
 var selected_character
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	concurrency_handler = ConcurrencyHandler.new()
 	start_button.visible = false
@@ -62,6 +61,7 @@ func _character_name_entered(text):
 	
 	_pick_target()
 
+# Once all agent information has been generated, pick the target to kill
 func _pick_target():
 	var target_index : int = randi_range(0,len(character_nodes)-1)
 	while character_nodes[target_index] == selected_character:
@@ -77,6 +77,13 @@ func _pick_target():
 func _on_redo_button_pressed():
 	get_tree().reload_current_scene()
 
-
 func _on_start_button_pressed():
+	var player_info = {"name": selected_character.character_name, "texture": selected_character.texture_sheet}
+	DataTransfer.set_player_info(player_info)
+	character_nodes.erase(selected_character)
+	
+	DataTransfer.reset_values()
+	for node in character_nodes:
+		var agent_info = {"name": node.character_name, "texture": node.texture_sheet, "age": node.age, "gender": node.gender, "traits": node.traits, "history": node.history}
+		DataTransfer.add_agent_info(agent_info)
 	get_tree().change_scene_to_file(next_scene)

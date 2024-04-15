@@ -1,23 +1,23 @@
 extends CharacterBody2D
 
-@onready var game_manager : Node = get_node("/root/Game/GameManager")
+var game_manager : Node
 var concurrency_handler : ConcurrencyHandler
 
 var icon : Texture
-@export var animation_texture : Texture
-@onready var animated_sprite_2d = $AnimatedSprite2D
+var animation_texture : Texture
+var animated_sprite_2d
 
-@export var agent_name : String
-@export var age : int
-@export_enum("he/him", "she/her", "other") var pronouns : String
-@export_multiline var traits : String
+var agent_name : String
+var age : int
+var gender : String
+var traits : String
 
-@export_range(0, 1) var recency_weight : float = 1
-@export_range(0, 1) var importance_weight : float = 1
-@export_range(0, 1) var relevance_weight : float = 1
+var recency_weight : float = 1
+var importance_weight : float = 1
+var relevance_weight : float = 1
 
-@onready var navigation_agent_2d = $NavigationAgent2D
-@onready var interaction_zone = $"Interaction Zone"
+var navigation_agent_2d
+var interaction_zone
 var acceleration=7
 var speed=150
 var destination:Node
@@ -47,27 +47,36 @@ var is_reflecting : bool = false
 var num_reflection_questions : int = 3
 var num_insights_per_reflection_question : int = 5
 
-@onready var conversation_panel = $"Conversation Panel"
+var conversation_panel
 
 
-func _ready():
+func _initialize_children():
+	game_manager = get_node("/root/Game/GameManager")
+	animated_sprite_2d = $AnimatedSprite2D
+	navigation_agent_2d = $NavigationAgent2D
+	interaction_zone = $"Interaction Zone"
+	conversation_panel = $"Conversation Panel"
+
+func setup_intial_values(info, starting_location):
+	_initialize_children()
+	
+	global_position = starting_location
+	agent_name = info.name
+	gender = info.gender
+	animation_texture = info.texture
+	age = info.age
+	traits = info.traits
+	
 	concurrency_handler = ConcurrencyHandler.new()
 	
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "wants to talk to somebody", null)
 	game_manager.can_record = true
 	conversation_panel.visible = false
 	
-	var existing_memories_prompt = "I have a video game character called "+agent_name+" (pronouns: "+pronouns+", age: "+str(age)+", traits: "+traits+"). "
-	existing_memories_prompt += "Write me 10 short sentences that describe "+agent_name+"'s character, history, and current state. Imagine this character lives a pretty routine life. "
-	existing_memories_prompt += "Your response should be a single paragraph, with statements separated by semi-colons. Examples of statements are as follows:\nJohn likes to go for walks;\nEmily has three dogs that she adores;\nStacy loves her job at the family restaurant;"
-	
-	var existing_memories = await game_manager.chat_request(existing_memories_prompt,92,200)
-	
-	
-	for content in existing_memories.split(";"):
+	for content in info.history.split(";"):
 		_add_memory(content.strip_edges(), true)
 	
-	await concurrency_handler.wait_for_responses(existing_memories.split(";").size())
+	await concurrency_handler.wait_for_responses(info.history.split(";").size())
 	
 	await _generate_agent_summary()
 	var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
@@ -154,7 +163,7 @@ func _generate_memory_summary(query):
 	concurrency_handler.response_complete(response)
 
 func _generate_agent_summary():
-	agent_summary = "Name: " + agent_name + " (pronouns: "+pronouns+" | age:" + str(age) + ")\n"
+	agent_summary = "Name: " + agent_name + " (gender: "+gender+" | age:" + str(age) + ")\n"
 	agent_summary += "Innate traits: " + traits + "\n"
 	
 	

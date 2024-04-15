@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://ctn24y5h1lrue"]
+[gd_scene load_steps=46 format=3 uid="uid://ctn24y5h1lrue"]
 
 [ext_resource type="Script" path="res://Scripts/Game_Scene.gd" id="1_e2mgj"]
 [ext_resource type="Texture2D" uid="uid://ro4tl3yp0wfr" path="res://Assets/Graphics/32x32/Room_Builder_free_16x16.png" id="2_ieyad"]
@@ -8,16 +8,11 @@
 [ext_resource type="PackedScene" uid="uid://r3b617omh2a0" path="res://Resource_Scenes/Dialogue Panel.tscn" id="6_lnns6"]
 [ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Resource_Scenes/Item Panel.tscn" id="7_7vqfq"]
 [ext_resource type="PackedScene" uid="uid://i2b2qs8m3wkh" path="res://Resource_Scenes/inv_ui.tscn" id="8_s54jy"]
-[ext_resource type="PackedScene" uid="uid://mo2pu8d80ruj" path="res://Resource_Scenes/Agent.tscn" id="9_uwru5"]
-[ext_resource type="Texture2D" uid="uid://22c4d16uuqgh" path="res://Assets/Graphics/32x32/Agent_F_Luna.png" id="10_jmhot"]
-[ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://Assets/Graphics/32x32/Agent_M_Alex.png" id="11_siw4l"]
 [ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Resource_Scenes/Player.tscn" id="12_npqwv"]
 [ext_resource type="Script" path="res://Scripts/inventory_item.gd" id="13_04xv3"]
 [ext_resource type="Texture2D" uid="uid://or4iq6fxc2if" path="res://Assets/Graphics/pistol_full.png" id="14_edatd"]
 [ext_resource type="Texture2D" uid="uid://3swvtl22ygx4" path="res://Assets/Graphics/Coffee Mug 001 16x161.png" id="15_51ony"]
 [ext_resource type="Script" path="res://Scripts/inventory.gd" id="16_clthm"]
-[ext_resource type="Texture2D" uid="uid://dfq21c61fbykm" path="res://Assets/Graphics/32x32/Agent_F_Amelia.png" id="17_j7xuq"]
-[ext_resource type="Texture2D" uid="uid://dk2mhb5jn8mwl" path="res://Assets/Graphics/32x32/Agent_M_Bob.png" id="18_mylsi"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_cm5wk"]
 vertices = PackedVector2Array(277, 149, 376, 151, 149, 151, 235, 149, -235, -43, -149, -53, -140, -53, -140, -21, -213, -21, 91, -69, 91, -21, 43, -21, 5, -43, 5, -85, 37, -107, 375, -151, 375, -21, 357, -75, 357, -149, 229, -151, 299, -149, 299, -21, 299, -75, -126, -69, -123, -53, -132, -53, -132, -69, -181, 61, -142, 91, -139, 107, -181, 107, -331, 61, 75, 11, 75, 69, -107, 107, -43, 53, 52, 11, -43, 11, 43, -5, 52, -5, -235, -101, -149, -69, 229, -107, -299, -21, -376, -21, -375, -123, -309, -43, -373, 151, -377, 151, -376, 11, -373, 107, 101, -123, 101, -151, 107, -151, 107, -101, 43, -123, 37, -149, 43, -151, -43, -151, -37, -149, -43, -123, -37, -107, 124, -101, 124, -117, 132, -117, 132, -101, 149, -101, 149, -151, 155, -151, 155, -107, 299, -5, 308, -5, 308, 11, 181, 69, 204, 11, 213, -5, 331, 101, 277, 107, 235, 107, 181, 91, 213, -21, 149, -21, 149, -69, 132, -69, 124, -69, 132, -53, 124, -53, -85, -85, -52, 11, -52, -5, -43, -5, -43, -21, -85, -43, -107, -21, -107, -69, -203, 11, -140, 11, -140, 17, -181, 17, -331, 17, -213, -5, -206, -5, -308, 11, -139, 61, -139, 59, -116, 59, -116, 91, -116, 53, -107, 53, -107, 46, -101, 46, -101, 53, 117, 69, 117, 59, 139, 59, 139, 69, 181, 11, 204, -5, 331, 11, 373, 101, 373, 11, 376, 11, 149, 149, 181, 149, 155, 91, 155, 107, 140, 107, 140, 91, 75, 91, 75, 117, 84, 117, 84, 149, -107, 151, 107, 149, 107, 151, -116, 107, -181, 151, -331, 151, -331, 107, -308, -5, -299, -5, -149, -123, -149, -101, -132, -101, -132, -117, -126, -117, -123, -101, -107, -101, -107, -151, -101, -151, -101, -123, -309, -101, -373, 61, -373, 17)
@@ -7673,7 +7668,7 @@ position = Vector2(336, -124)
 shape = SubResource("RectangleShape2D_aipeb")
 
 [node name="Standing Zone 2" type="Area2D" parent="Layout/Mansion/Meeting room"]
-position = Vector2(336, 168)
+position = Vector2(256.731, 71)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Mansion/Meeting room/Standing Zone 2"]
 shape = SubResource("RectangleShape2D_aipeb")
@@ -7822,42 +7817,12 @@ offset_bottom = 230.0
 grow_horizontal = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="Agent 1" parent="." instance=ExtResource("9_uwru5")]
-position = Vector2(-28, 370)
-animation_texture = ExtResource("10_jmhot")
-agent_name = "Luna"
-age = 22
-pronouns = "she/her"
-traits = "Hot and mysterious"
-
-[node name="Agent 2" parent="." instance=ExtResource("9_uwru5")]
-position = Vector2(972, 261)
-animation_texture = ExtResource("11_siw4l")
-agent_name = "Alex"
-age = 20
-pronouns = "he/him"
-traits = "Witty, funny"
+[node name="Agents" type="Node" parent="."]
 
 [node name="Player" parent="." instance=ExtResource("12_npqwv")]
 position = Vector2(-959, 304)
 agent_name = "Dostee"
 inv = SubResource("Resource_0qmba")
-
-[node name="Agent 3" parent="." instance=ExtResource("9_uwru5")]
-position = Vector2(145, -235)
-animation_texture = ExtResource("17_j7xuq")
-agent_name = "Amelia"
-age = 19
-pronouns = "she/her"
-traits = "Sweet, kind, caring"
-
-[node name="Agent 4" parent="." instance=ExtResource("9_uwru5")]
-position = Vector2(-724, -198)
-animation_texture = ExtResource("18_mylsi")
-agent_name = "Charles"
-age = 22
-pronouns = "he/him"
-traits = "Analytical, harsh"
 
 [node name="Pick ups" type="Node" parent="."]
 
