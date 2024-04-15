@@ -1,5 +1,3 @@
-# Memory.gd
-
 class_name Memory extends Node2D
 
 var time_created : float
