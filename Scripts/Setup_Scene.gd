@@ -3,22 +3,28 @@ extends Game_Manager
 @onready var instruction_label : Label = $"../CanvasLayer/Instruction"
 @onready var slider : HBoxContainer = $"../CanvasLayer/ScrollContainer/Slider"
 @onready var character_setup = preload("res://Resource_Scenes/Character_Setup.tscn")
+
 var character_nodes : Array[Control]
+var character_genders : Array[bool] # male = true, female = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# Current index
-	var i : int = 0
-	# Folder where agent image sheets are located
-	var folder_path : String = "res://Assets/Graphics/32x32/"
-	while true:
-		# Continue the loop only if the current agent image sheet exists
-		var current_path : String = folder_path+"Agent_"+str(i)+".png"
-		if !FileAccess.file_exists(current_path):
-			break
+	var folder_path = "res://Assets/Graphics/32x32/"
+	var dir = DirAccess.open(folder_path)
+	var files : PackedStringArray = dir.get_files()
+	for path in files:
+		# If the current file is not one of the agent image sheets, move onto the next one
+		if "Agent" not in path or ".import" in path:
+			continue
+			
+		# Get the gender of the current agent
+		var is_male : bool = false
+		if path.split("_")[1] == "M":
+			is_male = true
+		character_genders.append(is_male)
 		
 		# Get the icon of the agent from the image sheet
-		var agent_image = load(current_path).get_image()
+		var agent_image = load(folder_path+path).get_image()
 		var icon_image = _get_image_region(0, 3, agent_image)
 		var new_size = icon_image.get_size()*10
 		icon_image.resize(new_size.x,new_size.y,0)
@@ -39,8 +45,6 @@ func _ready():
 		slider.add_child(new_setup)
 		character_nodes.append(new_setup)
 		
-		i += 1
-
 func _character_selected(selected_node):
 	instruction_label.text = "What's Your Name?"
 	for node in character_nodes:
@@ -57,7 +61,7 @@ func _character_name_entered(text, selected_node):
 		var node = character_nodes[i]
 		if node == selected_node:
 			continue
-		_generate_name(node, i<=len(character_nodes)/2)
+		_generate_name(node, character_genders[i])
 
 
 func _generate_name(node, is_male):

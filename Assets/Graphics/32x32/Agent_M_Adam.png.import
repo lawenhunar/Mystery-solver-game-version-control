@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfq21c61fbykm"
-path="res://.godot/imported/Agent_4.png-99630c6103fba1ef931f306e7c254940.ctex"
+uid="uid://c5rl5cpkku02p"
+path="res://.godot/imported/Agent_M_Adam.png-d4d0301dfe54868ee58d167aeaed8808.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Graphics/32x32/Agent_4.png"
-dest_files=["res://.godot/imported/Agent_4.png-99630c6103fba1ef931f306e7c254940.ctex"]
+source_file="res://Assets/Graphics/32x32/Agent_M_Adam.png"
+dest_files=["res://.godot/imported/Agent_M_Adam.png-d4d0301dfe54868ee58d167aeaed8808.ctex"]
 
 [params]
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://mo2pu8d80ruj"]
 
-[ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://Assets/Graphics/32x32/Agent_1.png" id="2_dweql"]
+[ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://Assets/Graphics/32x32/Agent_M_Alex.png" id="2_dweql"]
 [ext_resource type="Script" path="res://Scripts/Animation_Creator.gd" id="2_jhw7g"]
 [ext_resource type="Script" path="res://Scripts/Brain.gd" id="3_7g08s"]
 [ext_resource type="FontFile" uid="uid://bmr3debnqv0rs" path="res://Assets/Fonts/RobotoMono-Regular.ttf" id="4_wl32f"]
