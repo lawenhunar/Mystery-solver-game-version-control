@@ -1,5 +1,7 @@
 extends Node
 
+class_name Game_Manager
+
 @onready var time_label = $"../UI/TimePanel/TimeLabel"
 @onready var request_label = $"../UI/TimePanel/Request Label"
 @onready var time_panel = $"../UI/TimePanel"

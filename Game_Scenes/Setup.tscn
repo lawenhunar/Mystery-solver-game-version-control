@@ -25,7 +25,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_by6qa")
 
-[node name="Label" type="Label" parent="CanvasLayer"]
+[node name="Instruction" type="Label" parent="CanvasLayer"]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -51,3 +51,4 @@ follow_focus = true
 [node name="Slider" type="HBoxContainer" parent="CanvasLayer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 6
+size_flags_vertical = 0
