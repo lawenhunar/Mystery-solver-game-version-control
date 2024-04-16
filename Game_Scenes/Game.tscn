@@ -7823,7 +7823,7 @@ grow_horizontal = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="Agent 1" parent="." instance=ExtResource("9_uwru5")]
-position = Vector2(-28, 370)
+position = Vector2(-47, 353)
 animation_texture = ExtResource("10_jmhot")
 agent_name = "Luna"
 age = 22
