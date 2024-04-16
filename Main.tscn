@@ -1,23 +1,23 @@
 [gd_scene load_steps=51 format=3 uid="uid://ctn24y5h1lrue"]
 
-[ext_resource type="Script" path="res://Scripts/Game_Manager.gd" id="1_1ntgh"]
-[ext_resource type="Texture2D" uid="uid://ro4tl3yp0wfr" path="res://Assets/Graphics/32x32/Room_Builder_free_16x16.png" id="2_ieyad"]
-[ext_resource type="Texture2D" uid="uid://bw5dgxcf1ykpe" path="res://Assets/Graphics/32x32/roguelikeIndoor_transparent.png" id="3_kd7xq"]
-[ext_resource type="Texture2D" uid="uid://0pjugd0acigq" path="res://Assets/Graphics/32x32/Interiors_free_16x16.png" id="4_hj1el"]
-[ext_resource type="PackedScene" uid="uid://tv0m3tp7mcub" path="res://Resource_Scenes/Item.tscn" id="5_3ilyt"]
-[ext_resource type="PackedScene" uid="uid://r3b617omh2a0" path="res://Resource_Scenes/Dialogue Panel.tscn" id="6_lnns6"]
-[ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Resource_Scenes/Item Panel.tscn" id="7_7vqfq"]
-[ext_resource type="PackedScene" uid="uid://i2b2qs8m3wkh" path="res://Resource_Scenes/inv_ui.tscn" id="8_s54jy"]
-[ext_resource type="PackedScene" uid="uid://mo2pu8d80ruj" path="res://Resource_Scenes/Agent.tscn" id="9_uwru5"]
-[ext_resource type="Texture2D" uid="uid://22c4d16uuqgh" path="res://Assets/Graphics/32x32/Luna_16x16.png" id="10_jmhot"]
-[ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://Assets/Graphics/32x32/Alex_16x16.png" id="11_siw4l"]
-[ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Resource_Scenes/Player.tscn" id="12_npqwv"]
-[ext_resource type="Script" path="res://Scripts/inventory_item.gd" id="13_04xv3"]
-[ext_resource type="Texture2D" uid="uid://or4iq6fxc2if" path="res://Assets/Graphics/pistol_full.png" id="14_edatd"]
-[ext_resource type="Texture2D" uid="uid://3swvtl22ygx4" path="res://Assets/Graphics/Coffee Mug 001 16x161.png" id="15_51ony"]
-[ext_resource type="Script" path="res://Scripts/inventory.gd" id="16_clthm"]
-[ext_resource type="Texture2D" uid="uid://dfq21c61fbykm" path="res://Assets/Graphics/32x32/Amelia_16x16.png" id="17_j7xuq"]
-[ext_resource type="Texture2D" uid="uid://dk2mhb5jn8mwl" path="res://Assets/Graphics/32x32/Bob_16x16.png" id="18_mylsi"]
+[ext_resource type="Script" path="res://Scripts/Game_Manager.gd" id="1_wv6pv"]
+[ext_resource type="Texture2D" uid="uid://ro4tl3yp0wfr" path="res://Assets/Graphics/32x32/Room_Builder_free_16x16.png" id="2_5kl4b"]
+[ext_resource type="Texture2D" uid="uid://bw5dgxcf1ykpe" path="res://Assets/Graphics/32x32/roguelikeIndoor_transparent.png" id="3_roctc"]
+[ext_resource type="Texture2D" uid="uid://0pjugd0acigq" path="res://Assets/Graphics/32x32/Interiors_free_16x16.png" id="4_3aorg"]
+[ext_resource type="PackedScene" uid="uid://tv0m3tp7mcub" path="res://Resource_Scenes/Item.tscn" id="5_b87n4"]
+[ext_resource type="PackedScene" uid="uid://r3b617omh2a0" path="res://Resource_Scenes/Dialogue Panel.tscn" id="6_mb65b"]
+[ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Resource_Scenes/Item Panel.tscn" id="7_8hciq"]
+[ext_resource type="PackedScene" uid="uid://i2b2qs8m3wkh" path="res://Resource_Scenes/inv_ui.tscn" id="8_djj3f"]
+[ext_resource type="PackedScene" uid="uid://mo2pu8d80ruj" path="res://Resource_Scenes/Agent.tscn" id="9_7pvp2"]
+[ext_resource type="Texture2D" uid="uid://22c4d16uuqgh" path="res://Assets/Graphics/32x32/Luna_16x16.png" id="10_4re6g"]
+[ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://Assets/Graphics/32x32/Alex_16x16.png" id="11_p4s4w"]
+[ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Resource_Scenes/Player.tscn" id="12_iifb6"]
+[ext_resource type="Script" path="res://Scripts/inventory_item.gd" id="13_utd5i"]
+[ext_resource type="Texture2D" uid="uid://or4iq6fxc2if" path="res://Assets/Graphics/pistol_full.png" id="14_a6xey"]
+[ext_resource type="Texture2D" uid="uid://3swvtl22ygx4" path="res://Assets/Graphics/Coffee Mug 001 16x161.png" id="15_3l2dx"]
+[ext_resource type="Script" path="res://Scripts/inventory.gd" id="16_5yx2v"]
+[ext_resource type="Texture2D" uid="uid://dfq21c61fbykm" path="res://Assets/Graphics/32x32/Amelia_16x16.png" id="17_3sexm"]
+[ext_resource type="Texture2D" uid="uid://dk2mhb5jn8mwl" path="res://Assets/Graphics/32x32/Bob_16x16.png" id="18_3eff5"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_cm5wk"]
 vertices = PackedVector2Array(277, 149, 376, 151, 149, 151, 235, 149, -235, -43, -149, -53, -140, -53, -140, -21, -213, -21, 91, -69, 91, -21, 43, -21, 5, -43, 5, -85, 37, -107, 375, -151, 375, -21, 357, -75, 357, -149, 229, -151, 299, -149, 299, -21, 299, -75, -126, -69, -123, -53, -132, -53, -132, -69, -181, 61, -142, 91, -139, 107, -181, 107, -331, 61, 75, 11, 75, 69, -107, 107, -43, 53, 52, 11, -43, 11, 43, -5, 52, -5, -235, -101, -149, -69, 229, -107, -299, -21, -376, -21, -375, -123, -309, -43, -373, 151, -377, 151, -376, 11, -373, 107, 101, -123, 101, -151, 107, -151, 107, -101, 43, -123, 37, -149, 43, -151, -43, -151, -37, -149, -43, -123, -37, -107, 124, -101, 124, -117, 132, -117, 132, -101, 149, -101, 149, -151, 155, -151, 155, -107, 299, -5, 308, -5, 308, 11, 181, 69, 204, 11, 213, -5, 331, 101, 277, 107, 235, 107, 181, 91, 213, -21, 149, -21, 149, -69, 132, -69, 124, -69, 132, -53, 124, -53, -85, -85, -52, 11, -52, -5, -43, -5, -43, -21, -85, -43, -107, -21, -107, -69, -203, 11, -140, 11, -140, 17, -181, 17, -331, 17, -213, -5, -206, -5, -308, 11, -139, 61, -139, 59, -116, 59, -116, 91, -116, 53, -107, 53, -107, 46, -101, 46, -101, 53, 117, 69, 117, 59, 139, 59, 139, 69, 181, 11, 204, -5, 331, 11, 373, 101, 373, 11, 376, 11, 149, 149, 181, 149, 155, 91, 155, 107, 140, 107, 140, 91, 75, 91, 75, 117, 84, 117, 84, 149, -107, 151, 107, 149, 107, 151, -116, 107, -181, 151, -331, 151, -331, 107, -308, -5, -299, -5, -149, -123, -149, -101, -132, -101, -132, -117, -126, -117, -123, -101, -107, -101, -107, -151, -101, -151, -101, -123, -309, -101, -373, 61, -373, 17)
@@ -125,7 +125,7 @@ source_geometry_group_name = &"navigation_polygon_source_group"
 agent_radius = 0.0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_nxvbd"]
-texture = ExtResource("2_ieyad")
+texture = ExtResource("2_5kl4b")
 3:0/0 = 0
 3:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 3:0/0/physics_layer_0/angular_velocity = 0.0
@@ -968,7 +968,7 @@ texture = ExtResource("2_ieyad")
 9:20/0/physics_layer_0/angular_velocity = 0.0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_l342k"]
-texture = ExtResource("3_kd7xq")
+texture = ExtResource("3_roctc")
 separation = Vector2i(1, 1)
 0:0/0 = 0
 0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
@@ -2916,7 +2916,7 @@ separation = Vector2i(1, 1)
 11:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(4.75, -5.25, 8, -5.125, 8, 8, 5.375, 8)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_05a24"]
-texture = ExtResource("4_hj1el")
+texture = ExtResource("4_3aorg")
 0:0/0 = 0
 0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 0:0/0/physics_layer_0/angular_velocity = 0.0
@@ -7441,18 +7441,18 @@ size = Vector2(929, 570)
 size = Vector2(919, 624.75)
 
 [sub_resource type="Resource" id="Resource_lr3qs"]
-script = ExtResource("13_04xv3")
+script = ExtResource("13_utd5i")
 name = "pistol"
-texture = ExtResource("14_edatd")
+texture = ExtResource("14_a6xey")
 
 [sub_resource type="Resource" id="Resource_ih8eo"]
-script = ExtResource("13_04xv3")
+script = ExtResource("13_utd5i")
 name = "coffee mug"
-texture = ExtResource("15_51ony")
+texture = ExtResource("15_3l2dx")
 
 [sub_resource type="Resource" id="Resource_0qmba"]
-script = ExtResource("16_clthm")
-items = Array[ExtResource("13_04xv3")]([null, SubResource("Resource_lr3qs"), SubResource("Resource_ih8eo"), null, SubResource("Resource_lr3qs")])
+script = ExtResource("16_5yx2v")
+items = Array[ExtResource("13_utd5i")]([null, SubResource("Resource_lr3qs"), SubResource("Resource_ih8eo"), null, SubResource("Resource_lr3qs")])
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j3a6f"]
 size = Vector2(174, 123)
@@ -7463,7 +7463,7 @@ size = Vector2(122, 156)
 [node name="Game" type="Node2D"]
 
 [node name="GameManager" type="Node" parent="."]
-script = ExtResource("1_1ntgh")
+script = ExtResource("1_wv6pv")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 scale = Vector2(4, 4)
@@ -7496,22 +7496,22 @@ scale = Vector2(0.26, 0.26)
 position = Vector2(0, 20)
 shape = SubResource("RectangleShape2D_y8vnd")
 
-[node name="Fireplace" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ilyt")]
+[node name="Fireplace" parent="Layout/Mansion/Living room" instance=ExtResource("5_b87n4")]
 position = Vector2(361.538, -111.538)
 scale = Vector2(6.12, 4.84)
 actions_string = "is empty; contains logs; contains logs and is burning slowly;"
 
-[node name="Couch 1" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ilyt")]
+[node name="Couch 1" parent="Layout/Mansion/Living room" instance=ExtResource("5_b87n4")]
 position = Vector2(-280.769, -138.462)
 scale = Vector2(8.96, 4.52)
 actions_string = "unoccupied and clean; occupied and clean; unoccupied and dirty; occupied and dirty;"
 
-[node name="Couch 2" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ilyt")]
+[node name="Couch 2" parent="Layout/Mansion/Living room" instance=ExtResource("5_b87n4")]
 position = Vector2(380.769, 200)
 scale = Vector2(4.32, 6.96)
 actions_string = "unoccupied and clean; occupied and clean; unoccupied and dirty; occupied and dirty;"
 
-[node name="Plant" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ilyt")]
+[node name="Plant" parent="Layout/Mansion/Living room" instance=ExtResource("5_b87n4")]
 position = Vector2(-407.692, -153.846)
 scale = Vector2(2.88, 3.16)
 actions_string = "alive and hydrated; alive and thirsty; withering; dead"
@@ -7536,22 +7536,22 @@ scale = Vector2(0.318985, 0.252825)
 position = Vector2(-10.5, 6)
 shape = SubResource("RectangleShape2D_5kexf")
 
-[node name="Book Stand 1" parent="Layout/Mansion/Library" instance=ExtResource("5_3ilyt")]
+[node name="Book Stand 1" parent="Layout/Mansion/Library" instance=ExtResource("5_b87n4")]
 position = Vector2(272.74, -146.346)
 scale = Vector2(5.07643, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
 
-[node name="Book Stand 2" parent="Layout/Mansion/Library" instance=ExtResource("5_3ilyt")]
+[node name="Book Stand 2" parent="Layout/Mansion/Library" instance=ExtResource("5_b87n4")]
 position = Vector2(-329.169, -146.346)
 scale = Vector2(4.98238, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
 
-[node name="Book Stand 3" parent="Layout/Mansion/Library" instance=ExtResource("5_3ilyt")]
+[node name="Book Stand 3" parent="Layout/Mansion/Library" instance=ExtResource("5_b87n4")]
 position = Vector2(272.74, 233.363)
 scale = Vector2(5.10777, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
 
-[node name="Book Stand 4" parent="Layout/Mansion/Library" instance=ExtResource("5_3ilyt")]
+[node name="Book Stand 4" parent="Layout/Mansion/Library" instance=ExtResource("5_b87n4")]
 position = Vector2(-329.169, 233.363)
 scale = Vector2(4.85698, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
@@ -7564,57 +7564,57 @@ scale = Vector2(0.320001, 0.280001)
 position = Vector2(1, -2)
 shape = SubResource("RectangleShape2D_hvxvm")
 
-[node name="Oven 1" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Oven 1" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(121.874, -207.142)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains food; on and cooking food; on and empty;"
 
-[node name="Oven 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Oven 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-178.124, -199.999)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains food; on and cooking food; on and empty;"
 
-[node name="Sink" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Sink" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-28.1249, -203.571)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains dishes; on and contains dishes; on and doesn't contain dishes"
 
-[node name="Table Chair 1" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 1" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(21.8748, -10.7142)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Table Chair 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-28.1249, -10.7143)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Table Chair 3" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 3" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-78.1247, -10.7143)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Table Chair 4" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 4" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-128.125, -10.7143)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Table Chair 5" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 5" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(21.8748, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Table Chair 6" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 6" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-28.1249, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Table Chair 7" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 7" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-78.1247, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
-[node name="Table Chair 8" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ilyt")]
+[node name="Table Chair 8" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_b87n4")]
 position = Vector2(-128.125, 89.2854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
@@ -7651,17 +7651,17 @@ scale = Vector2(0.26, 0.25)
 position = Vector2(5, 1)
 shape = SubResource("RectangleShape2D_kj3ub")
 
-[node name="Curtain 1" parent="Layout/Mansion/Meeting room" instance=ExtResource("5_3ilyt")]
+[node name="Curtain 1" parent="Layout/Mansion/Meeting room" instance=ExtResource("5_b87n4")]
 position = Vector2(-269.231, -232)
 scale = Vector2(4.04, 1)
 actions_string = "closed and tied up;closed and untied;open"
 
-[node name="Curtain 2" parent="Layout/Mansion/Meeting room" instance=ExtResource("5_3ilyt")]
+[node name="Curtain 2" parent="Layout/Mansion/Meeting room" instance=ExtResource("5_b87n4")]
 position = Vector2(280.769, -232)
 scale = Vector2(4.04, 1)
 actions_string = "closed and tied up;closed and untied;open"
 
-[node name="Candle Lamp" parent="Layout/Mansion/Meeting room" instance=ExtResource("5_3ilyt")]
+[node name="Candle Lamp" parent="Layout/Mansion/Meeting room" instance=ExtResource("5_b87n4")]
 position = Vector2(403.846, 156)
 scale = Vector2(1.15648, 6.85509)
 actions_string = "off;on"
@@ -7698,17 +7698,17 @@ scale = Vector2(0.27, 0.27)
 position = Vector2(2, 1)
 shape = SubResource("RectangleShape2D_53h4t")
 
-[node name="Bathtub" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_3ilyt")]
+[node name="Bathtub" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_b87n4")]
 position = Vector2(281.481, -96.2963)
 scale = Vector2(8.16, 9.8)
 actions_string = "empty and unoccupied;on and occupied"
 
-[node name="Skincare Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_3ilyt")]
+[node name="Skincare Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_b87n4")]
 position = Vector2(-285.185, -207.407)
 scale = Vector2(5.7185, 5.49926)
 actions_string = "contains facewash and mouthwash;contains facewash;contains mouthwash;empty"
 
-[node name="Medical Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_3ilyt")]
+[node name="Medical Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_b87n4")]
 position = Vector2(-162.963, -192.593)
 scale = Vector2(5.92133, 4.72269)
 actions_string = "contains acne pills;empty"
@@ -7733,27 +7733,27 @@ scale = Vector2(0.28, 0.26)
 position = Vector2(-1.5, 4.625)
 shape = SubResource("RectangleShape2D_0ix8t")
 
-[node name="Piano" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ilyt")]
+[node name="Piano" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_b87n4")]
 position = Vector2(-3.57144, 188.462)
 scale = Vector2(5.16423, 5.54351)
 actions_string = "unoccupied and closed;occupied and open;unoccupied and open"
 
-[node name="Bed" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ilyt")]
+[node name="Bed" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_b87n4")]
 position = Vector2(339.286, 15.3846)
 scale = Vector2(6.05085, -6.71594)
 actions_string = "clean and unoccupied; occupied; messy and unoccupied"
 
-[node name="Mirror" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ilyt")]
+[node name="Mirror" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_b87n4")]
 position = Vector2(339.286, -134.615)
 scale = Vector2(3.4051, -6.23786)
 actions_string = "clean;dirty;broken"
 
-[node name="Wardrobe" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ilyt")]
+[node name="Wardrobe" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_b87n4")]
 position = Vector2(-346.429, -130.769)
 scale = Vector2(5.40511, -6.23786)
 actions_string = "contains clothes;empty"
 
-[node name="Desk" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ilyt")]
+[node name="Desk" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_b87n4")]
 position = Vector2(-328.571, 180.769)
 scale = Vector2(4.26225, -6.23786)
 actions_string = "contains a laptop that's turned off;contains a laptop that's on"
@@ -7803,15 +7803,15 @@ text = "Chat Requests: 0    (per min: 0)
 Embedding Requests: 0    (per min: 0)
 Chat Tokens: 0    (per min: 0)"
 
-[node name="Dialogue Panel" parent="UI" instance=ExtResource("6_lnns6")]
+[node name="Dialogue Panel" parent="UI" instance=ExtResource("6_mb65b")]
 offset_left = 63.0
 offset_top = 33.0
 offset_right = 952.0
 offset_bottom = 501.0
 
-[node name="Item Panel" parent="UI" instance=ExtResource("7_7vqfq")]
+[node name="Item Panel" parent="UI" instance=ExtResource("7_8hciq")]
 
-[node name="Inv_UI" parent="UI" instance=ExtResource("8_s54jy")]
+[node name="Inv_UI" parent="UI" instance=ExtResource("8_djj3f")]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -7822,38 +7822,38 @@ offset_bottom = 230.0
 grow_horizontal = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="Agent 1" parent="." instance=ExtResource("9_uwru5")]
+[node name="Agent 1" parent="." instance=ExtResource("9_7pvp2")]
 position = Vector2(-47, 353)
-animation_texture = ExtResource("10_jmhot")
+animation_texture = ExtResource("10_4re6g")
 agent_name = "Luna"
 age = 22
 pronouns = "she/her"
 traits = "Hot and mysterious"
 
-[node name="Agent 2" parent="." instance=ExtResource("9_uwru5")]
+[node name="Agent 2" parent="." instance=ExtResource("9_7pvp2")]
 position = Vector2(972, 261)
-animation_texture = ExtResource("11_siw4l")
+animation_texture = ExtResource("11_p4s4w")
 agent_name = "Alex"
 age = 20
 pronouns = "he/him"
 traits = "Witty, funny"
 
-[node name="Player" parent="." instance=ExtResource("12_npqwv")]
+[node name="Player" parent="." instance=ExtResource("12_iifb6")]
 position = Vector2(-959, 304)
 agent_name = "Dostee"
 inv = SubResource("Resource_0qmba")
 
-[node name="Agent 3" parent="." instance=ExtResource("9_uwru5")]
+[node name="Agent 3" parent="." instance=ExtResource("9_7pvp2")]
 position = Vector2(145, -235)
-animation_texture = ExtResource("17_j7xuq")
+animation_texture = ExtResource("17_3sexm")
 agent_name = "Amelia"
 age = 19
 pronouns = "she/her"
 traits = "Sweet, kind, caring"
 
-[node name="Agent 4" parent="." instance=ExtResource("9_uwru5")]
+[node name="Agent 4" parent="." instance=ExtResource("9_7pvp2")]
 position = Vector2(-724, -198)
-animation_texture = ExtResource("18_mylsi")
+animation_texture = ExtResource("18_3eff5")
 agent_name = "Charles"
 age = 22
 pronouns = "he/him"
@@ -7869,7 +7869,7 @@ metadata/_edit_group_ = true
 [node name="Sprite2D" type="Sprite2D" parent="Pick ups/Gun"]
 position = Vector2(5.99998, -18)
 scale = Vector2(0.174805, 0.174805)
-texture = ExtResource("14_edatd")
+texture = ExtResource("14_a6xey")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Pick ups/Gun"]
 position = Vector2(-1, -26)
@@ -7883,7 +7883,7 @@ metadata/_edit_group_ = true
 [node name="Sprite2D" type="Sprite2D" parent="Pick ups/Mug"]
 position = Vector2(8.5, 8.5)
 scale = Vector2(2.0625, 2.0625)
-texture = ExtResource("15_51ony")
+texture = ExtResource("15_3l2dx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Pick ups/Mug"]
 position = Vector2(11, 87)
