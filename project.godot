@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="Mystery solver game"
-run/main_scene="res://Game_Scenes/Game.tscn"
+run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
-config/icon="res://Assets/Graphics/icon.svg"
+config/icon="res://icon.svg"
 
 [input]
 
