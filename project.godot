@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="Mystery solver game"
-run/main_scene="res://Main.tscn"
+run/main_scene="res://Main_Scenes/Game.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://Assets/Graphics/icon.svg"
+
+[autoload]
+
+DataTransfer="*res://Scripts/Data_Transfer.gd"
 
 [input]
 
