@@ -13,8 +13,8 @@ func _ready():
 
 
 func _on_area_2d_body_entered(body):
-	print("entered area")
-	if body.has_method("Player"):
+
+	if body.is_in_group("Player"):
 		player=body
 		player_in_area=true
 		player.collect(item)

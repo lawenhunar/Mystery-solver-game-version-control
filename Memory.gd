@@ -1,5 +1,3 @@
-# Memory.gd
-
 class_name Memory extends Node2D
 
 var time_created : float
@@ -9,7 +7,9 @@ var embedding : Array
 var content : String
 var token_count : int
 
-func _init(_time_created, _content, game_manager, callback_signal, lock):
+signal completed
+
+func _init(_time_created, _content, game_manager):
 	time_created = _time_created
 	time_last_accessed = time_created
 	content = _content
@@ -22,7 +22,5 @@ func _init(_time_created, _content, game_manager, callback_signal, lock):
 	token_count = await game_manager.get_token_count(content)
 	embedding = await game_manager.embedding_request(content)
 	
-	lock.lock()
-	callback_signal.emit()
-	lock.unlock()
+	completed.emit()
 

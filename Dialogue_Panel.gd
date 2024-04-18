@@ -1,6 +1,6 @@
 extends Panel
 
-@onready var game_manager = get_node("/root/Main/GameManager")
+@onready var game_manager = get_node("/root/Game/GameManager")
 
 @onready var dialogue_text = $"Dialogue Text"
 @onready var agent_icon = $"Agent Icon"

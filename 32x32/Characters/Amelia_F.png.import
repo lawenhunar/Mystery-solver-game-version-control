@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://22c4d16uuqgh"
-path="res://.godot/imported/Luna_16x16.png-284378835565dc85aa50cc8b89ca9264.ctex"
+uid="uid://dfq21c61fbykm"
+path="res://.godot/imported/Amelia_F.png-994207e4a413a99554788dfb7f7f8c38.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://32x32/Luna_16x16.png"
-dest_files=["res://.godot/imported/Luna_16x16.png-284378835565dc85aa50cc8b89ca9264.ctex"]
+source_file="res://32x32/Characters/Amelia_F.png"
+dest_files=["res://.godot/imported/Amelia_F.png-994207e4a413a99554788dfb7f7f8c38.ctex"]
 
 [params]
 

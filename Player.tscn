@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://b10w5uttqs18h"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_qcete"]
-[ext_resource type="Texture2D" uid="uid://c5rl5cpkku02p" path="res://32x32/Adam_16x16.png" id="2_1h3gl"]
+[ext_resource type="Texture2D" uid="uid://c5rl5cpkku02p" path="res://32x32/Characters/Adam_M.png" id="2_1h3gl"]
 [ext_resource type="Script" path="res://Animation_Creator.gd" id="3_7gj1r"]
 [ext_resource type="FontFile" uid="uid://bmr3debnqv0rs" path="res://RobotoMono-Regular.ttf" id="4_ra68o"]
 

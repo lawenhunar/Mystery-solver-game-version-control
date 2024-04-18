@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c5rl5cpkku02p"
-path="res://.godot/imported/Adam_16x16.png-e46e90239800979ac54274f888a54823.ctex"
+uid="uid://22c4d16uuqgh"
+path="res://.godot/imported/Luna_F.png-e9ac6626b889b07a2c8f7df3b7ed10fe.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://32x32/Adam_16x16.png"
-dest_files=["res://.godot/imported/Adam_16x16.png-e46e90239800979ac54274f888a54823.ctex"]
+source_file="res://32x32/Characters/Luna_F.png"
+dest_files=["res://.godot/imported/Luna_F.png-e9ac6626b889b07a2c8f7df3b7ed10fe.ctex"]
 
 [params]
 

@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@onready var game_manager : Node = get_node("/root/Main/GameManager")
+@onready var game_manager : Node = get_node("/root/Game/GameManager")
 
 @export var agent_name : String
 @export var animation_texture : Texture
@@ -93,6 +93,3 @@ func _on_interaction_zone_body_exited(body):
 
 func collect(item):
 	inv.insert(item)
-
-func Player():
-	pass

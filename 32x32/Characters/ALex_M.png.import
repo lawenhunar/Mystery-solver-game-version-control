@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfq21c61fbykm"
-path="res://.godot/imported/Amelia_16x16.png-4264c45071ce2a0018aa203246b6acfc.ctex"
+uid="uid://d1m2738keddqj"
+path="res://.godot/imported/ALex_M.png-1728241dce181e6344284bc5efde3046.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://32x32/Amelia_16x16.png"
-dest_files=["res://.godot/imported/Amelia_16x16.png-4264c45071ce2a0018aa203246b6acfc.ctex"]
+source_file="res://32x32/Characters/ALex_M.png"
+dest_files=["res://.godot/imported/ALex_M.png-1728241dce181e6344284bc5efde3046.ctex"]
 
 [params]
 

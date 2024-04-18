@@ -1,6 +1,6 @@
 extends Panel
 
-@onready var game_manager : Node = get_node("/root/Main/GameManager")
+@onready var game_manager : Node = get_node("/root/Game/GameManager")
 
 @onready var name_label : Label = get_node("Name")
 @onready var current_action_label : Label = get_node("Current Action")
