@@ -16,6 +16,8 @@ var current_agent
 @onready var item_panel = get_node("/root/Game/UI/Item Panel")
 var current_item
 
+@onready var inv_ui = $"../UI/inv_ui"
+
 var in_game_time
 var month_conversions = {
 	1: "January",
@@ -160,6 +162,7 @@ func enter_new_dialogue(agent):
 	current_agent = agent
 	current_agent.dialogue_setup(player)
 	dialogue_panel.visible = true
+	inv_ui.visible=false
 	dialogue_panel.initialize_with_agent(agent)
 
 func set_dialogue_text(new_text):

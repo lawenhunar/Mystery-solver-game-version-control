@@ -4,6 +4,8 @@ extends Control
 @onready var inv:Inv=preload("res://Resources/player_inventory.tres")
 @onready var slots:Array =  $NinePatchRect/GridContainer.get_children()
 var isOpen=false
+@onready var dialogue_panel = $"../Dialogue Panel"
+@onready var item_panel = $"../Item Panel"
 
 
 func _ready():
@@ -16,7 +18,7 @@ func update_slots():
 		slots[i].update(inv.slots[i])
 
 func _process(delta):
-	if Input.is_action_just_pressed("toggle inventory"):
+	if Input.is_action_just_pressed("toggle inventory") && dialogue_panel.visible==false &&item_panel.visible==false:
 		if isOpen:
 			close()
 		else:
