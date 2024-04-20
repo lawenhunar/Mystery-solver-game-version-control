@@ -143,6 +143,7 @@ func _animate():
 
 func kill_agent(method_of_killing):
 	as_entity.set_action("killed by "+method_of_killing)
+	_end_navigation()
 	is_alive = false
 	if facing_direction.x < 0:
 		animated_sprite_2d.animation = "dead right"
