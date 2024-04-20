@@ -21,7 +21,7 @@ func _ready():
 	var files : PackedStringArray = dir.get_files()
 	for path in files:
 		# If the current file is not one of the agent image sheets, move onto the next one
-		if ".import" in path:
+		if path.find(".png") != len(path)-4:
 			continue
 			
 		# Get the gender of the current agent
