@@ -23,9 +23,11 @@ var popup_alpha : float
 
 var nearby_entity : Node
 
+var cause_of_kill:String
+
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
-	
+	cause_of_kill="Choked"
 
 func _physics_process(_delta):
 	if game_manager.is_UI_active():
@@ -78,14 +80,20 @@ func _input(_event):
 			as_entity.set_action("interacting with "+nearby_entity.as_entity.entity_name)
 			as_entity.set_interactable(nearby_entity.as_entity)
 			nearby_entity.as_entity.set_interactable(as_entity)
+	if Input.is_key_pressed(KEY_K) && is_showing_popup:
+		if nearby_entity.is_in_group("Agent"):
+			if (cause_of_kill=="poisoned"):
+				await get_tree().create_timer(10).timeout
+			nearby_entity.kill_agent(cause_of_kill)
 
 func _on_interaction_zone_body_entered(body):
 	if body == self:
 		return
 	
 	if body.is_in_group("Entity"):
-		if body.is_in_group("Agent"):
-			body.kill_agent("magic")
+		#if body.is_in_group("Agent"):
+			#body.kill_agent("magic")
+			
 		nearby_entity = body
 		is_showing_popup = true
 
@@ -97,3 +105,4 @@ func _on_interaction_zone_body_exited(body):
 
 func collect(item):
 	inv.insert(item)
+

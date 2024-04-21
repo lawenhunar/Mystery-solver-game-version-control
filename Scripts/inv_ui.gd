@@ -18,7 +18,7 @@ func update_slots():
 		slots[i].update(inv.slots[i])
 
 func _process(_delta):
-	if Input.is_action_just_pressed("toggle inventory"):
+	if Input.is_action_just_pressed("toggle inventory") && !dialogue_panel.visible && !item_panel.visible:
 		if isOpen:
 			close()
 		else:

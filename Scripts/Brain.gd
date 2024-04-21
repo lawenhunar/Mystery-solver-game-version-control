@@ -142,13 +142,15 @@ func _animate():
 		animated_sprite_2d.animation = "idle "+directions[round(facing_direction.angle()/(PI/2))+1]
 
 func kill_agent(method_of_killing):
-	as_entity.set_action("killed by "+method_of_killing)
+	as_entity.set_action("killed by "+ method_of_killing)
+	print(method_of_killing)
 	_end_navigation()
 	is_alive = false
 	if facing_direction.x < 0:
 		animated_sprite_2d.animation = "dead right"
 	else:
 		animated_sprite_2d.animation = "dead left"
+	#print(agent_name+"is dead")
 
 func _set_destination(chosen_node):
 	previous_destination = destination
