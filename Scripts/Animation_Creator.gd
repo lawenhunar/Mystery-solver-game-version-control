@@ -11,7 +11,7 @@ func _ready():
 	var directions = ["right", "up", "left", "down"]
 	
 	if get_parent().is_in_group("Agent"):
-		get_parent().icon = _get_texture_region(0, 3)
+		get_parent().icon = ImageTexture.create_from_image(_get_image_region(0, 3))
 	
 	for i in 2:
 		for j in 4:
@@ -19,17 +19,28 @@ func _ready():
 			frames.add_animation(current_animation_name)
 			
 			for f in frame_count:
-				var frame_texture = _get_texture_region(i+1, j*6 + f)
+				var frame_texture = ImageTexture.create_from_image(_get_image_region(i+1, j*6 + f))
 				frames.add_frame(current_animation_name, frame_texture)
 				if i == 1:
 					frames.set_animation_speed(current_animation_name, 10)
+	
+	# Death frames
+	for direction in range(0,3,2):
+		var current_animation_name = "dead "+directions[direction] 
+		frames.add_animation(current_animation_name)
+		var frame_image = _get_image_region(5,12 + direction/2)
+		if direction == 0:
+			frame_image.rotate_90(CLOCKWISE)
+		else:
+			frame_image.rotate_90(COUNTERCLOCKWISE)
+		frames.add_frame(current_animation_name, ImageTexture.create_from_image(frame_image))
 	
 	sprite_frames = frames
 	animation = "idle down"
 	play("idle down")
 
-func _get_texture_region(row, column) -> Texture:
+func _get_image_region(row, column) -> Image:
 	var frame_position = Vector2(column * frame_size.x, row * frame_size.y)
 	var region = Rect2i(frame_position, frame_size)
 	var image_region = texture_image.get_region(region)
-	return ImageTexture.create_from_image(image_region)
+	return image_region

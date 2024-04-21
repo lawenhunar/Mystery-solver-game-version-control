@@ -65,6 +65,8 @@ func _input(_event):
 		
 	if Input.is_key_pressed(KEY_I) and is_showing_popup:
 		if nearby_entity.is_in_group("Agent"):
+			if !nearby_entity.is_alive:
+				return
 			if nearby_entity.dialogue_partner != null:
 				return
 			game_manager.enter_new_dialogue(nearby_entity)
@@ -82,6 +84,8 @@ func _on_interaction_zone_body_entered(body):
 		return
 	
 	if body.is_in_group("Entity"):
+		if body.is_in_group("Agent"):
+			body.kill_agent("magic")
 		nearby_entity = body
 		is_showing_popup = true
 
