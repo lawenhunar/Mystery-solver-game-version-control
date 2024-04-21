@@ -6,8 +6,11 @@ extends Panel
 @onready var current_action_label : Label = get_node("Current Action")
 @onready var action_list : ItemList = get_node("Action List")
 
+@onready var inv_ui = $"../inv_ui"
+
 func initialize_with_item(item):
 	self.visible = true
+	inv_ui.visible=false
 	name_label.text = item.as_entity.entity_name
 	current_action_label.text = "Currently: "+item.as_entity.action
 	for action in item.all_actions:
