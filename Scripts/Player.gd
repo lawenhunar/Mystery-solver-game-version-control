@@ -76,13 +76,7 @@ func _input(_event):
 			as_entity.set_action("interacting with "+nearby_entity.as_entity.entity_name)
 			as_entity.set_interactable(nearby_entity.as_entity)
 			nearby_entity.as_entity.set_interactable(as_entity)
-		#kill starts from here
-	elif Input.is_key_pressed(KEY_K) and is_showing_popup:
-		if nearby_entity.is_in_group("Agent"):
-			nearby_entity.queue_free()
-			print("kill")
-		
-		
+
 func _on_interaction_zone_body_entered(body):
 	if body == self:
 		return
