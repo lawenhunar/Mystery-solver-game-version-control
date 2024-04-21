@@ -4,6 +4,8 @@ extends Control
 @onready var inv:Inv=preload("res://Resources/player_inventory.tres")
 @onready var slots:Array =  $NinePatchRect/GridContainer.get_children()
 var isOpen=false
+@onready var dialogue_panel = $"../Dialogue Panel"
+@onready var item_panel = $"../Item Panel"
 
 
 func _ready():
