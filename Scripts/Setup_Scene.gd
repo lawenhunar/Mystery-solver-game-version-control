@@ -2,9 +2,9 @@ extends Game_Manager
 
 var concurrency_handler : ConcurrencyHandler
 
-@onready var instruction_label : Label = $"../CanvasLayer/Instruction"
-@onready var slider : HBoxContainer = $"../CanvasLayer/ScrollContainer/Slider"
-@onready var start_button : Button = $"../CanvasLayer/Start Button"
+@onready var instruction_label : Label = get_node("/root/Setup/CanvasLayer/Instruction")
+@onready var slider : HBoxContainer = get_node("/root/Setup/CanvasLayer/ScrollContainer/Slider")
+@onready var start_button : Button = get_node("/root/Setup/CanvasLayer/Start Button")
 @onready var character_setup = preload("res://Secondary_Scenes/Character_Setup.tscn")
 
 @export_file("*.tscn") var next_scene
