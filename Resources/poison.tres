@@ -6,4 +6,5 @@
 [resource]
 script = ExtResource("1_hqndn")
 name = "poison"
+method_of_killing = "poisoned"
 texture = ExtResource("2_ljnic")

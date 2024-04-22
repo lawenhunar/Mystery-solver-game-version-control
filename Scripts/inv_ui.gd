@@ -7,6 +7,8 @@ var isOpen=false
 @onready var dialogue_panel = $"../Dialogue Panel"
 @onready var item_panel = $"../Item Panel"
 
+@onready var player = $"../../Player"
+
 
 func _ready():
 	inv.update.connect(update_slots)

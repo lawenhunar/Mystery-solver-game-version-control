@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cbuxy541evde0"]
-
-[ext_resource type="Script" path="res://Scripts/kill_button.gd" id="1_kvilv"]
-
-[node name="Button" type="Button"]
-offset_right = 70.0
-offset_bottom = 70.0
-script = ExtResource("1_kvilv")

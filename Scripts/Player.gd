@@ -8,6 +8,7 @@ extends CharacterBody2D
 var previous_velocity : Vector2
 
 @export var inv: Inv
+@onready var inv_ui = $"../UI/inv_ui"
 
 var dialogue_history : Array
 var dialogue_partner : Node2D
@@ -82,8 +83,8 @@ func _input(_event):
 			nearby_entity.as_entity.set_interactable(as_entity)
 	if Input.is_key_pressed(KEY_K) && is_showing_popup:
 		if nearby_entity.is_in_group("Agent"):
-			if (cause_of_kill=="poisoned"):
-				await get_tree().create_timer(10).timeout
+			#if (cause_of_kill=="poisoned"):
+				#await get_tree().create_timer(10).timeout
 			nearby_entity.kill_agent(cause_of_kill)
 
 func _on_interaction_zone_body_entered(body):
@@ -91,9 +92,6 @@ func _on_interaction_zone_body_entered(body):
 		return
 	
 	if body.is_in_group("Entity"):
-		#if body.is_in_group("Agent"):
-			#body.kill_agent("magic")
-			
 		nearby_entity = body
 		is_showing_popup = true
 

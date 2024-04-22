@@ -1,17 +1,11 @@
 extends Button
 
-@export var kill_method:String
+var kill_method:String
 
-@onready var player = $".."
+@onready var inv_ui_slot = $".."
+
+@onready var inside_slot = $"../CenterContainer/Panel/inside_slot"
 
 func _pressed():
-	player.cause_of_kill=kill_method
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+	if !inside_slot.texture==null:
+		inv_ui_slot.player.cause_of_kill=kill_method
