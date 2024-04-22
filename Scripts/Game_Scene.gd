@@ -161,6 +161,7 @@ func _update_stats():
 func enter_new_dialogue(agent):
 	current_agent = agent
 	current_agent.dialogue_setup(player)
+	player.velocity = Vector2.ZERO
 	dialogue_panel.visible = true
 	inv_ui.visible=false
 	dialogue_panel.initialize_with_agent(agent)

@@ -28,6 +28,15 @@ func _ready():
 	
 
 func _physics_process(_delta):
+	var directions = ["up", "right", "down", "left"]
+	if velocity != Vector2.ZERO:
+		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
+		previous_velocity = velocity
+	else:
+		animated_sprite_2d.animation = "idle "+directions[round(previous_velocity.angle()/(PI/2))+1]
+	
+	as_entity.set_location(game_manager.get_location(global_position))
+	
 	if game_manager.is_UI_active():
 		return
 	
@@ -53,16 +62,6 @@ func _physics_process(_delta):
 		velocity += acceleration
 		velocity = velocity.limit_length(200)
 	move_and_slide()
-		
-	
-	var directions = ["up", "right", "down", "left"]
-	if velocity != Vector2.ZERO:
-		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
-		previous_velocity = velocity
-	else:
-		animated_sprite_2d.animation = "idle "+directions[round(previous_velocity.angle()/(PI/2))+1]
-	
-	as_entity.set_location(game_manager.get_location(global_position))
 	
 	var nearby_entities = interaction_zone.get_overlapping_bodies()
 	for i in range(len(nearby_entities)-1,-1,-1):
