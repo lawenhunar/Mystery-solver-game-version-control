@@ -15,7 +15,8 @@ func update(slot:InvSlot):
 	else:
 		item_visuals.visible=true
 		button.visible=true
-		button.kill_method=slot.item.method_of_killing
+		if slot.item.pickup_type=="Weapon":
+			button.kill_method=slot.item.method_of_killing
 		player=inv_ui.player
 		item_visuals.texture=slot.item.texture
 		amount_text.visible=true

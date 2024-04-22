@@ -7,4 +7,5 @@
 script = ExtResource("1_8ai3g")
 name = "coffee mug"
 method_of_killing = "mug thrown at"
+pickup_type = "Weapon"
 texture = ExtResource("2_xrnjq")

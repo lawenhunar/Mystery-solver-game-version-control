@@ -26,6 +26,8 @@ var nearby_entity : Node
 
 var cause_of_kill:String
 
+@onready var lights = $"../UI/Lights"
+
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
 	cause_of_kill="Choked"
@@ -86,6 +88,9 @@ func _input(_event):
 			#if (cause_of_kill=="poisoned"):
 				#await get_tree().create_timer(10).timeout
 			nearby_entity.kill_agent(cause_of_kill)
+			
+	if Input.is_key_pressed(KEY_L):
+		lights.canvas_modulate.toggleLights()
 
 func _on_interaction_zone_body_entered(body):
 	if body == self:
