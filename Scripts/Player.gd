@@ -19,10 +19,9 @@ signal callback_signal
 var lock : Mutex = Mutex.new()
 
 @onready var popup_ui_label : Label = $"Popup UI"
-var is_showing_popup : bool
+@onready var interaction_zone : Area2D = $"Interaction Zone"
 var popup_alpha : float
-
-var nearby_entity : Node
+var closest_entity : Node2D
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
@@ -65,9 +64,26 @@ func _physics_process(_delta):
 	
 	as_entity.set_location(game_manager.get_location(global_position))
 	
+	var nearby_entities = interaction_zone.get_overlapping_bodies()
+	for i in range(len(nearby_entities)-1,-1,-1):
+		if !nearby_entities[i].is_in_group("Entity") || nearby_entities[i].is_in_group("Player"):
+			nearby_entities.erase(nearby_entities[i])
+	closest_entity = null
+	var min_distance = INF # Start with infinity, which will be larger than any other distance
+	for entity in nearby_entities:
+		var distance = global_position.distance_to(entity.global_position)
+		if distance < min_distance:
+			min_distance = distance
+			closest_entity = entity
+	
+	
 	var target_alpha : float = 0
-	if is_showing_popup:
+	if closest_entity != null:
 		target_alpha = 1
+		
+		var direction_to_entity = closest_entity.global_position - global_position
+		direction_to_entity = direction_to_entity.limit_length(115)
+		popup_ui_label.position = direction_to_entity
 	popup_alpha = lerpf(popup_alpha, target_alpha, 0.2)
 	popup_ui_label.label_settings.font_color.a = popup_alpha
 
@@ -75,21 +91,21 @@ func _input(_event):
 	if game_manager.is_UI_active():
 		return
 		
-	if Input.is_key_pressed(KEY_I) and is_showing_popup:
-		if nearby_entity.is_in_group("Agent"):
-			if !nearby_entity.is_alive:
+	if Input.is_key_pressed(KEY_I) and closest_entity != null:
+		if closest_entity.is_in_group("Agent"):
+			if !closest_entity.is_alive:
 				return
-			if nearby_entity.dialogue_partner != null:
+			if closest_entity.dialogue_partner != null:
 				return
-			game_manager.enter_new_dialogue(nearby_entity)
-			as_entity.set_action("talking with "+nearby_entity.as_entity.entity_name)
-			as_entity.set_interactable(nearby_entity.as_entity)
-			nearby_entity.receive_dialogue("")
-		elif nearby_entity.is_in_group("Item"):
-			game_manager.setup_item_panel(nearby_entity)
-			as_entity.set_action("interacting with "+nearby_entity.as_entity.entity_name)
-			as_entity.set_interactable(nearby_entity.as_entity)
-			nearby_entity.as_entity.set_interactable(as_entity)
+			game_manager.enter_new_dialogue(closest_entity)
+			as_entity.set_action("talking with "+closest_entity.as_entity.entity_name)
+			as_entity.set_interactable(closest_entity.as_entity)
+			closest_entity.receive_dialogue("")
+		elif closest_entity.is_in_group("Item"):
+			game_manager.setup_item_panel(closest_entity)
+			as_entity.set_action("interacting with "+closest_entity.as_entity.entity_name)
+			as_entity.set_interactable(closest_entity.as_entity)
+			closest_entity.as_entity.set_interactable(as_entity)
 
 func _on_interaction_zone_body_entered(body):
 	if body == self:
@@ -98,14 +114,6 @@ func _on_interaction_zone_body_entered(body):
 	if body.is_in_group("Entity"):
 		if body.is_in_group("Agent"):
 			body.kill_agent("magic")
-		nearby_entity = body
-		is_showing_popup = true
-
-
-func _on_interaction_zone_body_exited(body):
-	if body.is_in_group("Entity") and body == nearby_entity:
-		nearby_entity = null
-		is_showing_popup = false
 
 func collect(item):
 	inv.insert(item)

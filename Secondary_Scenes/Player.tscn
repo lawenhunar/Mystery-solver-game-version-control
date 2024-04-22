@@ -53,10 +53,9 @@ shape = SubResource("RectangleShape2D_dcpn5")
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="Popup UI" type="Label" parent="."]
-offset_left = -15.0
-offset_top = -115.0
-offset_right = 25.0
-offset_bottom = -54.0
+offset_right = 27.0
+offset_bottom = 61.0
+pivot_offset = Vector2(14, 30.5)
 text = "I"
 label_settings = SubResource("LabelSettings_3jul1")
 
@@ -65,6 +64,3 @@ collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interaction Zone"]
 shape = SubResource("CircleShape2D_j416i")
-
-[connection signal="body_entered" from="Interaction Zone" to="." method="_on_interaction_zone_body_entered"]
-[connection signal="body_exited" from="Interaction Zone" to="." method="_on_interaction_zone_body_exited"]
