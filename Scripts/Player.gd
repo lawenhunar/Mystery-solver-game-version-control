@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var animation_texture : Texture
 @onready var animated_sprite_2d = $AnimatedSprite2D
 var previous_velocity : Vector2
+var damping_factor : float = 0.9
 
 @export var inv: Inv
 
@@ -31,16 +32,27 @@ func _physics_process(_delta):
 	if game_manager.is_UI_active():
 		return
 	
-	velocity = Vector2.ZERO
+	var acceleration : Vector2 = Vector2.ZERO
 	if Input.is_key_pressed(KEY_LEFT):
-		velocity.x -=1
+		acceleration.x -=1
 	if Input.is_key_pressed(KEY_RIGHT):
-		velocity.x +=1
+		acceleration.x +=1
 	if Input.is_key_pressed(KEY_UP):
-		velocity.y -=1
+		acceleration.y -=1
 	if Input.is_key_pressed(KEY_DOWN):
-		velocity.y +=1
-	velocity *= 180
+		acceleration.y +=1
+	
+	# If the player hasn't pressed any movement buttons, slow down to a halt
+	if acceleration == Vector2.ZERO:
+		velocity *= damping_factor
+		
+		if velocity.length() < 5:
+			velocity = Vector2.ZERO
+	# If the player has pressed some movement buttons, apply the acceleration and limit the velocity
+	else:
+		acceleration *= 10
+		velocity += acceleration
+		velocity = velocity.limit_length(200)
 	move_and_slide()
 		
 	
