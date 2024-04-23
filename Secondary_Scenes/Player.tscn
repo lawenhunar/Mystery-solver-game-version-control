@@ -23,12 +23,12 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dcpn5"]
 size = Vector2(28.3273, 22.366)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_j416i"]
+radius = 101.005
+
 [sub_resource type="LabelSettings" id="LabelSettings_3jul1"]
 font = ExtResource("4_ra68o")
 font_size = 45
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_j416i"]
-radius = 101.005
 
 [node name="Player" type="CharacterBody2D" groups=["Entity", "Player"]]
 z_index = 6
@@ -52,15 +52,18 @@ shape = SubResource("RectangleShape2D_dcpn5")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="Popup UI" type="Label" parent="."]
-offset_right = 27.0
-offset_bottom = 61.0
-pivot_offset = Vector2(14, 30.5)
-text = "I"
-label_settings = SubResource("LabelSettings_3jul1")
-
 [node name="Interaction Zone" type="Area2D" parent="."]
 collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interaction Zone"]
 shape = SubResource("CircleShape2D_j416i")
+
+[node name="Popup UI" type="Label" parent="."]
+offset_left = -67.5
+offset_top = -30.5
+offset_right = 67.5
+offset_bottom = 30.5
+text = "I | K"
+label_settings = SubResource("LabelSettings_3jul1")
+horizontal_alignment = 1
+vertical_alignment = 1

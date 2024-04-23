@@ -70,8 +70,13 @@ func _physics_process(_delta):
 	
 	var nearby_entities = interaction_zone.get_overlapping_bodies()
 	for i in range(len(nearby_entities)-1,-1,-1):
-		if !nearby_entities[i].is_in_group("Entity") || nearby_entities[i].is_in_group("Player"):
-			nearby_entities.erase(nearby_entities[i])
+		var current_entity : Node2D = nearby_entities[i]
+		if !current_entity.is_in_group("Entity") || current_entity.is_in_group("Player"):
+			nearby_entities.erase(current_entity)
+			
+		if current_entity.is_in_group("Agent"):
+			if !current_entity.is_alive:
+				nearby_entities.erase(current_entity)
 	closest_entity = null
 	var min_distance = INF # Start with infinity, which will be larger than any other distance
 	for entity in nearby_entities:
@@ -85,9 +90,14 @@ func _physics_process(_delta):
 	if closest_entity != null:
 		target_alpha = 1
 		
+		if closest_entity.is_in_group("Agent"):
+			popup_ui_label.text = "I , K"
+		else:
+			popup_ui_label.text = "I"
+		
 		var direction_to_entity = closest_entity.global_position - global_position
 		direction_to_entity = direction_to_entity.limit_length(115)
-		popup_ui_label.position = direction_to_entity
+		popup_ui_label.position = direction_to_entity - popup_ui_label.size/2
 	popup_alpha = lerpf(popup_alpha, target_alpha, 0.2)
 	popup_ui_label.label_settings.font_color.a = popup_alpha
 
