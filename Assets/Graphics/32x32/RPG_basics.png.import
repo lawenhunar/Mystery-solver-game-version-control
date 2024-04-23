@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://byxwuibc5y1r6"
-path="res://.godot/imported/Adam_icon.png-e0274d7df2bd96f15a8da6d92a3ffb5a.ctex"
+uid="uid://ick6vpip4umn"
+path="res://.godot/imported/RPG_basics.png-a33de855defd8a066f145e8e5e76cb24.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://32x32/Adam_icon.png"
-dest_files=["res://.godot/imported/Adam_icon.png-e0274d7df2bd96f15a8da6d92a3ffb5a.ctex"]
+source_file="res://Assets/Graphics/32x32/RPG_basics.png"
+dest_files=["res://.godot/imported/RPG_basics.png-a33de855defd8a066f145e8e5e76cb24.ctex"]
 
 [params]
 
