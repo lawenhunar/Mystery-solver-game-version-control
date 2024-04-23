@@ -1,13 +1,9 @@
 extends Game_Manager
 
-@onready var time_label = $"../UI/TimePanel/TimeLabel"
-@onready var request_label = $"../UI/TimePanel/Request Label"
-@onready var time_panel = $"../UI/TimePanel"
-
-@onready var layout = $"../Layout"
+@onready var layout = get_node("/root/Game/Layout")
 
 @onready var player = get_node("/root/Game/Player")
-@onready var agents_root = $"../Agents"
+@onready var agents_root = get_node("/root/Game/Agents")
 @onready var agent_scene = preload("res://Secondary_Scenes/Agent.tscn")
 
 @onready var dialogue_panel = get_node("/root/Game/UI/Dialogue Panel")
@@ -16,7 +12,7 @@ var current_agent
 @onready var item_panel = get_node("/root/Game/UI/Item Panel")
 var current_item
 
-@onready var inv_ui = $"../UI/inv_ui"
+@onready var inv_ui = get_node("/root/Game/UI/inv_ui")
 
 var in_game_time
 var month_conversions = {
@@ -66,8 +62,9 @@ func _ready():
 func _update_time():
 	super._update_time()
 	in_game_time += 60
-	time_label.text = "Time: " + get_current_datetime_string()
-	_update_stats()
+
+func _prepare_stats_string() -> String:
+	return "Time: "+get_current_datetime_string()+"\n"+super._prepare_stats_string()
 
 func get_location(point: Vector2) -> String:
 	var result_path = ""
@@ -151,16 +148,10 @@ func get_current_datetime_string():
 	result += Time.get_time_string_from_unix_time(in_game_time)
 	return result
 
-func _update_stats():
-	var num_mins = (Time.get_unix_time_from_system()-start_time)/60
-	var label_text = "Chat Requests: "+str(num_chat_requests)+"    (per min: "+str(round(num_chat_requests/num_mins))+")\n"
-	label_text += "Embedding Requests: "+str(num_embedding_requests)+"    (per min: "+str(round(num_embedding_requests/num_mins))+")\n"
-	label_text += "Chat Tokens: "+str(round(num_chat_tokens))+"    (per min: "+str(round(num_chat_tokens/num_mins))+")\n"
-	request_label.text = label_text
-
 func enter_new_dialogue(agent):
 	current_agent = agent
 	current_agent.dialogue_setup(player)
+	player.velocity = Vector2.ZERO
 	dialogue_panel.visible = true
 	inv_ui.visible=false
 	dialogue_panel.initialize_with_agent(agent)

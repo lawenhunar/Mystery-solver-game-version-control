@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var animation_texture : Texture
 @onready var animated_sprite_2d = $AnimatedSprite2D
 var previous_velocity : Vector2
+var damping_factor : float = 0.9
 
 @export var inv: Inv
 @onready var inv_ui = $"../UI/inv_ui"
@@ -19,10 +20,9 @@ signal callback_signal
 var lock : Mutex = Mutex.new()
 
 @onready var popup_ui_label : Label = $"Popup UI"
-var is_showing_popup : bool
+@onready var interaction_zone : Area2D = $"Interaction Zone"
 var popup_alpha : float
-
-var nearby_entity : Node
+var closest_entity : Node2D
 
 var cause_of_kill:String
 
@@ -33,22 +33,6 @@ func _ready():
 	cause_of_kill="Choked"
 
 func _physics_process(_delta):
-	if game_manager.is_UI_active():
-		return
-	
-	velocity = Vector2.ZERO
-	if Input.is_key_pressed(KEY_LEFT):
-		velocity.x -=1
-	if Input.is_key_pressed(KEY_RIGHT):
-		velocity.x +=1
-	if Input.is_key_pressed(KEY_UP):
-		velocity.y -=1
-	if Input.is_key_pressed(KEY_DOWN):
-		velocity.y +=1
-	velocity *= 180
-	move_and_slide()
-		
-	
 	var directions = ["up", "right", "down", "left"]
 	if velocity != Vector2.ZERO:
 		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
@@ -58,9 +42,52 @@ func _physics_process(_delta):
 	
 	as_entity.set_location(game_manager.get_location(global_position))
 	
+	if game_manager.is_UI_active():
+		return
+	
+	var acceleration : Vector2 = Vector2.ZERO
+	if Input.is_key_pressed(KEY_LEFT):
+		acceleration.x -=1
+	if Input.is_key_pressed(KEY_RIGHT):
+		acceleration.x +=1
+	if Input.is_key_pressed(KEY_UP):
+		acceleration.y -=1
+	if Input.is_key_pressed(KEY_DOWN):
+		acceleration.y +=1
+	
+	# If the player hasn't pressed any movement buttons, slow down to a halt
+	if acceleration == Vector2.ZERO:
+		velocity *= damping_factor
+		
+		if velocity.length() < 5:
+			velocity = Vector2.ZERO
+	# If the player has pressed some movement buttons, apply the acceleration and limit the velocity
+	else:
+		acceleration *= 10
+		velocity += acceleration
+		velocity = velocity.limit_length(200)
+	move_and_slide()
+	
+	var nearby_entities = interaction_zone.get_overlapping_bodies()
+	for i in range(len(nearby_entities)-1,-1,-1):
+		if !nearby_entities[i].is_in_group("Entity") || nearby_entities[i].is_in_group("Player"):
+			nearby_entities.erase(nearby_entities[i])
+	closest_entity = null
+	var min_distance = INF # Start with infinity, which will be larger than any other distance
+	for entity in nearby_entities:
+		var distance = global_position.distance_to(entity.global_position)
+		if distance < min_distance:
+			min_distance = distance
+			closest_entity = entity
+	
+	
 	var target_alpha : float = 0
-	if is_showing_popup:
+	if closest_entity != null:
 		target_alpha = 1
+		
+		var direction_to_entity = closest_entity.global_position - global_position
+		direction_to_entity = direction_to_entity.limit_length(115)
+		popup_ui_label.position = direction_to_entity
 	popup_alpha = lerpf(popup_alpha, target_alpha, 0.2)
 	popup_ui_label.label_settings.font_color.a = popup_alpha
 
@@ -68,43 +95,29 @@ func _input(_event):
 	if game_manager.is_UI_active():
 		return
 		
-	if Input.is_key_pressed(KEY_I) and is_showing_popup:
-		if nearby_entity.is_in_group("Agent"):
-			if !nearby_entity.is_alive:
+	if Input.is_key_pressed(KEY_I) and closest_entity != null:
+		if closest_entity.is_in_group("Agent"):
+			if !closest_entity.is_alive:
 				return
-			if nearby_entity.dialogue_partner != null:
+			if closest_entity.dialogue_partner != null:
 				return
-			game_manager.enter_new_dialogue(nearby_entity)
-			as_entity.set_action("talking with "+nearby_entity.as_entity.entity_name)
-			as_entity.set_interactable(nearby_entity.as_entity)
-			nearby_entity.receive_dialogue("")
-		elif nearby_entity.is_in_group("Item"):
-			game_manager.setup_item_panel(nearby_entity)
-			as_entity.set_action("interacting with "+nearby_entity.as_entity.entity_name)
-			as_entity.set_interactable(nearby_entity.as_entity)
-			nearby_entity.as_entity.set_interactable(as_entity)
+			game_manager.enter_new_dialogue(closest_entity)
+			as_entity.set_action("talking with "+closest_entity.as_entity.entity_name)
+			as_entity.set_interactable(closest_entity.as_entity)
+			closest_entity.receive_dialogue("")
+		elif closest_entity.is_in_group("Item"):
+			game_manager.setup_item_panel(closest_entity)
+			as_entity.set_action("interacting with "+closest_entity.as_entity.entity_name)
+			as_entity.set_interactable(closest_entity.as_entity)
+			closest_entity.as_entity.set_interactable(as_entity)
 	if Input.is_key_pressed(KEY_K) && is_showing_popup:
 		if nearby_entity.is_in_group("Agent"):
 			#if (cause_of_kill=="poisoned"):
 				#await get_tree().create_timer(10).timeout
-			nearby_entity.kill_agent(cause_of_kill)
+			closest_entity.kill_agent(cause_of_kill)
 			
 	if Input.is_key_pressed(KEY_L):
 		lights.canvas_modulate.toggleLights()
-
-func _on_interaction_zone_body_entered(body):
-	if body == self:
-		return
-	
-	if body.is_in_group("Entity"):
-		nearby_entity = body
-		is_showing_popup = true
-
-
-func _on_interaction_zone_body_exited(body):
-	if body.is_in_group("Entity") and body == nearby_entity:
-		nearby_entity = null
-		is_showing_popup = false
 
 func collect(item):
 	inv.insert(item)
