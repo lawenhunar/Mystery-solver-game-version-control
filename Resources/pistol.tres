@@ -6,4 +6,6 @@
 [resource]
 script = ExtResource("1_wbcb0")
 name = "pistol"
+method_of_killing = "shot"
+pickup_type = "Weapon"
 texture = ExtResource("2_f6yof")

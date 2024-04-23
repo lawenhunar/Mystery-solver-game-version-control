@@ -7,6 +7,8 @@ var isOpen=false
 @onready var dialogue_panel = $"../Dialogue Panel"
 @onready var item_panel = $"../Item Panel"
 
+@onready var player = $"../../Player"
+
 
 func _ready():
 	inv.update.connect(update_slots)
@@ -18,7 +20,7 @@ func update_slots():
 		slots[i].update(inv.slots[i])
 
 func _process(_delta):
-	if Input.is_action_just_pressed("toggle inventory"):
+	if Input.is_action_just_pressed("toggle inventory") && !dialogue_panel.visible && !item_panel.visible:
 		if isOpen:
 			close()
 		else:

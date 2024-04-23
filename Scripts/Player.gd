@@ -9,6 +9,7 @@ var previous_velocity : Vector2
 var damping_factor : float = 0.9
 
 @export var inv: Inv
+@onready var inv_ui = $"../UI/inv_ui"
 
 var dialogue_history : Array
 var dialogue_partner : Node2D
@@ -23,9 +24,13 @@ var lock : Mutex = Mutex.new()
 var popup_alpha : float
 var closest_entity : Node2D
 
+var cause_of_kill:String
+
+@onready var lights = $"../UI/Lights"
+
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
-	
+	cause_of_kill="Choked"
 
 func _physics_process(_delta):
 	var directions = ["up", "right", "down", "left"]
@@ -105,14 +110,15 @@ func _input(_event):
 			as_entity.set_action("interacting with "+closest_entity.as_entity.entity_name)
 			as_entity.set_interactable(closest_entity.as_entity)
 			closest_entity.as_entity.set_interactable(as_entity)
-
-func _on_interaction_zone_body_entered(body):
-	if body == self:
-		return
-	
-	if body.is_in_group("Entity"):
-		if body.is_in_group("Agent"):
-			body.kill_agent("magic")
+	if Input.is_key_pressed(KEY_K) && is_showing_popup:
+		if nearby_entity.is_in_group("Agent"):
+			#if (cause_of_kill=="poisoned"):
+				#await get_tree().create_timer(10).timeout
+			closest_entity.kill_agent(cause_of_kill)
+			
+	if Input.is_key_pressed(KEY_L):
+		lights.canvas_modulate.toggleLights()
 
 func collect(item):
 	inv.insert(item)
+
