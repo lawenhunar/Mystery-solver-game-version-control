@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://ctn24y5h1lrue"]
+[gd_scene load_steps=47 format=3 uid="uid://ctn24y5h1lrue"]
 
 [ext_resource type="PackedScene" uid="uid://dnmqbbkcnsnb5" path="res://Secondary_Scenes/Game_Manager.tscn" id="1_ffubo"]
 [ext_resource type="Script" path="res://Scripts/Game_Scene.gd" id="1_titmr"]
@@ -10,7 +10,9 @@
 [ext_resource type="PackedScene" uid="uid://r3b617omh2a0" path="res://Secondary_Scenes/Dialogue Panel.tscn" id="6_78pgh"]
 [ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Secondary_Scenes/Item Panel.tscn" id="7_y1yib"]
 [ext_resource type="PackedScene" uid="uid://bkpt0i40vowfy" path="res://Secondary_Scenes/inv_ui.tscn" id="8_3ymyg"]
+[ext_resource type="Script" path="res://Scripts/day_night_cycle.gd" id="8_cdygh"]
 [ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Secondary_Scenes/Player.tscn" id="9_807kv"]
+[ext_resource type="Texture2D" uid="uid://bxiquo3uvfm0q" path="res://Secondary_Scenes/daynightcycle-gradient-texture.tres" id="9_ww0mc"]
 [ext_resource type="Resource" uid="uid://baal7jyhuyqi7" path="res://Resources/player_inventory.tres" id="10_nh7ua"]
 [ext_resource type="PackedScene" uid="uid://dx671hoibc5pn" path="res://Secondary_Scenes/pickup_node.tscn" id="11_ae3wu"]
 [ext_resource type="Resource" uid="uid://b37vjdr563x7k" path="res://Resources/pistol.tres" id="12_p7drs"]
@@ -8150,6 +8152,13 @@ position = Vector2(-207.143, -11.5385)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Mansion/Bedroom/Standing Zone 2"]
 shape = SubResource("RectangleShape2D_aipeb")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Layout"]
+z_index = 18
+position = Vector2(-8, -304)
+scale = Vector2(1.04, 1)
+script = ExtResource("8_cdygh")
+gradient = ExtResource("9_ww0mc")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
