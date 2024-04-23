@@ -26,7 +26,7 @@ var closest_entity : Node2D
 
 var cause_of_kill:String
 
-@onready var lights = $"../UI/Lights"
+#@onready var lights = $"../UI/Lights"
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
@@ -110,14 +110,14 @@ func _input(_event):
 			as_entity.set_action("interacting with "+closest_entity.as_entity.entity_name)
 			as_entity.set_interactable(closest_entity.as_entity)
 			closest_entity.as_entity.set_interactable(as_entity)
-	if Input.is_key_pressed(KEY_K) && is_showing_popup:
-		if nearby_entity.is_in_group("Agent"):
+	if Input.is_key_pressed(KEY_K) && closest_entity != null:
+		if closest_entity.is_in_group("Agent"):
 			#if (cause_of_kill=="poisoned"):
 				#await get_tree().create_timer(10).timeout
 			closest_entity.kill_agent(cause_of_kill)
 			
-	if Input.is_key_pressed(KEY_L):
-		lights.canvas_modulate.toggleLights()
+	#if Input.is_key_pressed(KEY_L):
+		#lights.canvas_modulate.toggleLights()
 
 func collect(item):
 	inv.insert(item)
