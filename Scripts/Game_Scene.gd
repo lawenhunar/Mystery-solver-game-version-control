@@ -15,6 +15,7 @@ var current_item
 @onready var inv_ui = get_node("/root/Game/UI/inv_ui")
 
 var in_game_time
+
 var month_conversions = {
 	1: "January",
 	2: "February",
