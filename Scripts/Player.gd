@@ -90,10 +90,10 @@ func _physics_process(_delta):
 	if closest_entity != null:
 		target_alpha = 1
 		
+		popup_ui_label.text = "I"
 		if closest_entity.is_in_group("Agent"):
-			popup_ui_label.text = "I , K"
-		else:
-			popup_ui_label.text = "I"
+			if closest_entity.is_target:
+				popup_ui_label.text += " , K"
 		
 		var direction_to_entity = closest_entity.global_position - global_position
 		direction_to_entity = direction_to_entity.limit_length(115)
@@ -122,9 +122,8 @@ func _input(_event):
 			closest_entity.as_entity.set_interactable(as_entity)
 	if Input.is_key_pressed(KEY_K) && closest_entity != null:
 		if closest_entity.is_in_group("Agent"):
-			#if (cause_of_kill=="poisoned"):
-				#await get_tree().create_timer(10).timeout
-			closest_entity.kill_agent(cause_of_kill)
+			if closest_entity.is_target:
+				closest_entity.kill_agent(cause_of_kill)
 			
 	#if Input.is_key_pressed(KEY_L):
 		#lights.canvas_modulate.toggleLights()
