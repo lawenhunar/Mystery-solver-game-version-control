@@ -3,8 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://g6v8mtm5cno" path="res://Assets/Graphics/light asset.png" id="1_v15hn"]
 [ext_resource type="Script" path="res://Scripts/Light.gd" id="2_ns8xy"]
 
-[node name="CandleLight" type="PointLight2D"]
-scale = Vector2(0.608914, 0.106835)
+[node name="Light" type="PointLight2D"]
+scale = Vector2(0.75, 0.75)
 energy = 0.8
 texture = ExtResource("1_v15hn")
 script = ExtResource("2_ns8xy")
