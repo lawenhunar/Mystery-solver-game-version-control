@@ -30,6 +30,7 @@ var memories : Array
 var new_observations : Array[Entity]
 var dialogue_history : Array
 var dialogue_partner : Node2D
+var dialogue_context : String
 var current_plan : String
 var all_tasks : Array
 
@@ -610,9 +611,16 @@ func _reflection_coroutine(question):
 func dialogue_setup(partner):
 	dialogue_history.clear()
 	dialogue_partner = partner
+	dialogue_context = ""
 	can_trigger = false
 	as_entity.set_action("busy talking with "+partner.as_entity.entity_name)
 	_end_navigation()
+
+func _create_dialogue_context():
+	var queries : Array[String] = []
+	queries.append("What are all the things "+agent_name+" remembers about "+dialogue_partner.as_entity.entity_name+"?")
+	queries.append("Has "+agent_name+" ever heard of "+dialogue_partner.as_entity.entity_name+"'s name before in a previous conversation?")
+	return await _generate_memory_summary(queries)
 
 func initiate_dialogue(partner):
 	dialogue_setup(partner)
@@ -621,15 +629,12 @@ func initiate_dialogue(partner):
 	first_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
 	first_dialogue_prompt += as_entity.description+"\n"
 	first_dialogue_prompt += "Observation: "+dialogue_partner.as_entity.description+"\n"
-	
-	first_dialogue_prompt += "Summary of relevant context from "+agent_name+"’s memory:\n"
-	var queries : Array[String] = []
-	queries.append("What does "+agent_name+" know about "+dialogue_partner.as_entity.entity_name+"?")
-	queries.append("Has "+agent_name+" heard "+dialogue_partner.as_entity.entity_name+"'s name before explicitly?")
-	first_dialogue_prompt += await _generate_memory_summary(queries)
-	first_dialogue_prompt += "\n"+as_entity.description+"\n. What would "+agent_name+" say to "+dialogue_partner.as_entity.entity_name+"?\n"
+	first_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	dialogue_context = await _create_dialogue_context()
+	first_dialogue_prompt += dialogue_context+"\n"
+	first_dialogue_prompt += as_entity.description+"\n. What would "+agent_name+" say to "+dialogue_partner.as_entity.entity_name+"?\n"
 	first_dialogue_prompt += "Respond only with the dialogue as if you are in character. Don't start with \""+agent_name+":\" or anything. "
-	first_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits
+	first_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits+".\n"
 	
 	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt)
 	
@@ -654,15 +659,14 @@ func receive_dialogue(partner_statement):
 	next_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
 	next_dialogue_prompt += as_entity.description+"\n"
 	next_dialogue_prompt += "Observation: "+dialogue_partner.as_entity.description+"\n"
-
+	
 	# Generate the context about the partner and what the partner said
-	next_dialogue_prompt += "This is the only relevant information "+agent_name+" has:\n"
-	var queries : Array[String] = []
-	queries.append("What does "+agent_name+" know about "+dialogue_partner.as_entity.entity_name+"?")
-	queries.append("Has "+agent_name+" heard "+dialogue_partner.as_entity.entity_name+"'s name before in a previous dialogue?")
+	next_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	if dialogue_context == "":
+		dialogue_context = await _create_dialogue_context()
+	next_dialogue_prompt += dialogue_context+"\n"
 	if partner_statement != "":
-		queries.append(partner_statement)
-	next_dialogue_prompt += await _generate_memory_summary(queries)
+		next_dialogue_prompt += await _generate_memory_summary([partner_statement])
 	
 	if dialogue_partner == null:
 		end_dialogue()
@@ -672,17 +676,17 @@ func receive_dialogue(partner_statement):
 	if partner_statement == "" and len(dialogue_history) == 1:
 		next_dialogue_prompt += dialogue_partner.agent_name+" came over to initiate a conversation with "+agent_name+".\n"
 	else:
-		next_dialogue_prompt += "\nHere is the dialogue history:\n"
+		next_dialogue_prompt += "Here is the dialogue history:\n"
 		for line in dialogue_history:
 			next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
 	
 	next_dialogue_prompt += "How would "+agent_name+" respond to "+dialogue_partner.agent_name+"?\n"
 	next_dialogue_prompt += "Respond only with the dialogue as if you are in character using the memories given. Don't start with \""+agent_name+":\" or anything.\n"
-	next_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits
+	next_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits+"\n"
 	
 	if !dialogue_partner.is_in_group("Player"):
 		next_dialogue_prompt += "If the conversation is nearing its end or becoming repetitive, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
-	
+
 	print(next_dialogue_prompt)
 	var next_dialogue = await game_manager.chat_request(next_dialogue_prompt)
 	
