@@ -183,3 +183,6 @@ func close_item_panel():
 
 func set_item_action(action):
 	current_item.as_entity.set_action(action)
+
+func get_item_action(item):
+	return item.as_entity.action
