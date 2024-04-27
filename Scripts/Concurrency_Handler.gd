@@ -12,10 +12,10 @@ func wait_for_responses(num_expected_responses):
 		num_responses_recieved += 1
 
 # Whenever we declare that a request was successfully processed, store any response and trigger the signal
-func response_complete(response=""):
+func response_complete(response=null):
 	lock.lock()
 	
-	if response != "":
+	if response != null:
 		responses.append(response)
 	response_recieved.emit()
 		
@@ -26,6 +26,13 @@ func pop_responses_as_string(delimiter = " ") -> String:
 	var result : String = ""
 	for response in responses:
 		result += response + delimiter
+	responses.clear()
+	return result
+	
+func pop_responses() -> Array:
+	var result : Array = []
+	for response in responses:
+		result.append(response)
 	responses.clear()
 	return result
 

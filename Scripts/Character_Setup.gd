@@ -38,15 +38,14 @@ func setup_initial_values(_texture_sheet, _is_male):
 	description_label.text = ""
 
 func generate_info(game_manager, concurrency_handler):
+	age = randi_range(18,60)
+	
 	var random_letter = char(randi_range(65,90))
 	gender = "female"
 	if is_male:
 		gender = "male"
-	character_name = await game_manager.chat_request("What's a random "+gender+" name that starts with "+random_letter)
+	character_name = await game_manager.chat_request("What's a random name for a "+str(age)+" old "+gender+" that starts with "+random_letter)
 	name_label.text = character_name
-	
-	age = randi_range(18,60)
-	
 	description_label.text += "Age: "+str(age)
 	
 	var traits_prompt : String = "I have a "+gender+" character who is "+str(age)+" years old named "+character_name+". "

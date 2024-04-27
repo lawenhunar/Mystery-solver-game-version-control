@@ -29,7 +29,7 @@ var cause_of_kill:String
 #@onready var lights = $"../UI/Lights"
 
 func _ready():
-	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
+	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)
 	cause_of_kill="Choked"
 
 func _physics_process(_delta):
@@ -75,7 +75,7 @@ func _physics_process(_delta):
 			nearby_entities.erase(current_entity)
 			
 		if current_entity.is_in_group("Agent"):
-			if !current_entity.is_alive:
+			if !current_entity.can_be_interacted_wtih():
 				nearby_entities.erase(current_entity)
 	closest_entity = null
 	var min_distance = INF # Start with infinity, which will be larger than any other distance
@@ -107,9 +107,7 @@ func _input(_event):
 		
 	if Input.is_key_pressed(KEY_I) and closest_entity != null:
 		if closest_entity.is_in_group("Agent"):
-			if !closest_entity.is_alive:
-				return
-			if closest_entity.dialogue_partner != null:
+			if !closest_entity.can_be_interacted_wtih():
 				return
 			game_manager.enter_new_dialogue(closest_entity)
 			as_entity.set_action("talking with "+closest_entity.as_entity.entity_name)

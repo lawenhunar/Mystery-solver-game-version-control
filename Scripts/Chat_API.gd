@@ -5,7 +5,7 @@ class_name Chat_API
 
 var api_key : String = "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"
 var url : String = "https://api.openai.com/v1/chat/completions"
-var temperature : float = 1
+var temperature : float = 0.5
 var max_tokens : int
 var headers = ["Content-type: application/json", "Authorization: Bearer " + api_key]
 var model : String = "gpt-3.5-turbo"

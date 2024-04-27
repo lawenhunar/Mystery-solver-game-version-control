@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://mo2pu8d80ruj"]
 
-[ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://Assets/Graphics/32x32/Characters/ALex_M.png" id="2_dweql"]
+[ext_resource type="Texture2D" uid="uid://d1m2738keddqj" path="res://Assets/Graphics/32x32/Characters/Alex_M.png" id="2_dweql"]
 [ext_resource type="Script" path="res://Scripts/Animation_Creator.gd" id="2_jhw7g"]
 [ext_resource type="Script" path="res://Scripts/Brain.gd" id="3_7g08s"]
 [ext_resource type="FontFile" uid="uid://bmr3debnqv0rs" path="res://Assets/Fonts/RobotoMono-Regular.ttf" id="4_wl32f"]
@@ -50,6 +50,7 @@ path_postprocessing = 1
 avoidance_enabled = true
 radius = 0.01
 max_neighbors = 1
+debug_enabled = true
 
 [node name="Interaction Zone" type="Area2D" parent="."]
 scale = Vector2(0.8, 0.8)
@@ -80,5 +81,3 @@ Agent: Hello this is a sample text
 "
 
 [connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]
-[connection signal="body_entered" from="Interaction Zone" to="." method="_on_interaction_zone_body_entered"]
-[connection signal="body_exited" from="Interaction Zone" to="." method="_on_interaction_zone_body_exited"]

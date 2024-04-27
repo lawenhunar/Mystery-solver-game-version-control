@@ -63,12 +63,19 @@ func embedding_request(input_text):
 	add_child(request)
 	
 	var response = await Embedding_API.new().send_request(input_text, request)
+	if response == null:
+		print("Embedding API failed: ", response)
+		return []
+	
+	if !response.has("data"):
+		print("Embedding API failed: ", response)
+		return []
 	
 	if(can_record):
 		num_embedding_requests += 1
 		_update_stats()
 	request.queue_free()
-	return response
+	return response["data"][0]["embedding"]
 
 func _update_stats():
 	stats_label.text = _prepare_stats_string()

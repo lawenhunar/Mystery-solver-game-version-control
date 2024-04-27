@@ -24,7 +24,7 @@ func generate_description():
 	description = entity_name+" is currently at "+location+". "
 	
 	if action != "[nothing]":
-		description += entity_name+" is currently "+action+". "
+		description += entity_name+" currently "+action+". "
 	
 	if interactable != null:
 		description += entity_name+" is currently interacting with "+interactable.entity_name+"."
