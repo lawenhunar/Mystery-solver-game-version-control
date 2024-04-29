@@ -186,3 +186,6 @@ func set_item_action(action):
 
 func get_item_action(item):
 	return item.as_entity.action
+
+func set_item_action_from_nodes(item,action):
+	item.as_entity.set_action(action)
