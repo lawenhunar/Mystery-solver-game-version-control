@@ -32,14 +32,11 @@ var dialogue_history : Array
 var dialogue_partner : Node2D
 var dialogue_context : String
 var current_plan : String
-var all_tasks : Array
 
 var as_entity : Entity
 
 var can_trigger : bool = false
 var time_since_last_trigger : int
-var time_since_last_plan : int
-var planning_duration : int = 60 # in seconds
 var trigger_duration : int = 10 # in seconds
 
 # These variables are used for the relfection process
@@ -76,7 +73,7 @@ func setup_intial_values(info, starting_location):
 	
 	concurrency_handler = ConcurrencyHandler.new()
 	
-	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)
+	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is planning out the day", null)
 	game_manager.can_record = true
 	conversation_panel.visible = false
 	
@@ -85,6 +82,8 @@ func setup_intial_values(info, starting_location):
 	history_prompt += "Your response should be a collection of subject-description statemnts seperated with semicolons. Examples of statements are as follows:\nJohn likes to go for walks; John has three dogs that he adores; John loves his job at the family restaurant;"
 	
 	var history = await game_manager.chat_request(history_prompt,92,200)
+	history += agent_name+" is invited to a Mansion to spend some time to relax with strangers;"
+	history += agent_name+" wants to enjoy time at the Mansion by talking to people and exploring around;"
 	
 	#for content in info.history.split(";"):
 	for content in history.split(";"):
@@ -94,8 +93,8 @@ func setup_intial_values(info, starting_location):
 	#await concurrency_handler.wait_for_responses(info.history.split(";").size())
 	
 	await _generate_agent_summary()
-	var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
-	await _generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
+	await _generate_plan()
+	as_entity.set_action("is idle")
 	
 	can_trigger = true
 
@@ -202,7 +201,7 @@ func _generate_memory_summary(queries: Array[String]) -> String:
 			summary_prompt += "- "+memory.content+"\n"
 			current_token_count += memory.token_count
 	
-	summary_prompt += "Answer only the queries and ignore everything else, don't make inferences, assumptions, or hallucinations"
+	summary_prompt += "Answer only the queries and ignore everything else, don't make inferences, assumptions, or hallucinations. If the answer to the query doesn't sound too important, you can ignore it."
 	return await game_manager.chat_request(summary_prompt, 0, 600)
 
 func _generate_agent_summary():
@@ -217,67 +216,51 @@ func _generate_agent_summary():
 	agent_summary += await _generate_memory_summary(queries)
 	print(agent_summary)
 
-func _get_general_plan_prompt(existing_plan):
+func _get_general_plan_prompt(existing_plan:String = "") -> String:
 	var plan_prompt = agent_summary
-	plan_prompt += "\nToday is "+game_manager.get_current_datetime_string()+"."
+	plan_prompt += "\nToday is "+game_manager.get_current_datetime_string()+". Here is "+agent_name+"'s current plan for the day:\n"
 	
 	if existing_plan == "":
-		plan_prompt += " "+agent_name+" doesn't have a plan for today."
+		plan_prompt = await _generate_memory_summary(["What is "+agent_name+"'s plan for "+game_manager.get_current_date_string()+" in broad strokes"])
 	else:
-		plan_prompt += " Here is "+agent_name+"'s current plan for the day:\n"+existing_plan
-	plan_prompt += "\nHere is all the places "+agent_name+" is aware of:\n"
+		plan_prompt += existing_plan
+	
+	plan_prompt += "\nHere are all the places "+agent_name+" is aware of:\n"
 	
 	var locations = game_manager.get_all_locations()
 	for location in locations:
 		plan_prompt += "-"+location+"\n"
 	
-	plan_prompt += as_entity.description+"\n"
+	plan_prompt += agent_name+" wants to do the following task: "+as_entity.action
 	return plan_prompt
 
-func _generate_plan(start_time):
-	time_since_last_plan = Time.get_unix_time_from_system()
-	var memory_header = "Plan made at "+game_manager.get_current_datetime_string()+"\n"
+func _generate_plan():
+	var start_time = game_manager.get_current_time_string()
+	var broad_level_prompt = await _get_general_plan_prompt()
+	broad_level_prompt += "Update the plan for "+agent_name+" starting from "+start_time+" to complete the desired task in broad multi-hour long strokes (might be completed in only 1 task if necessary).\n"
+	broad_level_prompt += "The format of each entry in the plan should be as follows: Plan for "+game_manager.get_current_date_string()+" for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
+	broad_level_prompt += "Respond only with the entries of the plan with each on a new line. Use only the locations listed and nothing else"
+	var broad_level = await game_manager.chat_request(broad_level_prompt)
+	print("<------ Broad Level ------>\n", broad_level)
 	
-	if current_plan == "":
-		var broad_level_prompt = _get_general_plan_prompt(current_plan)
-		broad_level_prompt += "Generate a new plan for "+agent_name+" starting from "+start_time.hour+":"+start_time.minute+" till 23:59 midnight in broad strokes.\n"
-		broad_level_prompt += "The format of each item in the plan should be as follows: [chosen start time]) For [chosen duration in mins], at [chosen location], [chosen task in one sentence].\n"
-		broad_level_prompt += "Keep in mind that all time is in 24-hour format. Use only the locations listed and nothing else"
-		
-		var broad_level = await game_manager.chat_request(broad_level_prompt)
-		current_plan = broad_level
-		
-		var hourly_level_prompt = _get_general_plan_prompt(current_plan)
-		hourly_level_prompt += "Update this plan by breaking down each task into hourly subtasks.\n"
-		hourly_level_prompt += "The format of each item in the plan should be as follows: [chosen start time]) For [chosen duration in mins], at [chosen location], [chosen task in one sentence].\n"
-		hourly_level_prompt += "For each subtask, include the appropraite location. Keep in mind that all time is in 24-hour format. Use only the locations listed and nothing else"
+	var hourly_level_prompt = await _get_general_plan_prompt(broad_level)
+	hourly_level_prompt += "Update this plan by breaking down each entry into hourly subtasks.\n"
+	hourly_level_prompt += "The format of each entry in the plan should be as follows: Plan for "+game_manager.get_current_date_string()+" for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
+	hourly_level_prompt += "Respond only with the entries of the plan with each on a new line. Use only the locations listed and nothing else"
+	var hourly_level = await game_manager.chat_request(hourly_level_prompt)
+	print("<------ Hourly Level ------>\n", hourly_level)
 
-		var hourly_level = await game_manager.chat_request(hourly_level_prompt)
-		current_plan = hourly_level
-
-	var fine_level_prompt = _get_general_plan_prompt(current_plan)
-	fine_level_prompt += "Update this plan starting from "+start_time.hour+":"+start_time.minute+" till 23:59 midnight by breaking down each task into 5-15 min subtasks.\n"
-	fine_level_prompt += "The format of each item in the plan should be as follows: [chosen start time]) For [chosen duration in mins], at [chosen location], [chosen task in one sentence].\n"
-	fine_level_prompt += "For each subtask, include the appropraite location. Keep in mind that all time is in 24-hour format. Use only the locations listed and nothing else"
-	
+	var fine_level_prompt = await _get_general_plan_prompt(hourly_level)
+	fine_level_prompt += "Update this plan by breaking down each entry into 5-15 min subtasks.\n"
+	fine_level_prompt += "The format of each entry in the plan should be as follows: Plan for "+game_manager.get_current_date_string()+" for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
+	fine_level_prompt += "Respond only with the entries of the plan with each on a new line. Use only the locations listed and nothing else"
 	var fine_level = await game_manager.chat_request(fine_level_prompt)
-	current_plan = fine_level
 	
-	all_tasks = current_plan.split("\n")
-	for i in len(all_tasks):
-		var task = all_tasks[i]
-		var task_parts = task.split(",")
-		if len(task_parts) != 3:
-			all_tasks[i] = {"unix_time": 0, "task": "", "location":""}
-			continue
-		
-		var current_time_string = Time.get_datetime_string_from_unix_time(game_manager.in_game_time)
-		var task_time_string = task.split(")")[0]
-		var task_time_unix = Time.get_unix_time_from_datetime_string(current_time_string.split("T")[0]+"T"+task_time_string+":00")
-		all_tasks[i] = {"unix_time": task_time_unix, "task": task_parts[len(task_parts)-1], "location":task_parts[1]}
-		
-	current_plan = memory_header+current_plan
-	_add_memory(current_plan)
+	print("<------ Fine Level ------>\n")
+	var all_tasks = fine_level.split("\n")
+	for task in all_tasks:
+		print(task)
+		_add_memory(task)
 
 func _print_all_memories():
 	for memory in memories:
@@ -341,13 +324,13 @@ func _retrieve_memories(query, num_top_memories=len(memories)):
 		
 	# Return the top num_top_memories memories
 	var top_memories = []
-	print("-------------------  ",query)
+	#print("-------------------  ",query)
 	for i in min(num_top_memories, memory_scores.size()):
-		print("T: ",memory_scores[i].final_score,", Rc: ",memory_scores[i].recency,", Im: ",memory_scores[i].importance,", Rl: ",memory_scores[i].relevance,", M: ",memory_scores[i].memory.content)
+		#print("T: ",memory_scores[i].final_score,", Rc: ",memory_scores[i].recency,", Im: ",memory_scores[i].importance,", Rl: ",memory_scores[i].relevance,", M: ",memory_scores[i].memory.content)
 		var current_memory = memory_scores[i].memory
 		top_memories.append(current_memory)
 		current_memory.time_last_accessed = current_time
-	print()
+	#print()
 		
 	return top_memories
 
@@ -386,11 +369,7 @@ func _trigger_brain():
 	
 	if dialogue_partner != null:
 		return
-	
-	if reaction == "No":
-		can_trigger = true
-		return
-	
+		
 	var reaction_parts = reaction.split("|")
 	
 	if len(reaction_parts) != 2:
@@ -412,13 +391,11 @@ func _trigger_brain():
 		await _pick_location()	
 	as_entity.set_interactable(null)
 	as_entity.set_action(new_action)
-	
-	can_trigger = true
+
 	new_observations.clear()
-	
-	if Time.get_unix_time_from_system() - time_since_last_plan >= planning_duration:
-		var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
-		_generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
+	if reaction_parts[0] == "Update":
+		await _generate_plan()
+	can_trigger = true
 
 func _observe():
 	# Scan nearby entity nodes
@@ -492,10 +469,7 @@ func _react():
 	var reaction_prompt = agent_summary + "\n"
 	reaction_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
 	reaction_prompt += as_entity.description + "\n"
-	for task in all_tasks:
-		if task.unix_time >= game_manager.in_game_time:
-			reaction_prompt += agent_name+"'s current plan:"+task.task+"\n"
-			break
+	reaction_prompt += await _generate_memory_summary(["It is "+game_manager.get_current_datetime_string()+". What are "+agent_name+"'s upcoming plans"])
 	
 	reaction_prompt += "Observations (sorted from newest to oldest): \n"
 	var current_token_count = 0
@@ -523,16 +497,16 @@ func _react():
 	else:
 		reaction_prompt += "Summary of relevant context about each observation: \n"+response_string
 
-	reaction_prompt += "\nShould "+agent_name+" react to any of these observations or change their current action, and if so, what would be an appropriate reaction?\n"
-	reaction_prompt += "Respond only in the following format: [Yes/No]|[action to take in the present continuous tense]\n"
+	reaction_prompt += "\nShould "+agent_name+" react to any of these observations or continue with their current plan, and if so, what would be an appropriate reaction?\n"
+	reaction_prompt += "Respond only in the following format: [Continue/Update]|[action to take in the present continuous tense]\n"
 	reaction_prompt += "If the reaction involves interacting with an item or another person, make sure to add \";interact with [entity name]\" to the end of the action\n"
 	reaction_prompt += "Examples of responses:\n"
-	reaction_prompt += "Yes|is going for a walk\n"
-	reaction_prompt += "No\n"
-	reaction_prompt += "Yes|is asking John for help with his injury;interact with John\n"
-	reaction_prompt += "Yes|is asking Eddy about his music composition;interact with Eddy\n"
-	reaction_prompt += "Yes|is turning off Oven 1;interact with Oven 1\n"
-	reaction_prompt += "No"
+	reaction_prompt += "Update|is going for a walk\n"
+	reaction_prompt += "Continue|is making breakfast\n"
+	reaction_prompt += "Update|is asking John for help with his injury;interact with John\n"
+	reaction_prompt += "Update|is asking Eddy about his music composition;interact with Eddy\n"
+	reaction_prompt += "Update|is turning off Oven 1;interact with Oven 1\n"
+	reaction_prompt += "Continue|is writing a journal on Desk;interact with Desk"
 	
 	var reaction = await game_manager.chat_request(reaction_prompt, 0, 40)
 	print_reaction = true
@@ -687,7 +661,6 @@ func receive_dialogue(partner_statement):
 	if !dialogue_partner.is_in_group("Player"):
 		next_dialogue_prompt += "If the conversation is nearing its end or becoming repetitive, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
 
-	print(next_dialogue_prompt)
 	var next_dialogue = await game_manager.chat_request(next_dialogue_prompt)
 	
 	conversation_panel.find_child("Label").text += agent_name+": "+next_dialogue+"\n\n"
@@ -734,8 +707,7 @@ func end_dialogue():
 	if "React" in reaction:
 		as_entity.set_action(reaction.split("|")[1].strip_edges())
 		
-		var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
-		_generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
+		_generate_plan()
 		await _pick_location()	
 	else:
 		as_entity.set_action("idle")
