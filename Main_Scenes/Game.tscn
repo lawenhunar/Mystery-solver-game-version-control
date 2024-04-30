@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://r3b617omh2a0" path="res://Secondary_Scenes/Dialogue Panel.tscn" id="6_78pgh"]
 [ext_resource type="PackedScene" uid="uid://bix2o4aqo01a7" path="res://Secondary_Scenes/Item Panel.tscn" id="7_y1yib"]
 [ext_resource type="PackedScene" uid="uid://bkpt0i40vowfy" path="res://Secondary_Scenes/inv_ui.tscn" id="8_3ymyg"]
-[ext_resource type="PackedScene" path="res://Secondary_Scenes/light.tscn" id="8_04oo2"]
+[ext_resource type="PackedScene" uid="uid://d4kpvipi2o6c" path="res://Secondary_Scenes/light.tscn" id="8_04oo2"]
 [ext_resource type="Script" path="res://Scripts/day_night_cycle.gd" id="8_cdygh"]
 [ext_resource type="PackedScene" uid="uid://b10w5uttqs18h" path="res://Secondary_Scenes/Player.tscn" id="9_807kv"]
 [ext_resource type="Texture2D" uid="uid://b2fj0v3ip66el" path="res://Secondary_Scenes/daynightcycle-gradient-texture.tres" id="9_ww0mc"]
@@ -7914,7 +7914,7 @@ scale = Vector2(2.88, 3.16)
 actions_string = "alive and hydrated; alive and thirsty; withering; dead"
 
 [node name="Lamp" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ng1m")]
-position = Vector2(-210.577, 251.923)
+position = Vector2(-209.615, 261.539)
 actions_string = "on;off"
 
 [node name="Light" parent="Layout/Mansion/Living room/Lamp" instance=ExtResource("8_04oo2")]
@@ -8202,6 +8202,7 @@ position = Vector2(375, 199.038)
 actions_string = "on;off"
 
 [node name="Light" parent="Layout/Mansion/Bedroom/Lamp" instance=ExtResource("8_04oo2")]
+energy = 0.9
 
 [node name="DeskLamp" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ng1m")]
 position = Vector2(-311.607, 182.692)
@@ -8221,7 +8222,7 @@ position = Vector2(-207.143, -11.5385)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Mansion/Bedroom/Standing Zone 2"]
 shape = SubResource("RectangleShape2D_aipeb")
 
-[node name="CanvasModulate" type="CanvasModulate" parent="Layout"]
+[node name="day_night cycle" type="CanvasModulate" parent="Layout"]
 z_index = 18
 position = Vector2(-8, -304)
 scale = Vector2(1.04, 1)

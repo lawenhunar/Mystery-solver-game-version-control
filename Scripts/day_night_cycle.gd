@@ -2,13 +2,14 @@ extends CanvasModulate
 
 @export var gradient:GradientTexture1D
 @onready var game_manager = $"../../GameManager"
+var time_as_float
 
 func _ready():
-	pass # Replace with function body.
+	time_as_float = _convert_time_to_float(game_manager.get_current_datetime_string())
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta:float):
-	var time_as_float = _convert_time_to_float(game_manager.get_current_datetime_string())
+	time_as_float = _convert_time_to_float(game_manager.get_current_datetime_string())
 	# Adjust the time to start from 0 at 8 pm (20:00)
 	var adjusted_time = (time_as_float - 8)
 	# Calculate the phase based on adjusted time
