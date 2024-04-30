@@ -13,7 +13,7 @@ var gender : String
 var traits : String
 var is_target : bool
 
-var recency_weight : float = 0.4
+var recency_weight : float = 1
 var importance_weight : float = 0.5
 var relevance_weight : float = 1
 
@@ -31,7 +31,6 @@ var new_observations : Array[Entity]
 var dialogue_history : Array
 var dialogue_partner : Node2D
 var dialogue_context : String
-var current_plan : String
 
 var as_entity : Entity
 
@@ -40,17 +39,15 @@ var time_since_last_trigger : int
 var trigger_duration : int = 10 # in seconds
 
 # These variables are used for the relfection process
-var recent_importance_threshold : int = 100
+var recent_importance_threshold : int = 150
 var oldest_memory_index : int = 0
 var is_reflecting : bool = false
 var num_reflection_questions : int = 3
-var num_insights_per_reflection_question : int = 5
+var num_insights_per_reflection_question : int = 3
 
 var is_alive : bool = true
 
 var conversation_panel
-
-var print_reaction : bool
 
 
 func _initialize_children():
@@ -76,24 +73,14 @@ func setup_intial_values(info, starting_location):
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is planning out the day", null)
 	game_manager.can_record = true
 	conversation_panel.visible = false
-	
-	var history_prompt = "I have a character called "+agent_name+" (gender: "+gender+", age: "+str(age)+", traits: "+traits+"). "
-	history_prompt += "Write me 10 short sentences that describe "+agent_name+"'s character, history, and current state. Imagine this character lives a pretty routine life. "
-	history_prompt += "Your response should be a collection of subject-description statemnts seperated with semicolons. Examples of statements are as follows:\nJohn likes to go for walks; John has three dogs that he adores; John loves his job at the family restaurant;"
-	
-	var history = await game_manager.chat_request(history_prompt,92,200)
-	history += agent_name+" is invited to a Mansion to spend some time to relax with strangers;"
-	history += agent_name+" wants to enjoy time at the Mansion by talking to people and exploring around;"
-	
-	#for content in info.history.split(";"):
-	for content in history.split(";"):
+
+	for content in info.history.split(";"):
 		_add_memory(content.strip_edges(), true)
 	
-	await concurrency_handler.wait_for_responses(history.split(";").size())
-	#await concurrency_handler.wait_for_responses(info.history.split(";").size())
+	await concurrency_handler.wait_for_responses(info.history.split(";").size())
 	
 	await _generate_agent_summary()
-	await _generate_plan()
+	await _generate_plan(0)
 	as_entity.set_action("is idle")
 	
 	can_trigger = true
@@ -174,34 +161,30 @@ func _end_navigation():
 	navigation_agent_2d.set_velocity(Vector2.ZERO)
 	navigation_agent_2d.target_position = global_position
 
-func _get_memories_from_query(query):
-	var memories_retrieved_from_query = await _retrieve_memories(query)
-	concurrency_handler.response_complete(memories_retrieved_from_query)
-
 func _generate_memory_summary(queries: Array[String]) -> String:
-	var retrieved_memories : Array[Memory]
+	var retrieved_memories : Array[Memory] = await _retrieve_memories(queries)
 	var summary_prompt = "Answer the follwing queries ("
 	for query in queries:
-		_get_memories_from_query(query)
 		summary_prompt += query+" , "
-	summary_prompt += ") using the following statements with as much detail as necessary:\n"
-	await concurrency_handler.wait_for_responses(queries.size())
-	var all_responses = concurrency_handler.pop_responses()
-	for response in all_responses:
-		for memory in response:
-			if memory not in retrieved_memories:
-				retrieved_memories.append(memory)
+	summary_prompt += ") using the following statements (sorted from most relevant to least relevant) with as much detail as necessary:\n"
 	
 	if retrieved_memories.size() == 0:
 		return ""
 	
 	var current_token_count = 0
+	var existing_strings : Array[String] = []
 	for memory in retrieved_memories:
+		if memory.content in existing_strings:
+			continue
+			
 		if current_token_count + memory.token_count < 2040:
+			existing_strings.append(memory.content)
 			summary_prompt += "- "+memory.content+"\n"
 			current_token_count += memory.token_count
+		else:
+			break
 	
-	summary_prompt += "Answer only the queries and ignore everything else, don't make inferences, assumptions, or hallucinations. If the answer to the query doesn't sound too important, you can ignore it."
+	summary_prompt += "Address each query directly and ignore everything else, don't make inferences, assumptions, or hallucinations."
 	return await game_manager.chat_request(summary_prompt, 0, 600)
 
 func _generate_agent_summary():
@@ -216,50 +199,34 @@ func _generate_agent_summary():
 	agent_summary += await _generate_memory_summary(queries)
 	print(agent_summary)
 
-func _get_general_plan_prompt(existing_plan:String = "") -> String:
-	var plan_prompt = agent_summary
-	plan_prompt += "\nToday is "+game_manager.get_current_datetime_string()+". Here is "+agent_name+"'s current plan for the day:\n"
-	
-	if existing_plan == "":
-		plan_prompt = await _generate_memory_summary(["What is "+agent_name+"'s plan for "+game_manager.get_current_date_string()+" in broad strokes"])
-	else:
-		plan_prompt += existing_plan
-	
-	plan_prompt += "\nHere are all the places "+agent_name+" is aware of:\n"
-	
-	var locations = game_manager.get_all_locations()
-	for location in locations:
-		plan_prompt += "-"+location+"\n"
-	
-	plan_prompt += agent_name+" wants to do the following task: "+as_entity.action
-	return plan_prompt
-
-func _generate_plan():
+func _generate_plan(starting_level_of_detail:int = 2):
 	var start_time = game_manager.get_current_time_string()
-	var broad_level_prompt = await _get_general_plan_prompt()
-	broad_level_prompt += "Update the plan for "+agent_name+" starting from "+start_time+" to complete the desired task in broad multi-hour long strokes (might be completed in only 1 task if necessary).\n"
-	broad_level_prompt += "The format of each entry in the plan should be as follows: Plan for "+game_manager.get_current_date_string()+" for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
-	broad_level_prompt += "Respond only with the entries of the plan with each on a new line. Use only the locations listed and nothing else"
-	var broad_level = await game_manager.chat_request(broad_level_prompt)
-	print("<------ Broad Level ------>\n", broad_level)
 	
-	var hourly_level_prompt = await _get_general_plan_prompt(broad_level)
-	hourly_level_prompt += "Update this plan by breaking down each entry into hourly subtasks.\n"
-	hourly_level_prompt += "The format of each entry in the plan should be as follows: Plan for "+game_manager.get_current_date_string()+" for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
-	hourly_level_prompt += "Respond only with the entries of the plan with each on a new line. Use only the locations listed and nothing else"
-	var hourly_level = await game_manager.chat_request(hourly_level_prompt)
-	print("<------ Hourly Level ------>\n", hourly_level)
+	var levels_of_detail : Array[String] = ["multi-hour", "hourly", "5-15 minute"]
+	var current_plan = ""
+	for level in range(starting_level_of_detail,len(levels_of_detail)):
+		var detail = levels_of_detail[level]
+		var plan_prompt = agent_summary
+		
+		plan_prompt += "\nToday is "+game_manager.get_current_datetime_string()+". Here is "+agent_name+"'s current plan for the day:\n"
+		if current_plan == "":
+			plan_prompt = await _generate_memory_summary(["What is "+agent_name+"'s plan for "+game_manager.get_current_date_string()+" in broad strokes"])
+		else:
+			plan_prompt += current_plan
+		
+		plan_prompt += "\nHere are all the places "+agent_name+" is aware of:\n"
+		var locations = game_manager.get_all_locations()
+		for location in locations:
+			plan_prompt += "-"+location+"\n"
+		
+		plan_prompt += agent_name+" wants to do the following task: "+as_entity.action+".\n"
+		plan_prompt += "Update the plan for "+agent_name+" starting from "+start_time+" by breaking down each entry into "+detail+" long tasks (might be completed in only 1 task if necessary).\n"
+		plan_prompt += "The format of each entry in the plan should be as follows: Plan made at "+start_time+" for "+game_manager.get_current_date_string()+", for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
+		plan_prompt += "Respond only with the entries of the plan with each on a new line. You can only use the locations listed and nothing else"
+		current_plan = await game_manager.chat_request(plan_prompt)
 
-	var fine_level_prompt = await _get_general_plan_prompt(hourly_level)
-	fine_level_prompt += "Update this plan by breaking down each entry into 5-15 min subtasks.\n"
-	fine_level_prompt += "The format of each entry in the plan should be as follows: Plan for "+game_manager.get_current_date_string()+" for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
-	fine_level_prompt += "Respond only with the entries of the plan with each on a new line. Use only the locations listed and nothing else"
-	var fine_level = await game_manager.chat_request(fine_level_prompt)
-	
-	print("<------ Fine Level ------>\n")
-	var all_tasks = fine_level.split("\n")
+	var all_tasks = current_plan.split("\n")
 	for task in all_tasks:
-		print(task)
 		_add_memory(task)
 
 func _print_all_memories():
@@ -283,56 +250,60 @@ func _add_memory(content, is_concurrent=false):
 		memory.completed.connect(concurrency_handler.response_complete)
 	memories.append(memory)
 
-func _retrieve_memories(query, num_top_memories=len(memories)):
-	var query_embedding = await game_manager.embedding_request(query)
+func _get_embedding_from_query(query):
+	concurrency_handler.response_complete(await game_manager.embedding_request(query))
 
-	var current_time = game_manager.in_game_time
+func _retrieve_memories(queries:Array[String], num_top_memories=len(memories)) -> Array[Memory]:
+	var query_embeddings  = []
+	for query in queries:
+		_get_embedding_from_query(query)
+	await concurrency_handler.wait_for_responses(queries.size())
+	query_embeddings.append_array(concurrency_handler.pop_responses())
 	
-	var memory_scores = []
+	var current_time = game_manager.in_game_time
+	var memory_scores : Array[Dictionary] = []
 	var scaling_values = {"min_recency": 1, "max_recency": 0,
 						  "min_importance": 1, "max_importance": 0,
 						  "min_relevance": 1, "max_relevance": 0}
 	for memory in memories:
-		var time_difference = float(current_time - memory.time_created) / 3600
-		var recency = float(1) / exp(0.995 * time_difference)
-		var importance = memory.importance/10.0
-		var relevance = 0.5
-		if len(query_embedding) == len(memory.embedding):
-			relevance = _calculate_cosine_similarity(query_embedding, memory.embedding)
+		var time_difference = float(current_time - memory.time_last_accessed) / 3600
+		var recency = 1.0 / exp(0.995 * time_difference)
+		var importance = memory.importance
+		var record_relevance = 0
+		for query_embedding in query_embeddings:
+			if len(query_embedding) == len(memory.embedding):
+				var relevance = _calculate_cosine_similarity(query_embedding, memory.embedding)
+				record_relevance = max(record_relevance, relevance)
 		
-		if relevance < 0.2:
+		if record_relevance < 0.3:
 			continue
-		
+			
 		scaling_values.min_recency = min(scaling_values.min_recency, recency)
 		scaling_values.min_importance = min(scaling_values.min_importance, importance)
-		scaling_values.min_relevance = min(scaling_values.min_relevance, relevance)
+		scaling_values.min_relevance = min(scaling_values.min_relevance, record_relevance)
 		scaling_values.max_recency = max(scaling_values.max_recency, recency)
 		scaling_values.max_importance = max(scaling_values.max_importance, importance)
-		scaling_values.max_relevance = max(scaling_values.max_relevance, relevance)
+		scaling_values.max_relevance = max(scaling_values.max_relevance, record_relevance)
 		
-		var score = {"memory": memory, "final_score": 0, "recency": recency, "importance": importance, "relevance": relevance}		
+		var score = {"memory": memory, "final_score": 0, "recency": recency, "importance": importance, "relevance": record_relevance}		
 		memory_scores.append(score)
-		
+		memory.time_last_accessed = current_time
+#
 	for score_data in memory_scores:
 		var recency_mapped = _map(score_data.recency, scaling_values.min_recency, scaling_values.max_recency, 0, 1)
 		var importance_mapped = _map(score_data.importance, scaling_values.min_importance, scaling_values.max_importance, 0, 1)
 		var relevance_mapped = _map(score_data.relevance, scaling_values.min_relevance, scaling_values.max_relevance, 0, 1)
 		
 		score_data.final_score = recency_mapped * recency_weight + importance_mapped * importance_weight + relevance_mapped * relevance_weight
-	
+
 	memory_scores.sort_custom(func(a, b): return a.final_score > b.final_score)
-		
-	# Return the top num_top_memories memories
-	var top_memories = []
-	#print("-------------------  ",query)
-	for i in min(num_top_memories, memory_scores.size()):
+	var result : Array[Memory] = []
+	#print(queries,"---------------\n")
+	for i in min(num_top_memories,len(memory_scores)):
+		var score_data = memory_scores[i]
 		#print("T: ",memory_scores[i].final_score,", Rc: ",memory_scores[i].recency,", Im: ",memory_scores[i].importance,", Rl: ",memory_scores[i].relevance,", M: ",memory_scores[i].memory.content)
-		var current_memory = memory_scores[i].memory
-		top_memories.append(current_memory)
-		current_memory.time_last_accessed = current_time
-	#print()
-		
-	return top_memories
+		result.append(score_data.memory)
+	return result
 
 func _map(value, in_min, in_max, out_min, out_max):
 	if in_min == in_max:
@@ -341,25 +312,23 @@ func _map(value, in_min, in_max, out_min, out_max):
 
 func _calculate_cosine_similarity(vector1, vector2):
 	var dot_product = 0.0
-	var magnitude_vector1 = 0.0
-	var magnitude_vector2 = 0.0
+	var magnitude_vector1_squared = 0.0
+	var magnitude_vector2_squared = 0.0
 	
 	for i in len(vector1):
 		dot_product += vector1[i] * vector2[i]
-		magnitude_vector1 += vector1[i] * vector1[i]
-		magnitude_vector2 += vector2[i] * vector2[i]
-	
-	magnitude_vector1 = sqrt(magnitude_vector1)
-	magnitude_vector2 = sqrt(magnitude_vector2)
+		magnitude_vector1_squared += vector1[i] * vector1[i]
+		magnitude_vector2_squared += vector2[i] * vector2[i]
 
 	# Avoid division by zero
-	if magnitude_vector1 == 0.0 or magnitude_vector2 == 0.0:
+	if magnitude_vector1_squared == 0.0 or magnitude_vector2_squared == 0.0:
 		return 0
 	
-	return dot_product / (magnitude_vector1 * magnitude_vector2)
+	return dot_product / (magnitude_vector1_squared * magnitude_vector2_squared)
 
 func _trigger_brain():
 	can_trigger = false
+	@warning_ignore("narrowing_conversion")
 	time_since_last_trigger = Time.get_unix_time_from_system()
 	
 	if dialogue_partner != null:
@@ -461,7 +430,6 @@ func _observe():
 		new_observations.append(new_entity.copy())
 		if entity_node.is_in_group("Agent"):
 			if !entity_node.is_alive:
-				print_reaction = true
 				print(new_entity.description)
 		_add_memory(new_entity.description)
 
@@ -469,9 +437,9 @@ func _react():
 	var reaction_prompt = agent_summary + "\n"
 	reaction_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
 	reaction_prompt += as_entity.description + "\n"
-	reaction_prompt += await _generate_memory_summary(["It is "+game_manager.get_current_datetime_string()+". What are "+agent_name+"'s upcoming plans"])
+	reaction_prompt += await _generate_memory_summary(["Considering the plans made close to "+game_manager.get_current_datetime_string()+", what does "+agent_name+" plan to do next?"])
 	
-	reaction_prompt += "Observations (sorted from newest to oldest): \n"
+	reaction_prompt += "\nObservations of nearby entities (sorted from newest to oldest): \n"
 	var current_token_count = 0
 	for i in range(len(new_observations)-1,-1,-1):
 		var description_token_count : int = game_manager.get_token_count(new_observations[i].description)
@@ -482,7 +450,7 @@ func _react():
 			break
 	
 	# There could be multiple observations of the same entity, so generate summaries only for unique entities, not each observation
-	var unique_new_nodes : Array[Node]
+	var unique_new_nodes : Array[Node] = []
 	for entity in new_observations:
 		if !(entity.as_node in unique_new_nodes):
 			unique_new_nodes.append(entity.as_node)
@@ -499,7 +467,7 @@ func _react():
 
 	reaction_prompt += "\nShould "+agent_name+" react to any of these observations or continue with their current plan, and if so, what would be an appropriate reaction?\n"
 	reaction_prompt += "Respond only in the following format: [Continue/Update]|[action to take in the present continuous tense]\n"
-	reaction_prompt += "If the reaction involves interacting with an item or another person, make sure to add \";interact with [entity name]\" to the end of the action\n"
+	reaction_prompt += "If the reaction involves interacting with one of the previously mentioned entities, make sure to add \";interact with [entity name]\" to the end of the action\n"
 	reaction_prompt += "Examples of responses:\n"
 	reaction_prompt += "Update|is going for a walk\n"
 	reaction_prompt += "Continue|is making breakfast\n"
@@ -509,10 +477,6 @@ func _react():
 	reaction_prompt += "Continue|is writing a journal on Desk;interact with Desk"
 	
 	var reaction = await game_manager.chat_request(reaction_prompt, 0, 40)
-	print_reaction = true
-	if print_reaction:
-		print(reaction_prompt, "\n\n", reaction)
-		print_reaction = false
 	
 	return reaction
 
@@ -567,7 +531,7 @@ func _reflect():
 	is_reflecting = false
 
 func _reflection_coroutine(question):
-	var relevant_memories = await _retrieve_memories(question, 10)
+	var relevant_memories = await _retrieve_memories([question], 10)
 	
 	var insights_prompt = "Statements about "+agent_name+"\n"
 	for memory in relevant_memories:
@@ -593,7 +557,7 @@ func dialogue_setup(partner):
 func _create_dialogue_context():
 	var queries : Array[String] = []
 	queries.append("What are all the things "+agent_name+" remembers about "+dialogue_partner.as_entity.entity_name+"?")
-	queries.append("Has "+agent_name+" ever heard of "+dialogue_partner.as_entity.entity_name+"'s name before in a previous conversation?")
+	queries.append("Does "+agent_name+" know "+dialogue_partner.as_entity.entity_name+"'s name?")
 	return await _generate_memory_summary(queries)
 
 func initiate_dialogue(partner):
@@ -602,15 +566,21 @@ func initiate_dialogue(partner):
 	var first_dialogue_prompt = agent_summary+"\n"
 	first_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
 	first_dialogue_prompt += as_entity.description+"\n"
-	first_dialogue_prompt += "Observation: "+dialogue_partner.as_entity.description+"\n"
+	first_dialogue_prompt += agent_name+" observes the following: "+dialogue_partner.as_entity.description+"\n"
 	first_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	first_dialogue_prompt += "\n<Start of context>\n"
 	dialogue_context = await _create_dialogue_context()
 	first_dialogue_prompt += dialogue_context+"\n"
-	first_dialogue_prompt += as_entity.description+"\n. What would "+agent_name+" say to "+dialogue_partner.as_entity.entity_name+"?\n"
-	first_dialogue_prompt += "Respond only with the dialogue as if you are in character. Don't start with \""+agent_name+":\" or anything. "
-	first_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits+".\n"
+	first_dialogue_prompt += "\n<End of context>\n"
+	first_dialogue_prompt += as_entity.description+"\n. Greet "+dialogue_partner.as_entity.entity_name+" as if you are in character as "+agent_name+"\n"
+	first_dialogue_prompt += "If "+agent_name+" does not know "+dialogue_partner.as_entity.entity_name+"'s name, then "+agent_name+" will see "+dialogue_partner.as_entity.entity_name+" as a stranger.\n"
 	
 	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt)
+	
+	# Get rid of any header of the response if it exists
+	var name_index = first_dialogue.find(agent_name+": ")
+	if name_index != -1:
+		first_dialogue = first_dialogue.erase(name_index, len(agent_name+": "))
 	
 	conversation_panel.find_child("Label").text += agent_name+": "+first_dialogue+"\n\n"
 	
@@ -621,7 +591,10 @@ func initiate_dialogue(partner):
 		game_manager.set_dialogue_text(first_dialogue)
 
 func receive_dialogue(partner_statement):
-	dialogue_history.append({"agent":dialogue_partner.agent_name, "statement":partner_statement})
+	var txt = partner_statement
+	if partner_statement == "":
+		txt = "Hello"
+	dialogue_history.append({"agent":dialogue_partner.agent_name, "statement":txt})
 	
 	if partner_statement.contains("[end]"):
 		self.end_dialogue()
@@ -630,39 +603,44 @@ func receive_dialogue(partner_statement):
 	conversation_panel.find_child("Label").text += dialogue_partner.agent_name+": "+partner_statement+"\n\n"
 	
 	var next_dialogue_prompt = agent_summary+"\n"
-	next_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
+	next_dialogue_prompt += "It is currently "+game_manager.get_current_datetime_string()+"\n"
 	next_dialogue_prompt += as_entity.description+"\n"
-	next_dialogue_prompt += "Observation: "+dialogue_partner.as_entity.description+"\n"
+	next_dialogue_prompt += agent_name+" observes the following: "+dialogue_partner.as_entity.description+"\n"
 	
 	# Generate the context about the partner and what the partner said
 	next_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	next_dialogue_prompt += "<Start of context>\n"
 	if dialogue_context == "":
 		dialogue_context = await _create_dialogue_context()
 	next_dialogue_prompt += dialogue_context+"\n"
 	if partner_statement != "":
 		next_dialogue_prompt += await _generate_memory_summary([partner_statement])
+	next_dialogue_prompt += "\n<End of context>\n"
 	
 	if dialogue_partner == null:
 		end_dialogue()
 		return
 
-	# Append the dialogue history (if it exists)
-	if partner_statement == "" and len(dialogue_history) == 1:
-		next_dialogue_prompt += dialogue_partner.agent_name+" came over to initiate a conversation with "+agent_name+".\n"
-	else:
-		next_dialogue_prompt += "Here is the dialogue history:\n"
-		for line in dialogue_history:
-			next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
+	# Append the dialogue history
+	next_dialogue_prompt += "\nHere is the conversation that's going on right now:\n"
+	next_dialogue_prompt += "<Start of convo>\n"
+	for line in dialogue_history:
+		next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
+	next_dialogue_prompt += "<End of convo>\n"
+	next_dialogue_prompt += "Respond to "+dialogue_partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"
+		
+	next_dialogue_prompt += "If "+agent_name+" does not know "+dialogue_partner.as_entity.entity_name+"'s name, then "+agent_name+" will see "+dialogue_partner.as_entity.entity_name+" as a stranger.\n"
 	
-	next_dialogue_prompt += "How would "+agent_name+" respond to "+dialogue_partner.agent_name+"?\n"
-	next_dialogue_prompt += "Respond only with the dialogue as if you are in character using the memories given. Don't start with \""+agent_name+":\" or anything.\n"
-	next_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits+"\n"
-	
-	if !dialogue_partner.is_in_group("Player"):
+	if dialogue_partner.is_in_group("Agent"):
 		next_dialogue_prompt += "If the conversation is nearing its end or becoming repetitive, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
 
-	var next_dialogue = await game_manager.chat_request(next_dialogue_prompt)
+	var next_dialogue : String = await game_manager.chat_request(next_dialogue_prompt, 0, 100)
 	
+	# Get rid of any header of the response if it exists
+	var name_index = next_dialogue.find(agent_name+": ")
+	if name_index != -1:
+		next_dialogue = next_dialogue.erase(name_index, len(agent_name+": "))
+		
 	conversation_panel.find_child("Label").text += agent_name+": "+next_dialogue+"\n\n"
 	
 	if dialogue_partner == null:
@@ -680,7 +658,6 @@ func receive_dialogue(partner_statement):
 
 func end_dialogue():
 	conversation_panel.visible = false
-	as_entity.set_action("idle")
 	
 	if dialogue_partner == null:
 		print("The following conversation crashed:\n")
@@ -691,30 +668,31 @@ func end_dialogue():
 	var full_dialogue = "Dialogue between "+agent_name+" and "+dialogue_partner.agent_name+" on "+game_manager.get_current_datetime_string()+"\n"
 	for line in dialogue_history:
 		full_dialogue += line["agent"] + ": " + line["statement"]+"\n"
+	dialogue_history.clear()
+	dialogue_partner = null
 		
 	var reaction_prompt = agent_summary + "\n"
 	reaction_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
-	reaction_prompt += agent_name+"'s current action: "+as_entity.description+"\n"
+	reaction_prompt += as_entity.description+"\n"
+	reaction_prompt += await _generate_memory_summary(["Considering the plans made close to "+game_manager.get_current_datetime_string()+", what does "+agent_name+" plan to do next?"])
 	reaction_prompt += full_dialogue
-	reaction_prompt += "Considering the conversation above, should "+agent_name+" react in a certain way or continue with the current action?\n"
-	reaction_prompt += "If "+agent_name+" should continue, respond only with \"Continue\".\n" 
-	reaction_prompt += "If "+agent_name+" should react, respond only in the following format: React|[new action to take]. For example:\nContinue\nReact|turning off the oven\nContinue\nReact|looking for John"
+	reaction_prompt += "Respond only in the following format: [Continue/Update]|[action to take in the present continuous tense]\n"
+	reaction_prompt += "Examples of responses:\n"
+	reaction_prompt += "Update|is going for a walk\n"
+	reaction_prompt += "Continue|is making breakfast\n"
+	reaction_prompt += "Update|is asking John for help with his injury\n"
+	reaction_prompt += "Continue|is writing a journal"
 	
 	var reaction : String = await game_manager.chat_request(reaction_prompt, 0, 40)
 	
 	destination = null
 	as_entity.set_interactable(null)
-	if "React" in reaction:
-		as_entity.set_action(reaction.split("|")[1].strip_edges())
-		
-		_generate_plan()
-		await _pick_location()	
-	else:
-		as_entity.set_action("idle")
+	as_entity.set_action(reaction.split("|")[1].strip_edges())
+	await _pick_location()
+	if "Update" in reaction:
+		await _generate_plan()
 	
 	_add_memory(full_dialogue)
-	dialogue_history.clear()
-	dialogue_partner = null
 	can_trigger = true
 
 func _interact_with_nearby_entities():

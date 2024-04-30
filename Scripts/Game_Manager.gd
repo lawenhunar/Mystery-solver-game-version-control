@@ -49,6 +49,7 @@ func _send_chat_request(prompt, token_count, get_tokens=false):
 	var response : Dictionary = await Chat_API.new(token_count).send_request(prompt, request, get_tokens)
 	if !response.has("usage"):
 		print("Chat GPT API failed: ", response)
+		print(prompt)
 		return "[Ignore this text]"
 	
 	if(can_record):

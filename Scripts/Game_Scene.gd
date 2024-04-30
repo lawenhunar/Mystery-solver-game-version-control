@@ -171,7 +171,7 @@ func exit_dialogue ():
 	current_agent.end_dialogue()
 	current_agent = null
 	dialogue_panel.visible = false
-	player.as_entity.set_action("idle")
+	player.as_entity.set_action("is idle")
 
 func is_UI_active():
 	return dialogue_panel.visible or item_panel.visible

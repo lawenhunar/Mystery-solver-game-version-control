@@ -26,6 +26,7 @@ func setup_initial_values(_texture_sheet, _is_male):
 	var agent_image = texture_sheet.get_image()
 	var icon_image = _get_image_region(0, 3, agent_image)
 	var new_size = icon_image.get_size()*10
+	@warning_ignore("int_as_enum_without_cast")
 	icon_image.resize(new_size.x,new_size.y,0)
 	is_male = _is_male
 	
@@ -53,11 +54,13 @@ func generate_info(game_manager, concurrency_handler):
 	traits = await game_manager.chat_request(traits_prompt)
 	description_label.text += "\n\nTraits: "+traits
 	
-	var history_prompt = "I have a video game character called "+character_name+" (gender: "+gender+", age: "+str(age)+", traits: "+traits+"). "
+	var history_prompt = "I have a character called "+character_name+" (gender: "+gender+", age: "+str(age)+", traits: "+traits+"). "
 	history_prompt += "Write me 10 short sentences that describe "+character_name+"'s character, history, and current state. Imagine this character lives a pretty routine life. "
-	history_prompt += "Your response should be a single paragraph, with statements separated by semi-colons. Examples of statements are as follows:\nJohn likes to go for walks;\nEmily has three dogs that she adores;\nStacy loves her job at the family restaurant;"
+	history_prompt += "Your response should be a collection of subject-description statemnts seperated with semicolons. Examples of statements are as follows:\nJohn likes to go for walks; John has three dogs that he adores; John loves his job at the family restaurant;"
 	
 	history = await game_manager.chat_request(history_prompt,92,200)
+	history += character_name+" is invited to a Mansion to spend some time to relax with strangers;"
+	history += character_name+" wants to enjoy time at the Mansion by talking to people and exploring around;"
 	description_label.text += "\n\n"+history
 	
 	concurrency_handler.response_complete()

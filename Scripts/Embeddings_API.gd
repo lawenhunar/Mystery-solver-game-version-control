@@ -5,7 +5,7 @@ class_name Embedding_API
 var api_key : String = "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"
 var url : String = "https://api.openai.com/v1/embeddings"
 var headers = ["Content-type: application/json", "Authorization: Bearer " + api_key]
-var model : String = "text-embedding-3-large"
+var model : String = "text-embedding-3-small"
 var output
 signal response_recieved
 

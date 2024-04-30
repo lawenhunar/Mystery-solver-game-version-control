@@ -21,14 +21,16 @@ func _init(_as_node, _entity_name, _location, _action, _interactable):
 	generate_description()
 
 func generate_description():
-	description = entity_name+" is currently at "+location+". "
+	description = entity_name+" currently "
 	
 	if action != "[nothing]":
-		description += entity_name+" currently "+action+". "
-	
-	if interactable != null:
-		description += entity_name+" is currently interacting with "+interactable.entity_name+"."
+		description += action
+	else:
+		description += "is"
 
+	description +=  " at "+location+"."
+	
+	
 func set_location(new_location: String):
 	location = new_location
 	generate_description()
@@ -39,7 +41,6 @@ func set_action(new_action: String):
 
 func set_interactable(new_interactable: Entity):
 	interactable = new_interactable
-	generate_description()
 
 func copy() -> Entity:
 	return Entity.new(as_node, entity_name, location, action, interactable)
