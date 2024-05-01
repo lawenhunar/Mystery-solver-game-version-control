@@ -6,7 +6,7 @@ var api_key : String = "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"
 var url : String = "https://api.openai.com/v1/embeddings"
 var headers = ["Content-type: application/json", "Authorization: Bearer " + api_key]
 var model : String = "text-embedding-3-small"
-var output : Array
+var output
 signal response_recieved
 
 # Function to make a dialogue request
@@ -31,6 +31,6 @@ func _on_request_completed(_result, _response_code, _headers, body):
 	json.parse(body.get_string_from_utf8())
 	var response = json.get_data()
 
-	output = response['data'][0]['embedding']
+	output = response
 	response_recieved.emit()
 

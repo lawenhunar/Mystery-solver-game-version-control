@@ -29,7 +29,7 @@ var cause_of_kill:String
 #@onready var lights = $"../UI/Lights"
 
 func _ready():
-	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
+	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)
 	cause_of_kill="Choked"
 
 func _physics_process(_delta):
@@ -70,8 +70,13 @@ func _physics_process(_delta):
 	
 	var nearby_entities = interaction_zone.get_overlapping_bodies()
 	for i in range(len(nearby_entities)-1,-1,-1):
-		if !nearby_entities[i].is_in_group("Entity") || nearby_entities[i].is_in_group("Player"):
-			nearby_entities.erase(nearby_entities[i])
+		var current_entity : Node2D = nearby_entities[i]
+		if !current_entity.is_in_group("Entity") || current_entity.is_in_group("Player"):
+			nearby_entities.erase(current_entity)
+			
+		if current_entity.is_in_group("Agent"):
+			if !current_entity.can_be_interacted_wtih():
+				nearby_entities.erase(current_entity)
 	closest_entity = null
 	var min_distance = INF # Start with infinity, which will be larger than any other distance
 	for entity in nearby_entities:
@@ -85,9 +90,14 @@ func _physics_process(_delta):
 	if closest_entity != null:
 		target_alpha = 1
 		
+		popup_ui_label.text = "I"
+		if closest_entity.is_in_group("Agent"):
+			if closest_entity.is_target:
+				popup_ui_label.text += " , K"
+		
 		var direction_to_entity = closest_entity.global_position - global_position
 		direction_to_entity = direction_to_entity.limit_length(115)
-		popup_ui_label.position = direction_to_entity
+		popup_ui_label.position = direction_to_entity - popup_ui_label.size/2
 	popup_alpha = lerpf(popup_alpha, target_alpha, 0.2)
 	popup_ui_label.label_settings.font_color.a = popup_alpha
 
@@ -97,9 +107,7 @@ func _input(_event):
 		
 	if Input.is_key_pressed(KEY_I) and closest_entity != null:
 		if closest_entity.is_in_group("Agent"):
-			if !closest_entity.is_alive:
-				return
-			if closest_entity.dialogue_partner != null:
+			if !closest_entity.can_be_interacted_wtih():
 				return
 			game_manager.enter_new_dialogue(closest_entity)
 			as_entity.set_action("talking with "+closest_entity.as_entity.entity_name)
@@ -112,9 +120,8 @@ func _input(_event):
 			closest_entity.as_entity.set_interactable(as_entity)
 	if Input.is_key_pressed(KEY_K) && closest_entity != null:
 		if closest_entity.is_in_group("Agent"):
-			#if (cause_of_kill=="poisoned"):
-				#await get_tree().create_timer(10).timeout
-			closest_entity.kill_agent(cause_of_kill)
+			if closest_entity.is_target:
+				closest_entity.kill_agent(cause_of_kill)
 			
 	#if Input.is_key_pressed(KEY_L):
 		#lights.canvas_modulate.toggleLights()

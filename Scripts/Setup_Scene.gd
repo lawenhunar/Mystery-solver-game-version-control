@@ -11,6 +11,7 @@ var concurrency_handler : ConcurrencyHandler
 
 var character_nodes : Array
 var selected_character
+var target_character
 
 func _ready():
 	concurrency_handler = ConcurrencyHandler.new()
@@ -67,9 +68,9 @@ func _pick_target():
 	while character_nodes[target_index] == selected_character:
 		target_index = randi_range(0,len(character_nodes)-1)
 	
-	var target_node = character_nodes[target_index]
-	instruction_label.text = "Your Mission: Kill "+target_node.character_name
-	target_node.highlight_panel.visible = true
+	target_character = character_nodes[target_index]
+	instruction_label.text = "Your Mission: Kill "+target_character.character_name
+	target_character.highlight_panel.visible = true
 	
 	start_button.visible = true
 
@@ -84,6 +85,8 @@ func _on_start_button_pressed():
 	
 	DataTransfer.reset_values()
 	for node in character_nodes:
-		var agent_info = {"name": node.character_name, "texture": node.texture_sheet, "age": node.age, "gender": node.gender, "traits": node.traits, "history": node.history}
+		var agent_info = {"name": node.character_name, "texture": node.texture_sheet, "age": node.age, "gender": node.gender, "traits": node.traits, "history": node.history, "is_target":false}
+		if node == target_character:
+			agent_info["is_target"] = true
 		DataTransfer.add_agent_info(agent_info)
 	get_tree().change_scene_to_file(next_scene)
