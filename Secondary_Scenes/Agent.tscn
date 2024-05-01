@@ -50,7 +50,6 @@ path_postprocessing = 1
 avoidance_enabled = true
 radius = 0.01
 max_neighbors = 1
-debug_enabled = true
 
 [node name="Interaction Zone" type="Area2D" parent="."]
 scale = Vector2(0.8, 0.8)

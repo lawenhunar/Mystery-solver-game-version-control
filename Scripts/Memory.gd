@@ -21,6 +21,5 @@ func _init(_time_created, _content, game_manager):
 	importance = int(await game_manager.chat_request(importance_prompt, 0,3))
 	token_count = await game_manager.get_token_count(content)
 	embedding = await game_manager.embedding_request(content)
-	
 	completed.emit()
 

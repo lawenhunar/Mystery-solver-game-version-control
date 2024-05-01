@@ -26,9 +26,9 @@ var previous_destination:Node
 var facing_direction : Vector2 = Vector2.DOWN
 
 var agent_summary : String
-var memories : Array
+var memories : Array[Memory]
 var new_observations : Array[Entity]
-var dialogue_history : Array
+var dialogue_history : Array[Dictionary]
 var dialogue_partner : Node2D
 var dialogue_context : String
 
@@ -103,7 +103,7 @@ func _physics_process(delta):
 func _check_reflection():
 	if !memories.is_empty() && !is_reflecting:
 		var total_recent_importance = 0
-		for i in range(oldest_memory_index, len(memories)):
+		for i in range(oldest_memory_index, memories.size()):
 			total_recent_importance += memories[i].importance
 		
 		if total_recent_importance >= recent_importance_threshold:
@@ -204,7 +204,7 @@ func _generate_plan(starting_level_of_detail:int = 2):
 	
 	var levels_of_detail : Array[String] = ["multi-hour", "hourly", "5-15 minute"]
 	var current_plan = ""
-	for level in range(starting_level_of_detail,len(levels_of_detail)):
+	for level in range(starting_level_of_detail,levels_of_detail.size()):
 		var detail = levels_of_detail[level]
 		var plan_prompt = agent_summary
 		
@@ -253,7 +253,7 @@ func _add_memory(content, is_concurrent=false):
 func _get_embedding_from_query(query):
 	concurrency_handler.response_complete(await game_manager.embedding_request(query))
 
-func _retrieve_memories(queries:Array[String], num_top_memories=len(memories)) -> Array[Memory]:
+func _retrieve_memories(queries:Array[String], num_top_memories=memories.size()) -> Array[Memory]:
 	var query_embeddings  = []
 	for query in queries:
 		_get_embedding_from_query(query)
@@ -271,7 +271,7 @@ func _retrieve_memories(queries:Array[String], num_top_memories=len(memories)) -
 		var importance = memory.importance
 		var record_relevance = 0
 		for query_embedding in query_embeddings:
-			if len(query_embedding) == len(memory.embedding):
+			if query_embedding.size() == memory.embedding.size():
 				var relevance = _calculate_cosine_similarity(query_embedding, memory.embedding)
 				record_relevance = max(record_relevance, relevance)
 		
@@ -288,7 +288,7 @@ func _retrieve_memories(queries:Array[String], num_top_memories=len(memories)) -
 		var score = {"memory": memory, "final_score": 0, "recency": recency, "importance": importance, "relevance": record_relevance}		
 		memory_scores.append(score)
 		memory.time_last_accessed = current_time
-#
+
 	for score_data in memory_scores:
 		var recency_mapped = _map(score_data.recency, scaling_values.min_recency, scaling_values.max_recency, 0, 1)
 		var importance_mapped = _map(score_data.importance, scaling_values.min_importance, scaling_values.max_importance, 0, 1)
@@ -299,7 +299,7 @@ func _retrieve_memories(queries:Array[String], num_top_memories=len(memories)) -
 	memory_scores.sort_custom(func(a, b): return a.final_score > b.final_score)
 	var result : Array[Memory] = []
 	#print(queries,"---------------\n")
-	for i in min(num_top_memories,len(memory_scores)):
+	for i in min(num_top_memories,memory_scores.size()):
 		var score_data = memory_scores[i]
 		#print("T: ",memory_scores[i].final_score,", Rc: ",memory_scores[i].recency,", Im: ",memory_scores[i].importance,", Rl: ",memory_scores[i].relevance,", M: ",memory_scores[i].memory.content)
 		result.append(score_data.memory)
@@ -315,10 +315,12 @@ func _calculate_cosine_similarity(vector1, vector2):
 	var magnitude_vector1_squared = 0.0
 	var magnitude_vector2_squared = 0.0
 	
-	for i in len(vector1):
-		dot_product += vector1[i] * vector2[i]
-		magnitude_vector1_squared += vector1[i] * vector1[i]
-		magnitude_vector2_squared += vector2[i] * vector2[i]
+	for i in vector1.size():
+		var v1 = vector1[i]
+		var v2 = vector2[i]
+		dot_product += v1 * v2
+		magnitude_vector1_squared += v1 * v1
+		magnitude_vector2_squared += v2 * v2
 
 	# Avoid division by zero
 	if magnitude_vector1_squared == 0.0 or magnitude_vector2_squared == 0.0:
@@ -341,7 +343,7 @@ func _trigger_brain():
 		
 	var reaction_parts = reaction.split("|")
 	
-	if len(reaction_parts) != 2:
+	if reaction_parts.size() != 2:
 		print("Reaction failed: ", reaction)
 		return
 	
@@ -441,7 +443,7 @@ func _react():
 	
 	reaction_prompt += "\nObservations of nearby entities (sorted from newest to oldest): \n"
 	var current_token_count = 0
-	for i in range(len(new_observations)-1,-1,-1):
+	for i in range(new_observations.size()-1,-1,-1):
 		var description_token_count : int = game_manager.get_token_count(new_observations[i].description)
 		if current_token_count + description_token_count < 2040:
 			reaction_prompt += "- "+new_observations[i].description+"\n"
@@ -489,13 +491,13 @@ func _pick_location():
 		location_prompt += agent_name+" is located at "+as_entity.location+"\n"
 		
 		location_prompt += agent_name+" knows of the following locations:\n"
-		for i in len(available_locations):
+		for i in available_locations.size():
 			location_prompt += str(i+1)+") "+available_locations[i].get_name()+"\n"
 		location_prompt += agent_name+" wants to do the following: "+as_entity.action+".\n"
 		location_prompt += "Which area should "+agent_name+" go to? Respond only with the index of the given locations, nothing else. For example:\n1\n5\n3"
 	
 		var chosen_index = int(await game_manager.chat_request(location_prompt, 0, 2))-1
-		if chosen_index >= len(available_locations):
+		if chosen_index >= available_locations.size():
 			break
 			
 		chosen_node = available_locations[chosen_index]
@@ -510,7 +512,7 @@ func _reflect():
 	var questions_prompt : String = "Consider the following memories:\n"
 	
 	var current_token_count : int = 0
-	for i in range(len(memories)-1, oldest_memory_index, -1):
+	for i in range(memories.size()-1, oldest_memory_index, -1):
 		var memory : Memory = memories[i]
 		if current_token_count + memory.token_count < 2040:
 			questions_prompt += "- "+memory.content+"\n"
@@ -527,7 +529,7 @@ func _reflect():
 	
 	await concurrency_handler.wait_for_responses(num_reflection_questions * num_insights_per_reflection_question)
 	
-	oldest_memory_index = len(memories)
+	oldest_memory_index = memories.size()
 	is_reflecting = false
 
 func _reflection_coroutine(question):
@@ -698,7 +700,7 @@ func end_dialogue():
 func _interact_with_nearby_entities():
 	var nearby_entities = interaction_zone.get_overlapping_bodies()
 	var contains_destination : bool = false
-	for i in range(len(nearby_entities)-1,-1,-1):
+	for i in range(nearby_entities.size()-1,-1,-1):
 		var current_entity : Node2D = nearby_entities[i]
 		# If the nearby object is not an entity or is just the agent itself, move onto the next one
 		if !current_entity.is_in_group("Entity") || current_entity == self:
