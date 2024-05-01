@@ -15,6 +15,7 @@ var current_item
 @onready var inv_ui = get_node("/root/Game/UI/inv_ui")
 
 var in_game_time
+
 var month_conversions = {
 	1: "January",
 	2: "February",
@@ -187,3 +188,9 @@ func close_item_panel():
 
 func set_item_action(action):
 	current_item.as_entity.set_action(action)
+
+func get_item_action(item):
+	return item.as_entity.action
+
+func set_item_action_from_nodes(item,action):
+	item.as_entity.set_action(action)
