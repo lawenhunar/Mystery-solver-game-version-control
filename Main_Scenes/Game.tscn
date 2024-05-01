@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=3 uid="uid://ctn24y5h1lrue"]
+[gd_scene load_steps=53 format=3 uid="uid://ctn24y5h1lrue"]
 
 [ext_resource type="PackedScene" uid="uid://dnmqbbkcnsnb5" path="res://Secondary_Scenes/Game_Manager.tscn" id="1_ffubo"]
 [ext_resource type="Script" path="res://Scripts/Game_Scene.gd" id="1_titmr"]
@@ -22,6 +22,7 @@
 [ext_resource type="Resource" uid="uid://b37vjdr563x7k" path="res://Resources/pistol.tres" id="12_p7drs"]
 [ext_resource type="Resource" uid="uid://bln7wl6orci1t" path="res://Resources/poison.tres" id="13_syory"]
 [ext_resource type="Resource" uid="uid://bwhjrrc2we7av" path="res://Resources/coffee_mug.tres" id="14_i10yy"]
+[ext_resource type="PackedScene" uid="uid://bnsm7y6apkfdl" path="res://Secondary_Scenes/Meeting.tscn" id="18_vf10n"]
 [ext_resource type="Texture2D" uid="uid://g6v8mtm5cno" path="res://Assets/Graphics/light asset.png" id="19_25kie"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_cm5wk"]
@@ -7872,6 +7873,7 @@ layer_2/tile_data = PackedInt32Array(393226, 917509, 53, 458762, 917509, 54, -58
 [node name="Layout" type="Node" parent="."]
 
 [node name="Mansion" type="Area2D" parent="Layout"]
+visible = false
 scale = Vector2(4, 4)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Mansion"]
@@ -8252,6 +8254,8 @@ offset_right = -205.0
 offset_bottom = 54.0
 grow_horizontal = 2
 scale = Vector2(5.72755, 5.72755)
+
+[node name="Meeting_dialogue" parent="UI" instance=ExtResource("18_vf10n")]
 
 [node name="Agents" type="Node" parent="."]
 
