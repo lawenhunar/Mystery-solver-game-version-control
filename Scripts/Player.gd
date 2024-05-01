@@ -25,6 +25,7 @@ var popup_alpha : float
 var closest_entity : Node2D
 
 var cause_of_kill:String
+@onready var meeting_dialogue = $"../UI/Meeting_dialogue"
 
 #@onready var lights = $"../UI/Lights"
 
@@ -115,6 +116,7 @@ func _input(_event):
 			#if (cause_of_kill=="poisoned"):
 				#await get_tree().create_timer(10).timeout
 			closest_entity.kill_agent(cause_of_kill)
+			meeting_dialogue.visible=true
 			
 	#if Input.is_key_pressed(KEY_L):
 		#lights.canvas_modulate.toggleLights()

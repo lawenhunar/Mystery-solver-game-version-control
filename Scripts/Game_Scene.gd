@@ -14,6 +14,8 @@ var current_item
 
 @onready var inv_ui = get_node("/root/Game/UI/inv_ui")
 
+@onready var meeting_dialogue = $"../UI/Meeting_dialogue"
+
 var in_game_time
 
 var month_conversions = {
@@ -45,6 +47,7 @@ func _ready():
 	in_game_time = Time.get_unix_time_from_datetime_string("2024-03-11T08:00:00")
 	dialogue_panel.visible = false
 	item_panel.visible = false
+	meeting_dialogue.visible=false
 	
 	# Create all the agents using the information generated in the setup scene
 	for info in DataTransfer.agent_infos:
