@@ -6,6 +6,7 @@
 custom_minimum_size = Vector2(247, 84)
 offset_right = 247.0
 offset_bottom = 84.0
+scale = Vector2(1.44025, 1.44025)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(5.0625, 5.0625)

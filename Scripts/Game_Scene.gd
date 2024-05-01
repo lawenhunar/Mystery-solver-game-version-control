@@ -173,7 +173,7 @@ func exit_dialogue ():
 	player.as_entity.set_action("idle")
 
 func is_UI_active():
-	return dialogue_panel.visible or item_panel.visible
+	return dialogue_panel.visible or item_panel.visible or meeting_dialogue.visible
 
 func setup_item_panel(item):
 	current_item = item

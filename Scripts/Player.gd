@@ -27,7 +27,6 @@ var closest_entity : Node2D
 var cause_of_kill:String
 @onready var meeting_dialogue = $"../UI/Meeting_dialogue"
 
-#@onready var lights = $"../UI/Lights"
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "desperate to talk to somebody", null)
@@ -117,9 +116,6 @@ func _input(_event):
 				#await get_tree().create_timer(10).timeout
 			closest_entity.kill_agent(cause_of_kill)
 			meeting_dialogue.visible=true
-			
-	#if Input.is_key_pressed(KEY_L):
-		#lights.canvas_modulate.toggleLights()
 
 func collect(item):
 	inv.insert(item)

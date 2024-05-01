@@ -10,16 +10,18 @@ script = ExtResource("1_5cllq")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 6.0
-offset_right = 12.0
-offset_bottom = 6.0
+anchor_left = 0.0104167
+anchor_top = 0.0108025
+anchor_right = 0.989247
+anchor_bottom = 0.989632
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 25.3878
+offset_bottom = 14.7182
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.97883, 0.97883)
+metadata/_edit_use_anchors_ = true
 
 [node name="background" type="Panel" parent="Control"]
 layout_mode = 1
@@ -39,32 +41,32 @@ theme_override_font_sizes/font_size = 30
 text = "Group meeting"
 horizontal_alignment = 1
 vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
 
 [node name="Vote panel" type="Panel" parent="Control"]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.104938
-anchor_right = 0.488715
+anchor_top = 0.103395
+anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="GridContainer" type="GridContainer" parent="Control/Vote panel"]
-layout_direction = 1
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.00362923
-anchor_top = 0.00689461
-anchor_right = 0.999181
-anchor_bottom = 0.526661
-offset_right = -62.4956
-offset_bottom = -32.6283
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -249.0
+offset_top = -130.0
+offset_right = 249.0
+offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(1.12549, 1.12549)
 columns = 2
-metadata/_edit_use_anchors_ = true
 
 [node name="Meeting_agent" parent="Control/Vote panel/GridContainer" instance=ExtResource("2_qud7i")]
 layout_mode = 2
@@ -92,27 +94,24 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="Button" type="Button" parent="Control/Vote panel"]
-layout_mode = 0
-offset_left = 9.19464
-offset_top = 427.49
-offset_right = 254.195
-offset_bottom = 572.49
-theme_override_font_sizes/font_size = 20
-text = "Skip vote"
-
-[node name="VoteTimer" type="Timer" parent="Control/Vote panel"]
-wait_time = 15.0
-
-[node name="ChatPanel" type="Panel" parent="Control"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.499132
-anchor_top = 0.111111
-anchor_right = 0.990451
-anchor_bottom = 0.990741
-grow_horizontal = 0
-grow_vertical = 2
+anchor_left = 0.775174
+anchor_top = 0.805508
+anchor_right = 0.965278
+anchor_bottom = 0.963855
+theme_override_font_sizes/font_size = 20
+text = "Skip vote"
 metadata/_edit_use_anchors_ = true
+
+[node name="ChatPanel" type="Panel" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TextEdit" type="TextEdit" parent="Control/ChatPanel"]
 layout_mode = 1
@@ -126,23 +125,17 @@ theme_override_font_sizes/font_size = 23
 placeholder_text = "Enter your text here..."
 metadata/_edit_use_anchors_ = true
 
-[node name="Button" type="Button" parent="Control/ChatPanel"]
+[node name="TalkButton" type="Button" parent="Control/ChatPanel"]
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -109.155
-offset_top = -64.78
-offset_right = -6.15533
-offset_bottom = -0.780029
+anchors_preset = -1
+anchor_left = 0.893038
+anchor_top = 0.883403
+anchor_right = 0.982447
+anchor_bottom = 0.995291
 grow_horizontal = 0
 grow_vertical = 0
 text = "Talk"
-
-[node name="ChatTimer" type="Timer" parent="Control/ChatPanel"]
-wait_time = 30.0
+metadata/_edit_use_anchors_ = true
 
 [node name="Body_found" type="Control" parent="."]
 visible = false
