@@ -7,23 +7,24 @@ var frame_count : int = 6
 var frame_size = Vector2(16, 32) # Size of each frame
 
 func _ready():
-	var actions = ["idle", "run"]
+	var actions = ["idle", "run", "sit"]
 	var directions = ["right", "up", "left", "down"]
 	
 	if get_parent().is_in_group("Agent"):
 		get_parent().icon = ImageTexture.create_from_image(_get_image_region(0, 3))
 	
+	# Idle and running animations
 	for i in 2:
 		for j in 4:
-			var current_animation_name = actions[i]+" "+directions[j] 
-			frames.add_animation(current_animation_name)
-			
-			for f in frame_count:
-				var frame_texture = ImageTexture.create_from_image(_get_image_region(i+1, j*6 + f))
-				frames.add_frame(current_animation_name, frame_texture)
-				if i == 1:
-					frames.set_animation_speed(current_animation_name, 10)
+			var speed : int = 5
+			if i==1:
+				speed = 10
+			_create_animation(actions[i]+" "+directions[j], Vector2i(j*6, i+1), speed)
 	
+	# Sitting animation
+	for j in range(0,3,2):
+		_create_animation(actions[2]+" "+directions[j], Vector2i((j/2)*6, 5), 5)
+		
 	# Death frames
 	for direction in range(0,3,2):
 		var current_animation_name = "dead "+directions[direction] 
@@ -38,6 +39,14 @@ func _ready():
 	sprite_frames = frames
 	animation = "idle down"
 	play("idle down")
+
+func _create_animation(animation_name:String, starting_location:Vector2i, animation_speed:int) -> void:
+	frames.add_animation(animation_name)
+	frames.set_animation_speed(animation_name, animation_speed)
+	
+	for f in frame_count:
+		var frame_texture = ImageTexture.create_from_image(_get_image_region(starting_location.y,starting_location.x+f))
+		frames.add_frame(animation_name, frame_texture)
 
 func _get_image_region(row, column) -> Image:
 	var frame_position = Vector2(column * frame_size.x, row * frame_size.y)

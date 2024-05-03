@@ -10,10 +10,10 @@ script = ExtResource("1_5cllq")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
-anchor_left = 0.0104167
-anchor_top = 0.0108025
-anchor_right = 0.989247
-anchor_bottom = 0.989632
+anchor_left = 0.295139
+anchor_top = 0.087963
+anchor_right = 0.719281
+anchor_bottom = 0.792102
 offset_left = 1.0
 offset_top = 1.0
 offset_right = 25.3878

@@ -15,6 +15,7 @@ var current_item
 @onready var inv_ui = get_node("/root/Game/UI/inv_ui")
 
 @onready var meeting_dialogue = $"../UI/Meeting_dialogue"
+@onready var meeting_table = $"../Meeting Table"
 
 var in_game_time
 
@@ -192,3 +193,44 @@ func get_item_action(item):
 
 func set_item_action_from_nodes(item,action):
 	item.as_entity.set_action(action)
+
+func setup_meeting_dialogue():
+	meeting_dialogue.visible = true
+	
+	# Get a list of the agents that are still alive
+	var alive_characters = agents_root.get_children()
+	for i in range(alive_characters.size()-1,-1,-1):
+		var agent = alive_characters[i]
+		if !agent.is_alive:
+			alive_characters.erase(agent)
+	# Add the player to the list of alive characters
+	alive_characters.append(player)
+	
+	# Get a list of the available seets at the meeting table
+	var available_seats : Array[Node] = meeting_table.get_children()
+	var extreme_values : Dictionary = {"min_y":1.79769e308, "max_y":-1.79769e308}
+	for seat in available_seats:
+		extreme_values.min_y = min(extreme_values.min_y, seat.global_position.y)
+		extreme_values.max_y = max(extreme_values.max_y, seat.global_position.y)
+	
+	# Randomly put all the alive characters into seats
+	for character in alive_characters:
+		var random_seat = available_seats.pick_random()		
+		character.enter_meeting_mode(random_seat)
+		character.z_index = int(_map(character.global_position.y, extreme_values.min_y, extreme_values.max_y, 5,6))
+		available_seats.erase(random_seat)
+
+func end_meeting_dialogue():
+	player.exit_meeting_mode(meeting_table)
+
+	for agent in agents_root.get_children():
+		if !agent.is_alive:
+			continue
+		agent.exit_meeting_mode(meeting_table)
+		
+
+func _map(value, in_min, in_max, out_min, out_max):
+	if in_min == in_max:
+		return out_max
+	return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+	
