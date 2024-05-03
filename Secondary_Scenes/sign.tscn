@@ -1,0 +1,36 @@
+[gd_scene load_steps=2 format=3 uid="uid://drs83xwfrj1pp"]
+
+[ext_resource type="Script" path="res://Scripts/sign.gd" id="1_oaver"]
+
+[node name="sign" type="CanvasLayer"]
+script = ExtResource("1_oaver")
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 54.0
+offset_top = 58.0
+offset_right = 493.0
+offset_bottom = 584.0
+
+[node name="title" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.222433
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 30
+text = "Text"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="body" type="RichTextLabel" parent="Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.304182
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/normal_font_size = 19
+text = "Textssss"
+metadata/_edit_use_anchors_ = true
