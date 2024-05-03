@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 @onready var game_manager : Node = get_node("/root/Game/GameManager")
 
+@onready var camera : Camera2D = $Camera2D
+
 @export var agent_name : String
 @export var animation_texture : Texture
 @onready var animated_sprite_2d = $AnimatedSprite2D
@@ -25,14 +27,17 @@ var popup_alpha : float
 var closest_entity : Node2D
 
 var cause_of_kill:String
+var is_in_meeting : bool
 
-#@onready var lights = $"../UI/Lights"
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)
 	cause_of_kill="Choked"
 
 func _physics_process(_delta):
+	if is_in_meeting:
+		return
+
 	var directions = ["up", "right", "down", "left"]
 	if velocity != Vector2.ZERO:
 		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
@@ -102,7 +107,7 @@ func _physics_process(_delta):
 	popup_ui_label.label_settings.font_color.a = popup_alpha
 
 func _input(_event):
-	if game_manager.is_UI_active():
+	if game_manager.is_UI_active() or is_in_meeting:
 		return
 		
 	if Input.is_key_pressed(KEY_I) and closest_entity != null:
@@ -120,12 +125,33 @@ func _input(_event):
 			closest_entity.as_entity.set_interactable(as_entity)
 	if Input.is_key_pressed(KEY_K) && closest_entity != null:
 		if closest_entity.is_in_group("Agent"):
-			if closest_entity.is_target:
-				closest_entity.kill_agent(cause_of_kill)
-			
-	#if Input.is_key_pressed(KEY_L):
-		#lights.canvas_modulate.toggleLights()
+			closest_entity.kill_agent(cause_of_kill)
+			game_manager.setup_meeting_dialogue()
 
 func collect(item):
 	inv.insert(item)
+
+func enter_meeting_mode(given_seat: Node2D) -> void:
+	is_in_meeting = true
+	global_position = given_seat.global_position
+	popup_ui_label.label_settings.font_color.a = 0
+	
+	if given_seat.position.x > 0:
+		animated_sprite_2d.animation = "sit left"
+	else:
+		animated_sprite_2d.animation = "sit right"
+	animated_sprite_2d.frame = randi_range(0,6)
+	
+	camera.global_position = given_seat.get_parent().global_position
+	camera.zoom = Vector2(3,3)
+
+func exit_meeting_mode(meeting_table:Node2D):
+	z_index = 6
+	global_position += (global_position-meeting_table.global_position)*0.8
+	velocity = Vector2.ZERO
+	is_in_meeting = false
+	velocity = Vector2.ZERO
+	camera.global_position = global_position
+	camera.zoom = Vector2(1,1)
+	
 

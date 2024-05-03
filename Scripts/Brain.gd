@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 var game_manager : Node
 var concurrency_handler : ConcurrencyHandler
+var collision_shape_2D : CollisionShape2D
 
 var icon : Texture
 var animation_texture : Texture
@@ -46,6 +47,7 @@ var num_reflection_questions : int = 3
 var num_insights_per_reflection_question : int = 3
 
 var is_alive : bool = true
+var is_in_meeting : bool
 
 var conversation_panel
 
@@ -56,6 +58,7 @@ func _initialize_children():
 	navigation_agent_2d = $NavigationAgent2D
 	interaction_zone = $"Interaction Zone"
 	conversation_panel = $"Conversation Panel"
+	collision_shape_2D = $"CollisionShape2D"
 
 func setup_intial_values(info, starting_location):
 	_initialize_children()
@@ -86,7 +89,7 @@ func setup_intial_values(info, starting_location):
 	can_trigger = true
 
 func _physics_process(delta):
-	if !is_alive:
+	if !is_alive or is_in_meeting:
 		return
 	
 	_navigate(delta)
@@ -753,4 +756,25 @@ func _interact_with_nearby_entities():
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity
 	move_and_slide()
+
+func enter_meeting_mode(given_seat:Node2D) -> void:
+	is_in_meeting = true
+	collision_shape_2D.disabled = true
+	global_position = given_seat.global_position
+	_end_navigation()
+	
+	if given_seat.position.x > 0:
+		animated_sprite_2d.animation = "sit left"
+	else:
+		animated_sprite_2d.animation = "sit right"
+	animated_sprite_2d.frame = randi_range(0,6)
+
+func exit_meeting_mode(meeting_table:Node2D):
+	z_index = 5
+	global_position += (global_position-meeting_table.global_position)*0.8
+	velocity = Vector2.ZERO
+	collision_shape_2D.disabled = false
+	is_in_meeting = false
+
+
 

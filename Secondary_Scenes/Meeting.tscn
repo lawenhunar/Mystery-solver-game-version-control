@@ -1,0 +1,175 @@
+[gd_scene load_steps=4 format=3 uid="uid://bnsm7y6apkfdl"]
+
+[ext_resource type="Script" path="res://Scripts/Meeting.gd" id="1_5cllq"]
+[ext_resource type="PackedScene" uid="uid://biph1u856oeul" path="res://Secondary_Scenes/meeting_agent.tscn" id="2_qud7i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0g8hs"]
+
+[node name="Meeting_dialogue" type="CanvasLayer"]
+script = ExtResource("1_5cllq")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchor_left = 0.295139
+anchor_top = 0.087963
+anchor_right = 0.719281
+anchor_bottom = 0.792102
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 25.3878
+offset_bottom = 14.7182
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.97883, 0.97883)
+metadata/_edit_use_anchors_ = true
+
+[node name="background" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="title" type="Label" parent="Control"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 44.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 30
+text = "Group meeting"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Vote panel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.103395
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="GridContainer" type="GridContainer" parent="Control/Vote panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -249.0
+offset_top = -130.0
+offset_right = 249.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="Meeting_agent" parent="Control/Vote panel/GridContainer" instance=ExtResource("2_qud7i")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Meeting_agent2" parent="Control/Vote panel/GridContainer" instance=ExtResource("2_qud7i")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Meeting_agent3" parent="Control/Vote panel/GridContainer" instance=ExtResource("2_qud7i")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Meeting_agent4" parent="Control/Vote panel/GridContainer" instance=ExtResource("2_qud7i")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Meeting_agent5" parent="Control/Vote panel/GridContainer" instance=ExtResource("2_qud7i")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Button" type="Button" parent="Control/Vote panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.775174
+anchor_top = 0.805508
+anchor_right = 0.965278
+anchor_bottom = 0.963855
+theme_override_font_sizes/font_size = 20
+text = "Skip vote"
+metadata/_edit_use_anchors_ = true
+
+[node name="ChatPanel" type="Panel" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextEdit" type="TextEdit" parent="Control/ChatPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.885965
+anchor_right = 0.80212
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 23
+placeholder_text = "Enter your text here..."
+metadata/_edit_use_anchors_ = true
+
+[node name="TalkButton" type="Button" parent="Control/ChatPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.893038
+anchor_top = 0.883403
+anchor_right = 0.982447
+anchor_bottom = 0.995291
+grow_horizontal = 0
+grow_vertical = 0
+text = "Talk"
+metadata/_edit_use_anchors_ = true
+
+[node name="Body_found" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="background" type="Panel" parent="Body_found"]
+modulate = Color(0.45098, 0.12549, 0.101961, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0g8hs")
+
+[node name="Label" type="Label" parent="Body_found"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 2.0
+offset_top = -66.0
+offset_right = 2.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.976471, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "DEAD BODY FOUND!!"
+horizontal_alignment = 1
+vertical_alignment = 1
