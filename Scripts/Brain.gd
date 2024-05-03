@@ -12,9 +12,10 @@ var agent_name : String
 var age : int
 var gender : String
 var traits : String
+var is_target : bool
 
 var recency_weight : float = 1
-var importance_weight : float = 1
+var importance_weight : float = 0.5
 var relevance_weight : float = 1
 
 var navigation_agent_2d
@@ -26,27 +27,24 @@ var previous_destination:Node
 var facing_direction : Vector2 = Vector2.DOWN
 
 var agent_summary : String
-var memories : Array
+var memories : Array[Memory]
 var new_observations : Array[Entity]
-var dialogue_history : Array
+var dialogue_history : Array[Dictionary]
 var dialogue_partner : Node2D
-var current_plan : String
-var all_tasks : Array
+var dialogue_context : String
 
 var as_entity : Entity
 
 var can_trigger : bool = false
 var time_since_last_trigger : int
-var time_since_last_plan : int
-var planning_duration : int = 60 # in seconds
 var trigger_duration : int = 10 # in seconds
 
 # These variables are used for the relfection process
-var recent_importance_threshold : int = 100
+var recent_importance_threshold : int = 150
 var oldest_memory_index : int = 0
 var is_reflecting : bool = false
 var num_reflection_questions : int = 3
-var num_insights_per_reflection_question : int = 5
+var num_insights_per_reflection_question : int = 3
 
 var is_alive : bool = true
 var is_in_meeting : bool
@@ -71,21 +69,22 @@ func setup_intial_values(info, starting_location):
 	animation_texture = info.texture
 	age = info.age
 	traits = info.traits
+	is_target = info.is_target
 	
 	concurrency_handler = ConcurrencyHandler.new()
 	
-	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "wants to talk to somebody", null)
+	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is planning out the day", null)
 	game_manager.can_record = true
 	conversation_panel.visible = false
-	
+
 	for content in info.history.split(";"):
 		_add_memory(content.strip_edges(), true)
 	
 	await concurrency_handler.wait_for_responses(info.history.split(";").size())
 	
 	await _generate_agent_summary()
-	var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
-	await _generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
+	await _generate_plan(0)
+	as_entity.set_action("is idle")
 	
 	can_trigger = true
 
@@ -96,6 +95,7 @@ func _physics_process(delta):
 	_navigate(delta)
 	
 	as_entity.set_location(game_manager.get_location(global_position))
+	_interact_with_nearby_entities()	
 	if Engine.get_physics_frames() % 5 == 0:
 		_observe()
 	_check_reflection()
@@ -106,7 +106,7 @@ func _physics_process(delta):
 func _check_reflection():
 	if !memories.is_empty() && !is_reflecting:
 		var total_recent_importance = 0
-		for i in range(oldest_memory_index, len(memories)):
+		for i in range(oldest_memory_index, memories.size()):
 			total_recent_importance += memories[i].importance
 		
 		if total_recent_importance >= recent_importance_threshold:
@@ -128,9 +128,6 @@ func _navigate(delta):
 		navigation_agent_2d.set_velocity(intended_velocity)
 		
 		move_and_slide()
-		
-		if interaction_zone.overlaps_body(destination):
-			_end_navigation()
 	else:
 		# At this part of the program, the agent is idle, so face a random direction every now and then
 		if randf() < 0.001:
@@ -145,7 +142,7 @@ func _animate():
 		animated_sprite_2d.animation = "idle "+directions[round(facing_direction.angle()/(PI/2))+1]
 
 func kill_agent(method_of_killing):
-	as_entity.set_action("killed by "+ method_of_killing)
+	as_entity.set_action("lying dead on the floor, unattended and in need of attention, killed by being choked")
 	print(method_of_killing)
 	_end_navigation()
 	is_alive = false
@@ -159,102 +156,81 @@ func _set_destination(chosen_node):
 	previous_destination = destination
 	destination = chosen_node
 
+func can_be_interacted_wtih() -> bool:
+	return is_alive and dialogue_partner == null
+
 func _end_navigation():
 	destination = null
 	navigation_agent_2d.set_velocity(Vector2.ZERO)
 	navigation_agent_2d.target_position = global_position
 
-func _generate_memory_summary(query):
-	var relevant_memories = await _retrieve_memories(query, 5)
+func _generate_memory_summary(queries: Array[String]) -> String:
+	var retrieved_memories : Array[Memory] = await _retrieve_memories(queries)
+	var summary_prompt = "Answer the follwing queries ("
+	for query in queries:
+		summary_prompt += query+" , "
+	summary_prompt += ") using the following statements (sorted from most relevant to least relevant) with as much detail as necessary:\n"
 	
-	var summary_prompt = "Given the following statements, answer the following query: "+query+"\nStatements:\n"
+	if retrieved_memories.size() == 0:
+		return ""
+	
 	var current_token_count = 0
-	for memory in relevant_memories:
+	var existing_strings : Array[String] = []
+	for memory in retrieved_memories:
+		if memory.content in existing_strings:
+			continue
+			
 		if current_token_count + memory.token_count < 2040:
+			existing_strings.append(memory.content)
 			summary_prompt += "- "+memory.content+"\n"
 			current_token_count += memory.token_count
+		else:
+			break
 	
-	summary_prompt += "Be direct and concise, no introduction needed. Use only the statements relevant to the query, and if there are not enough relevant statements to form a logical conclusion, respond with [nothing]"
-	
-	var response = await game_manager.chat_request(summary_prompt, 0, 400)
-	if response.contains("[nothing]"):
-		response = ""
-	concurrency_handler.response_complete(response)
+	summary_prompt += "Address each query directly and ignore everything else, don't make inferences, assumptions, or hallucinations."
+	return await game_manager.chat_request(summary_prompt, 0, 600)
 
 func _generate_agent_summary():
 	agent_summary = "Name: " + agent_name + " (gender: "+gender+" | age:" + str(age) + ")\n"
 	agent_summary += "Innate traits: " + traits + "\n"
 	
 	
-	_generate_memory_summary(agent_name + "'s core characteristics")
-	_generate_memory_summary(agent_name + "'s current daily occupation")
-	_generate_memory_summary(agent_name + "'s feelings about his/her recent progress in life")
-	
-	await concurrency_handler.wait_for_responses(3)
-	agent_summary += concurrency_handler.pop_responses_as_string()
+	var queries : Array[String] = []
+	queries.append(agent_name + "'s core characteristics")
+	queries.append(agent_name + "'s current daily occupation")
+	queries.append(agent_name + "'s feelings about his/her recent progress in life")
+	agent_summary += await _generate_memory_summary(queries)
 	print(agent_summary)
 
-func _get_general_plan_prompt(existing_plan):
-	var plan_prompt = agent_summary
-	plan_prompt += "\nToday is "+game_manager.get_current_datetime_string()+"."
+func _generate_plan(starting_level_of_detail:int = 2):
+	var start_time = game_manager.get_current_time_string()
 	
-	if existing_plan == "":
-		plan_prompt += " "+agent_name+" doesn't have a plan for today."
-	else:
-		plan_prompt += " Here is "+agent_name+"'s current plan for the day:\n"+existing_plan
-	plan_prompt += "\nHere is all the places "+agent_name+" is aware of:\n"
-	
-	var locations = game_manager.get_all_locations()
-	for location in locations:
-		plan_prompt += "-"+location+"\n"
-	
-	plan_prompt += as_entity.description+"\n"
-	return plan_prompt
+	var levels_of_detail : Array[String] = ["multi-hour", "hourly", "5-15 minute"]
+	var current_plan = ""
+	for level in range(starting_level_of_detail,levels_of_detail.size()):
+		var detail = levels_of_detail[level]
+		var plan_prompt = agent_summary
+		
+		plan_prompt += "\nToday is "+game_manager.get_current_datetime_string()+". Here is "+agent_name+"'s current plan for the day:\n"
+		if current_plan == "":
+			plan_prompt = await _generate_memory_summary(["What is "+agent_name+"'s plan for "+game_manager.get_current_date_string()+" in broad strokes"])
+		else:
+			plan_prompt += current_plan
+		
+		plan_prompt += "\nHere are all the places "+agent_name+" is aware of:\n"
+		var locations = game_manager.get_all_locations()
+		for location in locations:
+			plan_prompt += "-"+location+"\n"
+		
+		plan_prompt += agent_name+" wants to do the following task: "+as_entity.action+".\n"
+		plan_prompt += "Update the plan for "+agent_name+" starting from "+start_time+" by breaking down each entry into "+detail+" long tasks (might be completed in only 1 task if necessary).\n"
+		plan_prompt += "The format of each entry in the plan should be as follows: Plan made at "+start_time+" for "+game_manager.get_current_date_string()+", for [chosen duration in mins] from [starting time of task in 24hr HH:MM format], at [chosen location], [plan entry in one sentence].\n"
+		plan_prompt += "Respond only with the entries of the plan with each on a new line. You can only use the locations listed and nothing else"
+		current_plan = await game_manager.chat_request(plan_prompt)
 
-func _generate_plan(start_time):
-	time_since_last_plan = Time.get_unix_time_from_system()
-	var memory_header = "Plan made at "+game_manager.get_current_datetime_string()+"\n"
-	
-	if current_plan == "":
-		var broad_level_prompt = _get_general_plan_prompt(current_plan)
-		broad_level_prompt += "Generate a new plan for "+agent_name+" starting from "+start_time.hour+":"+start_time.minute+" till 23:59 midnight in broad strokes.\n"
-		broad_level_prompt += "The format of each item in the plan should be as follows: [chosen start time]) For [chosen duration in mins], at [chosen location], [chosen task in one sentence].\n"
-		broad_level_prompt += "Keep in mind that all time is in 24-hour format. Use only the locations listed and nothing else"
-		
-		var broad_level = await game_manager.chat_request(broad_level_prompt)
-		current_plan = broad_level
-		
-		var hourly_level_prompt = _get_general_plan_prompt(current_plan)
-		hourly_level_prompt += "Update this plan by breaking down each task into hourly subtasks.\n"
-		hourly_level_prompt += "The format of each item in the plan should be as follows: [chosen start time]) For [chosen duration in mins], at [chosen location], [chosen task in one sentence].\n"
-		hourly_level_prompt += "For each subtask, include the appropraite location. Keep in mind that all time is in 24-hour format. Use only the locations listed and nothing else"
-
-		var hourly_level = await game_manager.chat_request(hourly_level_prompt)
-		current_plan = hourly_level
-
-	var fine_level_prompt = _get_general_plan_prompt(current_plan)
-	fine_level_prompt += "Update this plan starting from "+start_time.hour+":"+start_time.minute+" till 23:59 midnight by breaking down each task into 5-15 min subtasks.\n"
-	fine_level_prompt += "The format of each item in the plan should be as follows: [chosen start time]) For [chosen duration in mins], at [chosen location], [chosen task in one sentence].\n"
-	fine_level_prompt += "For each subtask, include the appropraite location. Keep in mind that all time is in 24-hour format. Use only the locations listed and nothing else"
-	
-	var fine_level = await game_manager.chat_request(fine_level_prompt)
-	current_plan = fine_level
-	
-	all_tasks = current_plan.split("\n")
-	for i in len(all_tasks):
-		var task = all_tasks[i]
-		var task_parts = task.split(",")
-		if len(task_parts) != 3:
-			all_tasks[i] = {"unix_time": 0, "task": "", "location":""}
-			continue
-		
-		var current_time_string = Time.get_datetime_string_from_unix_time(game_manager.in_game_time)
-		var task_time_string = task.split(")")[0]
-		var task_time_unix = Time.get_unix_time_from_datetime_string(current_time_string.split("T")[0]+"T"+task_time_string+":00")
-		all_tasks[i] = {"unix_time": task_time_unix, "task": task_parts[len(task_parts)-1], "location":task_parts[1]}
-		
-	current_plan = memory_header+current_plan
-	_add_memory(current_plan)
+	var all_tasks = current_plan.split("\n")
+	for task in all_tasks:
+		_add_memory(task)
 
 func _print_all_memories():
 	for memory in memories:
@@ -277,50 +253,60 @@ func _add_memory(content, is_concurrent=false):
 		memory.completed.connect(concurrency_handler.response_complete)
 	memories.append(memory)
 
-func _retrieve_memories(query, num_top_memories=len(memories)):
-	var query_embedding = await game_manager.embedding_request(query)
+func _get_embedding_from_query(query):
+	concurrency_handler.response_complete(await game_manager.embedding_request(query))
 
-	var current_time = Time.get_unix_time_from_datetime_string(Time.get_datetime_string_from_system())
+func _retrieve_memories(queries:Array[String], num_top_memories=memories.size()) -> Array[Memory]:
+	var query_embeddings  = []
+	for query in queries:
+		_get_embedding_from_query(query)
+	await concurrency_handler.wait_for_responses(queries.size())
+	query_embeddings.append_array(concurrency_handler.pop_responses())
 	
-	var memory_scores = []
+	var current_time = game_manager.in_game_time
+	var memory_scores : Array[Dictionary] = []
 	var scaling_values = {"min_recency": 1, "max_recency": 0,
 						  "min_importance": 1, "max_importance": 0,
 						  "min_relevance": 1, "max_relevance": 0}
 	for memory in memories:
-		var time_difference = (current_time - memory.time_created) / 3600
-		var recency = 1 / exp(0.995 * time_difference)
-		var importance = memory.importance/10.0
-		var relevance = 0.5
-		if len(query_embedding) == len(memory.embedding):
-			relevance = _calculate_cosine_similarity(query_embedding, memory.embedding)
+		var time_difference = float(current_time - memory.time_last_accessed) / 3600
+		var recency = 1.0 / exp(0.995 * time_difference)
+		var importance = memory.importance
+		var record_relevance = 0
+		for query_embedding in query_embeddings:
+			if query_embedding.size() == memory.embedding.size():
+				var relevance = _calculate_cosine_similarity(query_embedding, memory.embedding)
+				record_relevance = max(record_relevance, relevance)
 		
+		if record_relevance < 0.3:
+			continue
+			
 		scaling_values.min_recency = min(scaling_values.min_recency, recency)
 		scaling_values.min_importance = min(scaling_values.min_importance, importance)
-		scaling_values.min_relevance = min(scaling_values.min_relevance, relevance)
+		scaling_values.min_relevance = min(scaling_values.min_relevance, record_relevance)
 		scaling_values.max_recency = max(scaling_values.max_recency, recency)
 		scaling_values.max_importance = max(scaling_values.max_importance, importance)
-		scaling_values.max_relevance = max(scaling_values.max_relevance, relevance)
+		scaling_values.max_relevance = max(scaling_values.max_relevance, record_relevance)
 		
-		var score = {"memory": memory, "final_score": 0, "recency": recency, "importance": importance, "relevance": relevance}		
+		var score = {"memory": memory, "final_score": 0, "recency": recency, "importance": importance, "relevance": record_relevance}		
 		memory_scores.append(score)
-		
+		memory.time_last_accessed = current_time
+
 	for score_data in memory_scores:
 		var recency_mapped = _map(score_data.recency, scaling_values.min_recency, scaling_values.max_recency, 0, 1)
 		var importance_mapped = _map(score_data.importance, scaling_values.min_importance, scaling_values.max_importance, 0, 1)
 		var relevance_mapped = _map(score_data.relevance, scaling_values.min_relevance, scaling_values.max_relevance, 0, 1)
 		
 		score_data.final_score = recency_mapped * recency_weight + importance_mapped * importance_weight + relevance_mapped * relevance_weight
-	
+
 	memory_scores.sort_custom(func(a, b): return a.final_score > b.final_score)
-		
-	# Return the top num_top_memories memories
-	var top_memories = []
-	for i in min(num_top_memories, memory_scores.size()):
-		var current_memory = memory_scores[i].memory
-		top_memories.append(current_memory)
-		current_memory.time_last_accessed = current_time
-		
-	return top_memories
+	var result : Array[Memory] = []
+	#print(queries,"---------------\n")
+	for i in min(num_top_memories,memory_scores.size()):
+		var score_data = memory_scores[i]
+		#print("T: ",memory_scores[i].final_score,", Rc: ",memory_scores[i].recency,", Im: ",memory_scores[i].importance,", Rl: ",memory_scores[i].relevance,", M: ",memory_scores[i].memory.content)
+		result.append(score_data.memory)
+	return result
 
 func _map(value, in_min, in_max, out_min, out_max):
 	if in_min == in_max:
@@ -329,25 +315,25 @@ func _map(value, in_min, in_max, out_min, out_max):
 
 func _calculate_cosine_similarity(vector1, vector2):
 	var dot_product = 0.0
-	var magnitude_vector1 = 0.0
-	var magnitude_vector2 = 0.0
+	var magnitude_vector1_squared = 0.0
+	var magnitude_vector2_squared = 0.0
 	
-	for i in len(vector1):
-		dot_product += vector1[i] * vector2[i]
-		magnitude_vector1 += vector1[i] * vector1[i]
-		magnitude_vector2 += vector2[i] * vector2[i]
-	
-	magnitude_vector1 = sqrt(magnitude_vector1)
-	magnitude_vector2 = sqrt(magnitude_vector2)
+	for i in vector1.size():
+		var v1 = vector1[i]
+		var v2 = vector2[i]
+		dot_product += v1 * v2
+		magnitude_vector1_squared += v1 * v1
+		magnitude_vector2_squared += v2 * v2
 
 	# Avoid division by zero
-	if magnitude_vector1 == 0.0 or magnitude_vector2 == 0.0:
+	if magnitude_vector1_squared == 0.0 or magnitude_vector2_squared == 0.0:
 		return 0
 	
-	return dot_product / (magnitude_vector1 * magnitude_vector2)
+	return dot_product / (magnitude_vector1_squared * magnitude_vector2_squared)
 
 func _trigger_brain():
 	can_trigger = false
+	@warning_ignore("narrowing_conversion")
 	time_since_last_trigger = Time.get_unix_time_from_system()
 	
 	if dialogue_partner != null:
@@ -357,39 +343,33 @@ func _trigger_brain():
 	
 	if dialogue_partner != null:
 		return
-	
-	if reaction == "Continue":
-		can_trigger = true
-		return
-	
+		
 	var reaction_parts = reaction.split("|")
 	
-	if len(reaction_parts) != 2:
+	if reaction_parts.size() != 2:
 		print("Reaction failed: ", reaction)
 		return
+	
+	# Pick a destination, reset the interactable, and set the action
+	var new_action : String = reaction_parts[1].strip_edges()
+	if ";interact" in reaction_parts[1]:
+		var new_action_parts = new_action.split(";")
+		new_action = new_action_parts[0].strip_edges()
+		var interactable_name : String = new_action_parts[1].replace("interact with ","")
 		
-	as_entity.set_action(reaction_parts[1].strip_edges())
-	
-	if "Update" in reaction_parts[0].strip_edges():
-		as_entity.set_interactable(null)
-		await _pick_location()	
+		for observation in new_observations:
+			if observation.entity_name == interactable_name:
+				_set_destination(observation.as_node)
+				break
 	else:
-		var index = int(reaction_parts[0])-1
-		if index < new_observations.size():
-			var entity : Entity = new_observations[index]
-			if entity.as_node != previous_destination:
-				self.as_entity.set_interactable(entity)
-				_set_destination(entity.as_node)
-	
-	if dialogue_partner != null:
-		return
-	
-	can_trigger = true
+		await _pick_location()	
+	as_entity.set_interactable(null)
+	as_entity.set_action(new_action)
+
 	new_observations.clear()
-	
-	if Time.get_unix_time_from_system() - time_since_last_plan >= planning_duration:
-		var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
-		_generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
+	if reaction_parts[0] == "Update":
+		await _generate_plan()
+	can_trigger = true
 
 func _observe():
 	# Scan nearby entity nodes
@@ -453,54 +433,56 @@ func _observe():
 			
 		# Add the new observation to the list
 		new_observations.append(new_entity.copy())
+		if entity_node.is_in_group("Agent"):
+			if !entity_node.is_alive:
+				print(new_entity.description)
 		_add_memory(new_entity.description)
 
 func _react():
 	var reaction_prompt = agent_summary + "\n"
 	reaction_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
-	reaction_prompt += agent_name+"'s current action: " + as_entity.description + "\n"
-	for task in all_tasks:
-		if task.unix_time >= game_manager.in_game_time:
-			reaction_prompt += agent_name+"'s current plan:"+task.task+"\n"
-			break
+	reaction_prompt += as_entity.description + "\n"
+	reaction_prompt += await _generate_memory_summary(["Considering the plans made close to "+game_manager.get_current_datetime_string()+", what does "+agent_name+" plan to do next?"])
 	
-	reaction_prompt += "Observations (sorted from newest to oldest): \n"
+	reaction_prompt += "\nObservations of nearby entities (sorted from newest to oldest): \n"
 	var current_token_count = 0
-	for i in range(len(new_observations)-1,-1,-1):
+	for i in range(new_observations.size()-1,-1,-1):
 		var description_token_count : int = game_manager.get_token_count(new_observations[i].description)
 		if current_token_count + description_token_count < 2040:
-			reaction_prompt += str(i+1)+") "+new_observations[i].description+"\n"
+			reaction_prompt += "- "+new_observations[i].description+"\n"
 			current_token_count += description_token_count
 		else:
 			break
 	
 	# There could be multiple observations of the same entity, so generate summaries only for unique entities, not each observation
-	var unique_new_nodes : Array[Node]
+	var unique_new_nodes : Array[Node] = []
 	for entity in new_observations:
 		if !(entity.as_node in unique_new_nodes):
 			unique_new_nodes.append(entity.as_node)
 	
+	var queries : Array[String] = []
 	for node in unique_new_nodes:
-		_generate_memory_summary("What does "+agent_name+" know about "+node.as_entity.entity_name+"?")
-	await concurrency_handler.wait_for_responses(unique_new_nodes.size())
-	var response_string = concurrency_handler.pop_responses_as_string()
+		queries.append("What does "+agent_name+" know about "+node.as_entity.entity_name+"?")
+	var response_string = await _generate_memory_summary(queries)
 	
 	if response_string.strip_edges() == "":
 		reaction_prompt += agent_name+" has no relevant memories about the given observations.\n"
 	else:
 		reaction_prompt += "Summary of relevant context about each observation: \n"+response_string
 
-	reaction_prompt += "Should "+agent_name+" continue with their current action, update their action to match the plan, or react to one of the observations?\n"
-	reaction_prompt += "Respond only in the following format: [Continue/Update/(ID of observation to ineract with)]|[the immediate action to take]\n"
-	reaction_prompt += "Examples:\n"
-	reaction_prompt += "Update|going for a walk\n"
-	reaction_prompt += "Continue\n"
-	reaction_prompt += "Update|taking a shower\n"
-	reaction_prompt += "2|talking to Stacy\n"
-	reaction_prompt += "1|turning off the oven\n"
-	reaction_prompt += "Continue"
+	reaction_prompt += "\nShould "+agent_name+" react to any of these observations or continue with their current plan, and if so, what would be an appropriate reaction?\n"
+	reaction_prompt += "Respond only in the following format: [Continue/Update]|[action to take in the present continuous tense]\n"
+	reaction_prompt += "If the reaction involves interacting with one of the previously mentioned entities, make sure to add \";interact with [entity name]\" to the end of the action\n"
+	reaction_prompt += "Examples of responses:\n"
+	reaction_prompt += "Update|is going for a walk\n"
+	reaction_prompt += "Continue|is making breakfast\n"
+	reaction_prompt += "Update|is asking John for help with his injury;interact with John\n"
+	reaction_prompt += "Update|is asking Eddy about his music composition;interact with Eddy\n"
+	reaction_prompt += "Update|is turning off Oven 1;interact with Oven 1\n"
+	reaction_prompt += "Continue|is writing a journal on Desk;interact with Desk"
 	
 	var reaction = await game_manager.chat_request(reaction_prompt, 0, 40)
+	
 	return reaction
 
 func _pick_location():
@@ -509,17 +491,16 @@ func _pick_location():
 	var available_locations: Array = game_manager.get_sub_locations()
 	while !available_locations.is_empty():
 		var location_prompt = agent_summary + "\n"
-		location_prompt += agent_name+" is currently located at "+as_entity.location+"\n"
+		location_prompt += agent_name+" is located at "+as_entity.location+"\n"
+		
 		location_prompt += agent_name+" knows of the following locations:\n"
-		
-		for i in len(available_locations):
+		for i in available_locations.size():
 			location_prompt += str(i+1)+") "+available_locations[i].get_name()+"\n"
-		
-		location_prompt += agent_name+" is currently planning to "+as_entity.action+"\n"
+		location_prompt += agent_name+" wants to do the following: "+as_entity.action+".\n"
 		location_prompt += "Which area should "+agent_name+" go to? Respond only with the index of the given locations, nothing else. For example:\n1\n5\n3"
 	
 		var chosen_index = int(await game_manager.chat_request(location_prompt, 0, 2))-1
-		if chosen_index >= len(available_locations):
+		if chosen_index >= available_locations.size():
 			break
 			
 		chosen_node = available_locations[chosen_index]
@@ -534,7 +515,7 @@ func _reflect():
 	var questions_prompt : String = "Consider the following memories:\n"
 	
 	var current_token_count : int = 0
-	for i in range(len(memories)-1, oldest_memory_index, -1):
+	for i in range(memories.size()-1, oldest_memory_index, -1):
 		var memory : Memory = memories[i]
 		if current_token_count + memory.token_count < 2040:
 			questions_prompt += "- "+memory.content+"\n"
@@ -551,11 +532,11 @@ func _reflect():
 	
 	await concurrency_handler.wait_for_responses(num_reflection_questions * num_insights_per_reflection_question)
 	
-	oldest_memory_index = len(memories)
+	oldest_memory_index = memories.size()
 	is_reflecting = false
 
 func _reflection_coroutine(question):
-	var relevant_memories = await _retrieve_memories(question, 10)
+	var relevant_memories = await _retrieve_memories([question], 10)
 	
 	var insights_prompt = "Statements about "+agent_name+"\n"
 	for memory in relevant_memories:
@@ -573,25 +554,38 @@ func _reflection_coroutine(question):
 func dialogue_setup(partner):
 	dialogue_history.clear()
 	dialogue_partner = partner
+	dialogue_context = ""
 	can_trigger = false
 	as_entity.set_action("busy talking with "+partner.as_entity.entity_name)
 	_end_navigation()
+
+func _create_dialogue_context():
+	var queries : Array[String] = []
+	queries.append("What are all the things "+agent_name+" remembers about "+dialogue_partner.as_entity.entity_name+"?")
+	queries.append("Does "+agent_name+" know "+dialogue_partner.as_entity.entity_name+"'s name?")
+	return await _generate_memory_summary(queries)
 
 func initiate_dialogue(partner):
 	dialogue_setup(partner)
 	
 	var first_dialogue_prompt = agent_summary+"\n"
 	first_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
-	first_dialogue_prompt += "Observation: "+dialogue_partner.as_entity.description+"\n"
-	
-	first_dialogue_prompt += "Summary of relevant context from "+agent_name+"’s memory:\n"
-	await _generate_memory_summary("What is "+agent_name+"'s relationship with "+ dialogue_partner.as_entity.entity_name)
-	first_dialogue_prompt += concurrency_handler.pop_responses_as_string()
-	first_dialogue_prompt += "\n"+as_entity.description+"\n. What would "+agent_name+" say to "+dialogue_partner.as_entity.entity_name+"?\n"
-	first_dialogue_prompt += "Respond only with the dialogue as if you are in character. Don't start with \""+agent_name+":\" or anything. "
-	first_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits
+	first_dialogue_prompt += as_entity.description+"\n"
+	first_dialogue_prompt += agent_name+" observes the following: "+dialogue_partner.as_entity.description+"\n"
+	first_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	first_dialogue_prompt += "\n<Start of context>\n"
+	dialogue_context = await _create_dialogue_context()
+	first_dialogue_prompt += dialogue_context+"\n"
+	first_dialogue_prompt += "\n<End of context>\n"
+	first_dialogue_prompt += as_entity.description+"\n. Greet "+dialogue_partner.as_entity.entity_name+" as if you are in character as "+agent_name+"\n"
+	first_dialogue_prompt += "If "+agent_name+" does not know "+dialogue_partner.as_entity.entity_name+"'s name, then "+agent_name+" will see "+dialogue_partner.as_entity.entity_name+" as a stranger.\n"
 	
 	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt)
+	
+	# Get rid of any header of the response if it exists
+	var name_index = first_dialogue.find(agent_name+": ")
+	if name_index != -1:
+		first_dialogue = first_dialogue.erase(name_index, len(agent_name+": "))
 	
 	conversation_panel.find_child("Label").text += agent_name+": "+first_dialogue+"\n\n"
 	
@@ -602,7 +596,10 @@ func initiate_dialogue(partner):
 		game_manager.set_dialogue_text(first_dialogue)
 
 func receive_dialogue(partner_statement):
-	dialogue_history.append({"agent":dialogue_partner.agent_name, "statement":partner_statement})
+	var txt = partner_statement
+	if partner_statement == "":
+		txt = "Hello"
+	dialogue_history.append({"agent":dialogue_partner.agent_name, "statement":txt})
 	
 	if partner_statement.contains("[end]"):
 		self.end_dialogue()
@@ -611,36 +608,44 @@ func receive_dialogue(partner_statement):
 	conversation_panel.find_child("Label").text += dialogue_partner.agent_name+": "+partner_statement+"\n\n"
 	
 	var next_dialogue_prompt = agent_summary+"\n"
-	next_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
-	next_dialogue_prompt += "Observation: "+dialogue_partner.as_entity.description+"\n"
-
-	next_dialogue_prompt += "Summary of relevant context from "+agent_name+"’s memory:\n"
-	_generate_memory_summary("What is " + agent_name + "'s relationship with "+ dialogue_partner.as_entity.entity_name)
-	_generate_memory_summary(partner_statement)
-	await concurrency_handler.wait_for_responses(2)
+	next_dialogue_prompt += "It is currently "+game_manager.get_current_datetime_string()+"\n"
+	next_dialogue_prompt += as_entity.description+"\n"
+	next_dialogue_prompt += agent_name+" observes the following: "+dialogue_partner.as_entity.description+"\n"
+	
+	# Generate the context about the partner and what the partner said
+	next_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	next_dialogue_prompt += "<Start of context>\n"
+	if dialogue_context == "":
+		dialogue_context = await _create_dialogue_context()
+	next_dialogue_prompt += dialogue_context+"\n"
+	if partner_statement != "":
+		next_dialogue_prompt += await _generate_memory_summary([partner_statement])
+	next_dialogue_prompt += "\n<End of context>\n"
 	
 	if dialogue_partner == null:
 		end_dialogue()
 		return
+
+	# Append the dialogue history
+	next_dialogue_prompt += "\nHere is the conversation that's going on right now:\n"
+	next_dialogue_prompt += "<Start of convo>\n"
+	for line in dialogue_history:
+		next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
+	next_dialogue_prompt += "<End of convo>\n"
+	next_dialogue_prompt += "Respond to "+dialogue_partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"
+		
+	next_dialogue_prompt += "If "+agent_name+" does not know "+dialogue_partner.as_entity.entity_name+"'s name, then "+agent_name+" will see "+dialogue_partner.as_entity.entity_name+" as a stranger.\n"
 	
-	next_dialogue_prompt += concurrency_handler.pop_responses_as_string()
-	
-	if partner_statement == "" and len(dialogue_history) == 1:
-		next_dialogue_prompt += dialogue_partner.agent_name+" came over to initiate a conversation with "+agent_name+".\n"
-	else:
-		next_dialogue_prompt += "\nHere is the dialogue history:\n"
-		for line in dialogue_history:
-			next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
-	
-	next_dialogue_prompt += "How would "+agent_name+" respond to "+dialogue_partner.agent_name+"? Give only the response and nothing else\n"
-	next_dialogue_prompt += "Respond only with the dialogue as if you are in character. Don't start with \""+agent_name+":\" or anything.\n"
-	next_dialogue_prompt += "Don't be overly formal, you have to be in character. Remember "+agent_name+" is "+traits
-	
-	if !dialogue_partner.is_in_group("Player"):
+	if dialogue_partner.is_in_group("Agent"):
 		next_dialogue_prompt += "If the conversation is nearing its end or becoming repetitive, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
+
+	var next_dialogue : String = await game_manager.chat_request(next_dialogue_prompt, 0, 100)
 	
-	var next_dialogue = await game_manager.chat_request(next_dialogue_prompt)
-	
+	# Get rid of any header of the response if it exists
+	var name_index = next_dialogue.find(agent_name+": ")
+	if name_index != -1:
+		next_dialogue = next_dialogue.erase(name_index, len(agent_name+": "))
+		
 	conversation_panel.find_child("Label").text += agent_name+": "+next_dialogue+"\n\n"
 	
 	if dialogue_partner == null:
@@ -658,7 +663,6 @@ func receive_dialogue(partner_statement):
 
 func end_dialogue():
 	conversation_panel.visible = false
-	as_entity.set_action("idle")
 	
 	if dialogue_partner == null:
 		print("The following conversation crashed:\n")
@@ -669,36 +673,60 @@ func end_dialogue():
 	var full_dialogue = "Dialogue between "+agent_name+" and "+dialogue_partner.agent_name+" on "+game_manager.get_current_datetime_string()+"\n"
 	for line in dialogue_history:
 		full_dialogue += line["agent"] + ": " + line["statement"]+"\n"
+	dialogue_history.clear()
+	dialogue_partner = null
 		
 	var reaction_prompt = agent_summary + "\n"
 	reaction_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
-	reaction_prompt += agent_name+"'s current action: "+as_entity.description+"\n"
+	reaction_prompt += as_entity.description+"\n"
+	reaction_prompt += await _generate_memory_summary(["Considering the plans made close to "+game_manager.get_current_datetime_string()+", what does "+agent_name+" plan to do next?"])
 	reaction_prompt += full_dialogue
-	reaction_prompt += "Considering the conversation above, should "+agent_name+" react in a certain way or continue with the current action?\n"
-	reaction_prompt += "If "+agent_name+" should continue, respond only with \"Continue\".\n" 
-	reaction_prompt += "If "+agent_name+" should react, respond only in the following format: React|[new action to take]. For example:\nContinue\nReact|turning off the oven\nContinue\nReact|looking for John"
+	reaction_prompt += "Respond only in the following format: [Continue/Update]|[action to take in the present continuous tense]\n"
+	reaction_prompt += "Examples of responses:\n"
+	reaction_prompt += "Update|is going for a walk\n"
+	reaction_prompt += "Continue|is making breakfast\n"
+	reaction_prompt += "Update|is asking John for help with his injury\n"
+	reaction_prompt += "Continue|is writing a journal"
 	
 	var reaction : String = await game_manager.chat_request(reaction_prompt, 0, 40)
 	
 	destination = null
 	as_entity.set_interactable(null)
-	if "React" in reaction:
-		as_entity.set_action(reaction.split("|")[1].strip_edges())
-		
-		var current_time = Time.get_datetime_dict_from_unix_time(game_manager.in_game_time)
-		_generate_plan({"hour":str(current_time.hour),"minute":str(current_time.minute)})
-		await _pick_location()	
-	else:
-		as_entity.set_action("idle")
+	as_entity.set_action(reaction.split("|")[1].strip_edges())
+	await _pick_location()
+	if "Update" in reaction:
+		await _generate_plan()
 	
 	_add_memory(full_dialogue)
-	dialogue_history.clear()
-	dialogue_partner = null
 	can_trigger = true
 
-func _on_interaction_zone_body_entered(body):
-	if destination != body:
+func _interact_with_nearby_entities():
+	var nearby_entities = interaction_zone.get_overlapping_bodies()
+	var contains_destination : bool = false
+	for i in range(nearby_entities.size()-1,-1,-1):
+		var current_entity : Node2D = nearby_entities[i]
+		# If the nearby object is not an entity or is just the agent itself, move onto the next one
+		if !current_entity.is_in_group("Entity") || current_entity == self:
+			nearby_entities.erase(current_entity)
+			continue
+			
+		# If the nearby object is a dead agent, you can't interact with them so move onto the next one
+		if current_entity.is_in_group("Agent"):
+			if !current_entity.can_be_interacted_wtih():
+				nearby_entities.erase(current_entity)
+				continue
+
+		if current_entity == destination:
+			contains_destination = true
+	
+	# If the agent has not reached their destination, leave the function
+	if !contains_destination:
 		return
+	
+	var body = destination
+	_end_navigation()
+	body.as_entity.set_interactable(as_entity)
+	as_entity.set_interactable(body.as_entity)
 	
 	facing_direction = body.global_position - global_position
 	
@@ -718,24 +746,12 @@ func _on_interaction_zone_body_entered(body):
 	elif body.is_in_group("Item"):
 		var item_entity : Entity = body.as_entity
 		
-		item_entity.set_interactable(as_entity)
-		as_entity.set_interactable(item_entity)
-		
 		var status_update_prompt = "If someone is "+as_entity.action+" and wants to interact with "+item_entity.entity_name+", what would be the new status of "+item_entity.entity_name+"?\n"
 		status_update_prompt += "For example, if John wants to make some coffee and he's interacting with a coffee mixer, the mixer's new status should be \"mixing coffee\"."
 		status_update_prompt += "Respond only with the status, for example:\nbaking a pie\nburning some wood\nopen"
 		var status_update = await game_manager.chat_request(status_update_prompt, 0, 30)
 		
 		item_entity.set_action(status_update)
-	
-	_end_navigation()
-	
-func _on_interaction_zone_body_exited(body):
-	if body.is_in_group("Item"):
-		var item_entity : Entity = body.as_entity
-		
-		if item_entity.interactable == as_entity:
-			item_entity.set_interactable(null)
 
 func _on_navigation_agent_2d_velocity_computed(safe_velocity):
 	velocity = safe_velocity

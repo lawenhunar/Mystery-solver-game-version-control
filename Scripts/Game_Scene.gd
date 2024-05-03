@@ -142,16 +142,21 @@ func _add_location_path_to_list(list: Array, current_node: Node, current_path: S
 			_add_location_path_to_list(list, node, current_path)
 			new_area_found = true
 	
-	if !new_area_found:
+	if !new_area_found and current_path not in list:
 		list.append(current_path)
 		return
 
-func get_current_datetime_string():
+func get_current_date_string() -> String:
 	var datetime = Time.get_datetime_dict_from_unix_time(in_game_time)
 	var result = weekday_conversions[datetime.weekday] + ", "
-	result += month_conversions[datetime.month] + " " + str(datetime.day) + ", "
-	result += Time.get_time_string_from_unix_time(in_game_time)
+	result += month_conversions[datetime.month] + " " + str(datetime.day)
 	return result
+
+func get_current_time_string() -> String:
+	return Time.get_time_string_from_unix_time(in_game_time)
+
+func get_current_datetime_string():
+	return get_current_date_string()+", "+get_current_time_string()
 
 func enter_new_dialogue(agent):
 	current_agent = agent
@@ -171,7 +176,7 @@ func exit_dialogue ():
 	current_agent.end_dialogue()
 	current_agent = null
 	dialogue_panel.visible = false
-	player.as_entity.set_action("idle")
+	player.as_entity.set_action("is idle")
 
 func is_UI_active():
 	return dialogue_panel.visible or item_panel.visible or meeting_dialogue.visible

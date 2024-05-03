@@ -542,19 +542,19 @@ texture = ExtResource("2_grd7p")
 5:0/0 = 0
 5:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 5:0/0/physics_layer_0/angular_velocity = 0.0
-5:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(1, -8, 8, -8, 8, 8, 1.125, 8)
+5:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(1, -8, 8, -8, 8, 8, 1, 8)
 6:0/0 = 0
 6:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 6:0/0/physics_layer_0/angular_velocity = 0.0
-6:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -0.875, -8, -1.125, 8, -8, 8)
+6:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-1, -8, -8, -8, -8, 8, -1, 8)
 7:0/0 = 0
 7:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:0/0/physics_layer_0/angular_velocity = 0.0
-7:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(1.25, -8, 8, -8, 8, 8, 1.125, 8)
+7:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(1, -8, 8, -8, 8, 8, 1, 8)
 8:0/0 = 0
 8:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 8:0/0/physics_layer_0/angular_velocity = 0.0
-8:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -0.875, -8, -1.125, 8, -8, 8)
+8:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-1, -8, -8, -8, -8, 8, -1, 8)
 14:0/0 = 0
 14:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 14:0/0/physics_layer_0/angular_velocity = 0.0
@@ -585,35 +585,35 @@ texture = ExtResource("2_grd7p")
 5:1/0 = 0
 5:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 5:1/0/physics_layer_0/angular_velocity = 0.0
-5:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2.125)
+5:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2)
 6:1/0 = 0
 6:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 6:1/0/physics_layer_0/angular_velocity = 0.0
-6:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2.125)
+6:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2)
 7:1/0 = 0
 7:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:1/0/physics_layer_0/angular_velocity = 0.0
-7:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2.125)
+7:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2)
 8:1/0 = 0
 8:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 8:1/0/physics_layer_0/angular_velocity = 0.0
-8:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2.125)
+8:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2)
 9:1/0 = 0
 9:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 9:1/0/physics_layer_0/angular_velocity = 0.0
-9:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, 1.25, 8, 1.125, -1.75, -8, -1.875)
+9:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, 1, 8, 1, -2, -8, -2)
 10:1/0 = 0
 10:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 10:1/0/physics_layer_0/angular_velocity = 0.0
-10:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -0.75, -1.625, -0.875, 8, -8, 8)
+10:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -8, -8, -8, -8, 8, -1, 8, -1, -2, 8, -2)
 11:1/0 = 0
 11:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:1/0/physics_layer_0/angular_velocity = 0.0
-11:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(1.25, -8, 8, -8, 8, 8, 1.125, 8)
+11:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(1, -8, 8, -8, 8, 8, 1, 8)
 13:1/0 = 0
 13:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 13:1/0/physics_layer_0/angular_velocity = 0.0
-13:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -0.875, -8, -1.125, 8, -8, 8)
+13:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-1, -8, -8, -8, -8, 8, -1, 8)
 15:1/0 = 0
 15:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 15:1/0/physics_layer_0/angular_velocity = 0.0
@@ -640,11 +640,11 @@ texture = ExtResource("2_grd7p")
 5:2/0 = 0
 5:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 5:2/0/physics_layer_0/angular_velocity = 0.0
-5:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, 1.25, 8, 1.125, -1.75, -8, -1.875)
+5:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, 1, 8, 1, -2, -8, -2)
 6:2/0 = 0
 6:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 6:2/0/physics_layer_0/angular_velocity = 0.0
-6:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -0.75, -1.625, -0.875, 8, -8, 8)
+6:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -8, -8, -8, -8, 8, -1, 8, -1, -2, 8, -2)
 7:2/0 = 0
 7:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:2/0/physics_layer_0/angular_velocity = 0.0
@@ -660,11 +660,11 @@ texture = ExtResource("2_grd7p")
 11:2/0 = 0
 11:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:2/0/physics_layer_0/angular_velocity = 0.0
-11:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(1.25, -8, 8, -8, 8, 8, 1.125, 8)
+11:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(1, -8, 8, -8, 8, 8, 1, 8)
 13:2/0 = 0
 13:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 13:2/0/physics_layer_0/angular_velocity = 0.0
-13:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -0.875, -8, -1.125, 8, -8, 8)
+13:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-1, -8, -8, -8, -8, 8, -1, 8)
 14:2/0 = 0
 14:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 14:2/0/physics_layer_0/angular_velocity = 0.0
@@ -692,27 +692,27 @@ texture = ExtResource("2_grd7p")
 7:3/0 = 0
 7:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 7:3/0/physics_layer_0/angular_velocity = 0.0
-7:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -0.75, -1.625, -0.875, 8, -8, 8)
+7:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(8, -8, -8, -8, -8, 8, -1, 8, -1, -2, 8, -2)
 8:3/0 = 0
 8:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 8:3/0/physics_layer_0/angular_velocity = 0.0
-8:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, 1.25, 8, 1.125, -1.75, -8, -1.875)
+8:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, 1, 8, 1, -2, -8, -2)
 9:3/0 = 0
 9:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 9:3/0/physics_layer_0/angular_velocity = 0.0
-9:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -1.75, -8, -1.875)
+9:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2)
 11:3/0 = 0
 11:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 11:3/0/physics_layer_0/angular_velocity = 0.0
-11:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(0.5, -8, 8, -8, 8, -2, 0.625, -2.125)
+11:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(1, -8, 8, -8, 8, -2, 1, -2)
 12:3/0 = 0
 12:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 12:3/0/physics_layer_0/angular_velocity = 0.0
-12:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2.125)
+12:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -2, -8, -2)
 13:3/0 = 0
 13:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 13:3/0/physics_layer_0/angular_velocity = 0.0
-13:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, -1, -8, -1.125, -2.25, -8, -2.125)
+13:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-1, -8, -8, -8, -8, -2, -1, -2)
 14:3/0 = 0
 14:3/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 14:3/0/physics_layer_0/angular_velocity = 0.0
@@ -7889,7 +7889,7 @@ position = Vector2(0, 20)
 shape = SubResource("RectangleShape2D_y8vnd")
 
 [node name="Fireplace" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ng1m")]
-position = Vector2(361.538, -111.538)
+position = Vector2(376.922, -111.538)
 scale = Vector2(6.12, 4.84)
 actions_string = "is empty; contains logs; contains logs and is burning slowly;increase fire;"
 
@@ -7901,17 +7901,17 @@ energy = 1.29
 texture = ExtResource("19_25kie")
 
 [node name="Couch 1" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ng1m")]
-position = Vector2(-280.769, -138.462)
+position = Vector2(-265.385, -138.462)
 scale = Vector2(8.96, 4.52)
 actions_string = "unoccupied and clean; occupied and clean; unoccupied and dirty; occupied and dirty;"
 
 [node name="Couch 2" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ng1m")]
-position = Vector2(380.769, 200)
+position = Vector2(396.153, 200)
 scale = Vector2(4.32, 6.96)
 actions_string = "unoccupied and clean; occupied and clean; unoccupied and dirty; occupied and dirty;"
 
 [node name="Plant" parent="Layout/Mansion/Living room" instance=ExtResource("5_3ng1m")]
-position = Vector2(-407.692, -153.846)
+position = Vector2(-392.308, -153.846)
 scale = Vector2(2.88, 3.16)
 actions_string = "alive and hydrated; alive and thirsty; withering; dead"
 
@@ -7943,22 +7943,22 @@ position = Vector2(-10.5, 6)
 shape = SubResource("RectangleShape2D_5kexf")
 
 [node name="Book Stand 1" parent="Layout/Mansion/Library" instance=ExtResource("5_3ng1m")]
-position = Vector2(272.74, -146.346)
+position = Vector2(279.794, -146.346)
 scale = Vector2(5.07643, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
 
 [node name="Book Stand 2" parent="Layout/Mansion/Library" instance=ExtResource("5_3ng1m")]
-position = Vector2(-329.169, -146.346)
-scale = Vector2(4.98238, 5.96)
+position = Vector2(-312.711, -138.436)
+scale = Vector2(4.22999, 4.85251)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
 
 [node name="Book Stand 3" parent="Layout/Mansion/Library" instance=ExtResource("5_3ng1m")]
-position = Vector2(272.74, 233.363)
+position = Vector2(279.794, 233.363)
 scale = Vector2(5.10777, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
 
 [node name="Book Stand 4" parent="Layout/Mansion/Library" instance=ExtResource("5_3ng1m")]
-position = Vector2(-329.169, 233.363)
+position = Vector2(-322.115, 233.363)
 scale = Vector2(4.85698, 5.96)
 actions_string = "contains \"To Kill a Mockingbird\" and \"Thinking Fast and Slow\";contains \"To Kill a Mockingbird\";contains \"Thinking Fast and Slow\";is empty"
 
@@ -7977,57 +7977,57 @@ position = Vector2(1, -2)
 shape = SubResource("RectangleShape2D_hvxvm")
 
 [node name="Oven 1" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(121.874, -207.142)
+position = Vector2(132.811, -205.356)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains food; on and cooking food; on and empty;"
 
 [node name="Oven 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-178.124, -199.999)
+position = Vector2(-167.187, -198.213)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains food; on and cooking food; on and empty;"
 
 [node name="Sink" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-28.1249, -203.571)
+position = Vector2(-15.6249, -203.571)
 scale = Vector2(3.4, 3.48)
 actions_string = "off and empty; off and contains dishes; on and contains dishes; on and doesn't contain dishes"
 
 [node name="Table Chair 1" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(21.8748, -10.7142)
+position = Vector2(31.2502, -8.92844)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
 [node name="Table Chair 2" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-28.1249, -10.7143)
+position = Vector2(-18.7495, -8.92854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
 [node name="Table Chair 3" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-78.1247, -10.7143)
+position = Vector2(-68.7494, -8.92854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
 [node name="Table Chair 4" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-128.125, -10.7143)
+position = Vector2(-118.75, -8.92854)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
 [node name="Table Chair 5" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(21.8748, 89.2854)
+position = Vector2(31.2502, 91.0712)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
 [node name="Table Chair 6" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-28.1249, 89.2854)
+position = Vector2(-18.7495, 91.0712)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
 [node name="Table Chair 7" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-78.1247, 89.2854)
+position = Vector2(-68.7494, 91.0712)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
 [node name="Table Chair 8" parent="Layout/Mansion/Kitchen" instance=ExtResource("5_3ng1m")]
-position = Vector2(-128.125, 89.2854)
+position = Vector2(-118.75, 91.0712)
 scale = Vector2(2.12, 3.28)
 actions_string = "unoccupied; occupied"
 
@@ -8070,11 +8070,12 @@ position = Vector2(-2, -76)
 scale = Vector2(0.26, 0.25)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Mansion/Meeting room"]
-position = Vector2(5, 1)
+position = Vector2(10.5769, -17)
+scale = Vector2(0.971158, 1.11834)
 shape = SubResource("RectangleShape2D_kj3ub")
 
 [node name="Curtain 1" parent="Layout/Mansion/Meeting room" instance=ExtResource("5_3ng1m")]
-position = Vector2(-269.231, -232)
+position = Vector2(-258.654, -232)
 scale = Vector2(4.04, 1)
 actions_string = "closed and tied up;closed and untied;open"
 
@@ -8123,17 +8124,17 @@ position = Vector2(2, 1)
 shape = SubResource("RectangleShape2D_53h4t")
 
 [node name="Bathtub" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_3ng1m")]
-position = Vector2(281.481, -96.2963)
+position = Vector2(292.592, -92.593)
 scale = Vector2(8.16, 9.8)
 actions_string = "empty and unoccupied;on and occupied"
 
 [node name="Skincare Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_3ng1m")]
-position = Vector2(-285.185, -207.407)
+position = Vector2(-274.074, -203.704)
 scale = Vector2(5.7185, 5.49926)
 actions_string = "contains facewash and mouthwash;contains facewash;contains mouthwash;empty"
 
 [node name="Medical Cabinet" parent="Layout/Mansion/Bathroom" instance=ExtResource("5_3ng1m")]
-position = Vector2(-162.963, -192.593)
+position = Vector2(-151.852, -188.89)
 scale = Vector2(5.92133, 4.72269)
 actions_string = "contains acne pills;empty"
 
@@ -8164,17 +8165,17 @@ position = Vector2(-1.5, 4.625)
 shape = SubResource("RectangleShape2D_0ix8t")
 
 [node name="Piano" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ng1m")]
-position = Vector2(-3.57144, 188.462)
+position = Vector2(2.679, 188.462)
 scale = Vector2(5.16423, 5.54351)
 actions_string = "unoccupied and closed;occupied and open;unoccupied and open"
 
 [node name="Bed" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ng1m")]
-position = Vector2(339.286, 15.3846)
+position = Vector2(345.536, 15.3842)
 scale = Vector2(6.05085, -6.71594)
 actions_string = "clean and unoccupied; occupied; messy and unoccupied"
 
 [node name="Mirror" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ng1m")]
-position = Vector2(339.286, -134.615)
+position = Vector2(345.536, -134.615)
 scale = Vector2(3.4051, -6.23786)
 actions_string = "clean;dirty;broken"
 
@@ -8195,7 +8196,7 @@ volume_db = -18.82
 pitch_scale = 1.23
 
 [node name="Desk" parent="Layout/Mansion/Bedroom" instance=ExtResource("5_3ng1m")]
-position = Vector2(-328.571, 180.769)
+position = Vector2(-322.321, 180.769)
 scale = Vector2(4.26225, -6.23786)
 actions_string = "contains a laptop that's turned off;contains a laptop that's on"
 

@@ -29,7 +29,7 @@ func _ready():
 	for direction in range(0,3,2):
 		var current_animation_name = "dead "+directions[direction] 
 		frames.add_animation(current_animation_name)
-		var frame_image = _get_image_region(5,12 + direction/2)
+		var frame_image = _get_image_region(5,12 + direction/2.0)
 		if direction == 0:
 			frame_image.rotate_90(CLOCKWISE)
 		else:
