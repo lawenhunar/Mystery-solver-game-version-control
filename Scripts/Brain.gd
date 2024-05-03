@@ -133,7 +133,7 @@ func _navigate(delta):
 
 func _animate():
 	var directions = ["up", "right", "down", "left"]
-	if velocity != Vector2.ZERO:
+	if velocity != Vector2.ZERO and velocity != null:
 		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
 		facing_direction = velocity
 	else:

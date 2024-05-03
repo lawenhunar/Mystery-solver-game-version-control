@@ -2,8 +2,7 @@ extends Sprite2D
 
 @onready var speech_text : RichTextLabel = $"Speech Text"
 
-@export var lifetime_frames : int = 100 # Number of frames the speech bubble will be shown
-
+@export var lifetime_seconds : float = 5 # Number of seconds the speech bubble will be shown
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	speech_text.text = ""
@@ -12,13 +11,13 @@ func _ready():
 	var target_scale = scale
 	scale = Vector2.ZERO
 	tween.tween_property(self, "scale",target_scale,0.4).set_trans(Tween.TRANS_BOUNCE)
+	
+	create_tween().tween_callback(_close_bubble).set_delay(lifetime_seconds)
 
-func _physics_process(_delta):
-	lifetime_frames-=1
-	if lifetime_frames == 0:
-		var tween = create_tween()
-		tween.tween_property(self, "scale",Vector2.ZERO,0.4).set_trans(Tween.TRANS_BOUNCE)
-		tween.tween_callback(queue_free)
+func _close_bubble():
+	var tween = create_tween()
+	tween.tween_property(self, "scale",Vector2.ZERO,0.4).set_trans(Tween.TRANS_QUART)
+	tween.tween_callback(queue_free)
 
 func set_direction(is_left:bool,is_up:bool):
 	if is_left:

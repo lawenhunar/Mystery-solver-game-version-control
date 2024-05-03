@@ -9,7 +9,6 @@ position = Vector2(76, -12)
 scale = Vector2(0.10667, 0.10667)
 texture = ExtResource("1_81xj8")
 script = ExtResource("2_uc3o4")
-lifetime_frames = 200
 
 [node name="Speech Text" type="RichTextLabel" parent="."]
 offset_left = -295.0

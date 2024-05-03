@@ -185,6 +185,8 @@ func exit_dialogue ():
 func disable_all_UI():
 	close_item_panel()
 	exit_dialogue()
+	for agent in agents_root.get_children():
+		agent.conversation_panel.visible = false
 	inv_ui.visible = false
 
 func is_UI_active():
