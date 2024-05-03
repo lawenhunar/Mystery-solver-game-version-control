@@ -60,20 +60,8 @@ func _character_name_entered(text):
 		node.generate_info(self, concurrency_handler)
 	await concurrency_handler.wait_for_responses(len(character_nodes)-1)
 	
-	_pick_target()
-
-# Once all agent information has been generated, pick the target to kill
-func _pick_target():
-	var target_index : int = randi_range(0,len(character_nodes)-1)
-	while character_nodes[target_index] == selected_character:
-		target_index = randi_range(0,len(character_nodes)-1)
-	
-	target_character = character_nodes[target_index]
-	instruction_label.text = "Your Mission: Kill "+target_character.character_name
-	target_character.highlight_panel.visible = true
-	
+	instruction_label.text = "Kill "+str(character_nodes.size()-2)+" Other Characters!"
 	start_button.visible = true
-
 
 func _on_redo_button_pressed():
 	get_tree().reload_current_scene()
@@ -85,8 +73,6 @@ func _on_start_button_pressed():
 	
 	DataTransfer.reset_values()
 	for node in character_nodes:
-		var agent_info = {"name": node.character_name, "texture": node.texture_sheet, "age": node.age, "gender": node.gender, "traits": node.traits, "history": node.history, "is_target":false}
-		if node == target_character:
-			agent_info["is_target"] = true
+		var agent_info = {"name": node.character_name, "texture": node.texture_sheet, "age": node.age, "gender": node.gender, "traits": node.traits, "history": node.history}
 		DataTransfer.add_agent_info(agent_info)
 	get_tree().change_scene_to_file(next_scene)

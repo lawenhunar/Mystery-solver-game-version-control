@@ -97,8 +97,7 @@ func _physics_process(_delta):
 		
 		popup_ui_label.text = "I"
 		if closest_entity.is_in_group("Agent"):
-			if closest_entity.is_target:
-				popup_ui_label.text += " , K"
+			popup_ui_label.text += " , K"
 		
 		var direction_to_entity = closest_entity.global_position - global_position
 		direction_to_entity = direction_to_entity.limit_length(115)

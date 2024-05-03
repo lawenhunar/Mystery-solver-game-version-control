@@ -1,9 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://dpn0nhs3f34yy"]
+[gd_scene load_steps=2 format=3 uid="uid://dpn0nhs3f34yy"]
 
 [ext_resource type="Script" path="res://Scripts/Character_Setup.gd" id="1_lkgxo"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k6k7y"]
-bg_color = Color(0.870588, 0.133333, 0.286275, 0.698039)
 
 [node name="CharacterSetup" type="MarginContainer"]
 anchors_preset = 15
@@ -25,10 +22,6 @@ layout_mode = 2
 
 [node name="Control" type="PanelContainer" parent="Panel"]
 layout_mode = 2
-
-[node name="Highlight" type="Panel" parent="Panel/Control"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_k6k7y")
 
 [node name="Sprite Button" type="Button" parent="Panel/Control"]
 layout_mode = 2

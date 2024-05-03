@@ -12,7 +12,6 @@ var agent_name : String
 var age : int
 var gender : String
 var traits : String
-var is_target : bool
 
 var recency_weight : float = 1
 var importance_weight : float = 0.5
@@ -69,7 +68,6 @@ func setup_intial_values(info, starting_location):
 	animation_texture = info.texture
 	age = info.age
 	traits = info.traits
-	is_target = info.is_target
 	
 	concurrency_handler = ConcurrencyHandler.new()
 	

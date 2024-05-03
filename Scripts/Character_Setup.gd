@@ -9,14 +9,12 @@ var history : String
 var is_male : bool
 
 var sprite_button : Button
-var highlight_panel : Panel
 var name_textbox : LineEdit
 var name_label : Label
 var description_label : RichTextLabel
 
 func _initialize_children():
 	sprite_button = $"Panel/Control/Sprite Button"
-	highlight_panel = $Panel/Control/Highlight
 	name_textbox = $"Panel/Name TextBox"
 	name_label = $"Panel/Name Label"
 	description_label = $"Panel/Description Label"
@@ -34,7 +32,6 @@ func setup_initial_values(_texture_sheet, _is_male):
 	
 	sprite_button.icon = ImageTexture.create_from_image(icon_image)
 	name_textbox.visible = false
-	highlight_panel.visible = false
 	name_label.text = ""
 	description_label.text = ""
 
