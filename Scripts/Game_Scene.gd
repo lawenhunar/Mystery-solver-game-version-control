@@ -16,6 +16,7 @@ var current_item
 
 @onready var meeting_dialogue = $"../UI/Meeting_dialogue"
 @onready var meeting_table = $"../Meeting Table"
+var speech_bubble = preload("res://Secondary_Scenes/Speech_Bubble.tscn")
 
 var in_game_time
 
@@ -173,10 +174,18 @@ func send_dialogue_text(new_text):
 	current_agent.receive_dialogue(new_text)
 
 func exit_dialogue ():
+	if current_agent == null:
+		return
+		
 	current_agent.end_dialogue()
 	current_agent = null
 	dialogue_panel.visible = false
 	player.as_entity.set_action("is idle")
+
+func disable_all_UI():
+	close_item_panel()
+	exit_dialogue()
+	inv_ui.visible = false
 
 func is_UI_active():
 	return dialogue_panel.visible or item_panel.visible or meeting_dialogue.visible
@@ -186,9 +195,11 @@ func setup_item_panel(item):
 	item_panel.initialize_with_item(item)
 
 func close_item_panel():
+	if current_item == null:
+		return
 	current_item.as_entity.set_interactable(null)
 	current_item = null
-	player.as_entity.set_action("idle")
+	player.as_entity.set_action("is idle")
 
 func set_item_action(action):
 	current_item.as_entity.set_action(action)
@@ -200,6 +211,7 @@ func set_item_action_from_nodes(item,action):
 	item.as_entity.set_action(action)
 
 func setup_meeting_dialogue():
+	disable_all_UI()
 	meeting_dialogue.visible = true
 	
 	# Get a list of the agents that are still alive
@@ -232,7 +244,18 @@ func end_meeting_dialogue():
 		if !agent.is_alive:
 			continue
 		agent.exit_meeting_mode(meeting_table)
-		
+
+func add_group_message(new_message:String, speaker:Node2D=player):
+	_add_speech_bubble(new_message, speaker)
+
+func _add_speech_bubble(speech_text:String, speaker:Node2D):
+	var new_bubble = speech_bubble.instantiate()
+	speaker.add_child(new_bubble)
+	
+	new_bubble.speech_text.text = speech_text
+	var is_left : bool = speaker.global_position.x<meeting_table.global_position.x
+	var is_up : bool = speaker.global_position.y>meeting_table.global_position.y
+	new_bubble.set_direction(is_left,is_up)
 
 func _map(value, in_min, in_max, out_min, out_max):
 	if in_min == in_max:

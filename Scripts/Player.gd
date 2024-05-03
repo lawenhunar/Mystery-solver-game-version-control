@@ -1,7 +1,6 @@
 extends CharacterBody2D
 
 @onready var game_manager : Node = get_node("/root/Game/GameManager")
-var speech_bubble = preload("res://Secondary_Scenes/Speech_Bubble.tscn")
 
 @onready var camera : Camera2D = $Camera2D
 
@@ -12,7 +11,6 @@ var previous_velocity : Vector2
 var damping_factor : float = 0.9
 
 @export var inv: Inv
-@onready var inv_ui = $"../UI/inv_ui"
 
 var dialogue_history : Array
 var dialogue_partner : Node2D
@@ -153,12 +151,5 @@ func exit_meeting_mode(meeting_table:Node2D):
 	velocity = Vector2.ZERO
 	camera.global_position = global_position
 	camera.zoom = Vector2(1,1)
-
-func _add_speech_bubble(speech_text:String, is_left:bool, is_up:bool):
-	var new_bubble = speech_bubble.instantiate()
-	add_child(new_bubble)
-	
-	new_bubble.speech_text.text = speech_text
-	new_bubble.set_direction(is_left,is_up)
 	
 

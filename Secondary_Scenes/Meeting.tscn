@@ -1,12 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://bnsm7y6apkfdl"]
+[gd_scene load_steps=5 format=3 uid="uid://bnsm7y6apkfdl"]
 
 [ext_resource type="Script" path="res://Scripts/Meeting.gd" id="1_5cllq"]
 [ext_resource type="PackedScene" uid="uid://biph1u856oeul" path="res://Secondary_Scenes/meeting_agent.tscn" id="2_qud7i"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6sfif"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mdav7"]
-bg_color = Color(0, 0, 0, 0.443137)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0g8hs"]
 
@@ -99,31 +96,21 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_6sfif")
 
-[node name="TextEdit" type="TextEdit" parent="Control/ChatPanel"]
+[node name="Text Box" type="TextEdit" parent="Control/ChatPanel"]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.907285
-anchor_right = 0.802065
+anchor_left = 0.0774527
+anchor_top = 0.832781
+anchor_right = 0.921
 anchor_bottom = 1.0
+offset_right = -0.101013
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/background_color = Color(0, 0, 0, 0.443137)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 23
 placeholder_text = "Enter your text here..."
-metadata/_edit_use_anchors_ = true
-
-[node name="TalkButton" type="Button" parent="Control/ChatPanel"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.860585
-anchor_top = 0.90894
-anchor_right = 0.982788
-anchor_bottom = 0.996689
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_mdav7")
-text = "Talk"
+wrap_mode = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="Body_found" type="Control" parent="."]
@@ -162,3 +149,5 @@ theme_override_font_sizes/font_size = 30
 text = "DEAD BODY FOUND!!"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[connection signal="text_changed" from="Control/ChatPanel/Text Box" to="." method="_on_text_edit_text_changed"]

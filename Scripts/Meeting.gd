@@ -7,6 +7,7 @@ extends CanvasLayer
 var openBool:bool
 @onready var chat_panel = $Control/ChatPanel
 @onready var vote_panel = $"Control/Vote panel"
+@onready var text_box : TextEdit = $"Control/ChatPanel/Text Box"
 
 
 # Called when the node enters the scene tree for the first time.
@@ -21,7 +22,7 @@ func _ready():
 func _process(delta):
 	if visible &&openBool:
 		body_found.visible=true
-		#await get_tree().create_timer(3).timeout
+		await get_tree().create_timer(3).timeout
 		body_found.visible=false
 		openBool=false
 		chat_panel.visible=true
@@ -33,3 +34,9 @@ func _process(delta):
 		visible=false
 		game_manager.end_meeting_dialogue()
 		
+
+
+func _on_text_edit_text_changed():
+	if "\n" in text_box.text:
+		game_manager.add_group_message(text_box.text)
+		text_box.clear()

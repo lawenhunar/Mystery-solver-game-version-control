@@ -1,36 +1,25 @@
 extends Control
 
+@onready var game_manager : Node = get_node("/root/Game/GameManager")
 
 @onready var inv:Inv=preload("res://Resources/player_inventory.tres")
 @onready var slots:Array =  $NinePatchRect/GridContainer.get_children()
-var isOpen=false
-@onready var dialogue_panel = $"../Dialogue Panel"
-@onready var item_panel = $"../Item Panel"
 
 @onready var player = $"../../Player"
-
 
 func _ready():
 	inv.update.connect(update_slots)
 	update_slots()
-	close() 
+	visible = false
 
 func update_slots():
-	for i in range(min(inv.slots.size(),slots.size())):
+	for i in min(inv.slots.size(),slots.size()):
 		slots[i].update(inv.slots[i])
 
-func _process(_delta):
-	if Input.is_action_just_pressed("toggle inventory") && !dialogue_panel.visible && !item_panel.visible:
-		if isOpen:
-			close()
-		else:
-			open()
-
-func close():
-	isOpen=false
-	visible=false
-
-func open():
-	isOpen=true
-	visible=true
+func _input(_event):
+	if game_manager.is_UI_active():
+		return
+		
+	if Input.is_action_just_pressed("toggle inventory"):
+		visible = !visible
 
