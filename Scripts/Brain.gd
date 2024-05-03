@@ -3,6 +3,7 @@ extends CharacterBody2D
 var game_manager : Node
 var concurrency_handler : ConcurrencyHandler
 var collision_shape_2D : CollisionShape2D
+var speech_bubble = preload("res://Secondary_Scenes/Speech_Bubble.tscn")
 
 var icon : Texture
 var animation_texture : Texture
@@ -765,7 +766,16 @@ func enter_meeting_mode(given_seat:Node2D) -> void:
 		animated_sprite_2d.animation = "sit left"
 	else:
 		animated_sprite_2d.animation = "sit right"
+	
 	animated_sprite_2d.frame = randi_range(0,6)
+
+func _add_speech_bubble(speech_text:String, is_left:bool, is_up:bool):
+	var new_bubble = speech_bubble.instantiate()
+	add_child(new_bubble)
+	
+	new_bubble.speech_text.text = speech_text
+	new_bubble.set_direction(is_left,is_up)
+	
 
 func exit_meeting_mode(meeting_table:Node2D):
 	z_index = 5

@@ -1,7 +1,12 @@
-[gd_scene load_steps=4 format=3 uid="uid://bnsm7y6apkfdl"]
+[gd_scene load_steps=6 format=3 uid="uid://bnsm7y6apkfdl"]
 
 [ext_resource type="Script" path="res://Scripts/Meeting.gd" id="1_5cllq"]
 [ext_resource type="PackedScene" uid="uid://biph1u856oeul" path="res://Secondary_Scenes/meeting_agent.tscn" id="2_qud7i"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6sfif"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mdav7"]
+bg_color = Color(0, 0, 0, 0.443137)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0g8hs"]
 
@@ -10,10 +15,10 @@ script = ExtResource("1_5cllq")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
-anchor_left = 0.295139
-anchor_top = 0.087963
-anchor_right = 0.719281
-anchor_bottom = 0.792102
+anchor_left = 0.258681
+anchor_top = 0.0108025
+anchor_right = 0.741851
+anchor_bottom = 0.921731
 offset_left = 1.0
 offset_top = 1.0
 offset_right = 25.3878
@@ -23,27 +28,8 @@ grow_vertical = 2
 scale = Vector2(0.97883, 0.97883)
 metadata/_edit_use_anchors_ = true
 
-[node name="background" type="Panel" parent="Control"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="title" type="Label" parent="Control"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 44.0
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 30
-text = "Group meeting"
-horizontal_alignment = 1
-vertical_alignment = 1
-metadata/_edit_use_anchors_ = true
-
 [node name="Vote panel" type="Panel" parent="Control"]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 0.103395
@@ -105,22 +91,24 @@ text = "Skip vote"
 metadata/_edit_use_anchors_ = true
 
 [node name="ChatPanel" type="Panel" parent="Control"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_6sfif")
 
 [node name="TextEdit" type="TextEdit" parent="Control/ChatPanel"]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.885965
-anchor_right = 0.80212
+anchor_top = 0.907285
+anchor_right = 0.802065
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_colors/background_color = Color(0, 0, 0, 0.443137)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 23
 placeholder_text = "Enter your text here..."
 metadata/_edit_use_anchors_ = true
@@ -128,12 +116,13 @@ metadata/_edit_use_anchors_ = true
 [node name="TalkButton" type="Button" parent="Control/ChatPanel"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.893038
-anchor_top = 0.883403
-anchor_right = 0.982447
-anchor_bottom = 0.995291
+anchor_left = 0.860585
+anchor_top = 0.90894
+anchor_right = 0.982788
+anchor_bottom = 0.996689
 grow_horizontal = 0
 grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_mdav7")
 text = "Talk"
 metadata/_edit_use_anchors_ = true
 

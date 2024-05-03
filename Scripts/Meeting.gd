@@ -21,7 +21,7 @@ func _ready():
 func _process(delta):
 	if visible &&openBool:
 		body_found.visible=true
-		await get_tree().create_timer(3).timeout
+		#await get_tree().create_timer(3).timeout
 		body_found.visible=false
 		openBool=false
 		chat_panel.visible=true
