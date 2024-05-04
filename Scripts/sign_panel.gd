@@ -1,7 +1,7 @@
 extends CanvasLayer
 
-@export var titleText:String
-@export var bodyText:String
+var titleTexts:String
+var bodyTexts:String
 
 @onready var title = $Panel/title
 @onready var body = $Panel/body
@@ -9,9 +9,7 @@ extends CanvasLayer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	#visible=false
-	title.text=titleText
-	body.text=bodyText
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

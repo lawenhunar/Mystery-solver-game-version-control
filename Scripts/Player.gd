@@ -159,9 +159,9 @@ func exit_meeting_mode(meeting_table:Node2D):
 
 
 
-func _on_movement_sign_body_entered(body):
-	movement_sign.visible=true
-
-
-func _on_movement_sign_body_exited(body):
-	movement_sign.visible=false
+#func _on_movement_sign_body_entered(body):
+	#movement_sign.visible=true
+#
+#
+#func _on_movement_sign_body_exited(body):
+	#movement_sign.visible=false

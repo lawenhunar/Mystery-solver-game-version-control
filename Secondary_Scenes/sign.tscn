@@ -1,36 +1,23 @@
-[gd_scene load_steps=2 format=3 uid="uid://drs83xwfrj1pp"]
+[gd_scene load_steps=4 format=3 uid="uid://b2igj5pwxc2ru"]
 
-[ext_resource type="Script" path="res://Scripts/sign.gd" id="1_oaver"]
+[ext_resource type="PackedScene" uid="uid://drs83xwfrj1pp" path="res://Secondary_Scenes/sign_UI.tscn" id="1_f88qt"]
+[ext_resource type="Script" path="res://Scripts/sign_area.gd" id="1_qd60r"]
 
-[node name="sign" type="CanvasLayer"]
-script = ExtResource("1_oaver")
+[sub_resource type="CircleShape2D" id="CircleShape2D_71utx"]
+radius = 93.0215
 
-[node name="Panel" type="Panel" parent="."]
-offset_left = 54.0
-offset_top = 58.0
-offset_right = 493.0
-offset_bottom = 584.0
+[node name="sign_area" type="Area2D"]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("1_qd60r")
+titleText = "nhhhh"
+bodyText = "hhgggg"
 
-[node name="title" type="Label" parent="Panel"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 0.222433
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 30
-text = "Text"
-horizontal_alignment = 1
-vertical_alignment = 1
-metadata/_edit_use_anchors_ = true
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 64)
+shape = SubResource("CircleShape2D_71utx")
 
-[node name="body" type="RichTextLabel" parent="Panel"]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.304182
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_font_sizes/normal_font_size = 19
-text = "Textssss"
-metadata/_edit_use_anchors_ = true
+[node name="sign_UI" parent="." instance=ExtResource("1_f88qt")]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]
