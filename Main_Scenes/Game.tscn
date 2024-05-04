@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://ctn24y5h1lrue"]
+[gd_scene load_steps=58 format=3 uid="uid://ctn24y5h1lrue"]
 
 [ext_resource type="PackedScene" uid="uid://dnmqbbkcnsnb5" path="res://Secondary_Scenes/Game_Manager.tscn" id="1_ffubo"]
 [ext_resource type="Script" path="res://Scripts/Game_Scene.gd" id="1_titmr"]
@@ -22,10 +22,11 @@
 [ext_resource type="Resource" uid="uid://b37vjdr563x7k" path="res://Resources/pistol.tres" id="12_p7drs"]
 [ext_resource type="Resource" uid="uid://bln7wl6orci1t" path="res://Resources/poison.tres" id="13_syory"]
 [ext_resource type="Resource" uid="uid://bwhjrrc2we7av" path="res://Resources/coffee_mug.tres" id="14_i10yy"]
+[ext_resource type="Texture2D" uid="uid://c85gma3wyfllx" path="res://Assets/Graphics/door asset.png" id="16_2yxn1"]
 [ext_resource type="PackedScene" uid="uid://b2igj5pwxc2ru" path="res://Secondary_Scenes/sign.tscn" id="16_bc0bp"]
+[ext_resource type="Script" path="res://Scripts/Door_trigger.gd" id="16_l1dcx"]
 [ext_resource type="PackedScene" uid="uid://bnsm7y6apkfdl" path="res://Secondary_Scenes/Meeting.tscn" id="18_vf10n"]
 [ext_resource type="Texture2D" uid="uid://g6v8mtm5cno" path="res://Assets/Graphics/light asset.png" id="19_25kie"]
-[ext_resource type="PackedScene" uid="uid://drs83xwfrj1pp" path="res://Secondary_Scenes/sign_UI.tscn" id="20_pq1jn"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_cm5wk"]
 vertices = PackedVector2Array(116, 24, 104, 24, 104, 11, 116, 11, 116, -21, 114, -21, 114, -43, 116, -43, 116, -48, 113, -53, 116, -53, 375, -151, 375, -21, 373, -59, 373, -85, 373, 101, 376, 11, 376, 151, 373, 107, 373, 65, 368, 61, 331, 65, 337, 61, 368, 43, 89, -43, 93, -31, 95, -21, 43, -21, 19, -44, 19, -94, -126, -69, -123, -53, -132, -53, -132, -69, -308, 11, -299, -5, -142, 91, -139, 107, -181, 107, -331, 61, 349, 145, 350, 151, 149, 151, 274, 146, -370, 101, -369, 107, -373, 107, -373, 101, 75, 24, 75, 62, -43, 53, -43, 18, 52, 11, -149, -69, -149, -53, -213, -21, -235, -59, -235, -85, 91, 61, 91, 62, -299, -21, -376, -21, -375, -123, -306, -43, -373, 151, -377, 151, -376, 11, -373, 17, -331, 17, -95, -139, -93, -139, -93, -123, -107, -101, -51, -123, -51, -139, -49, -139, -37, -107, 49, -139, 51, -139, 51, -123, 93, -123, 93, -139, 95, -139, 107, -101, 95, -151, 107, -151, 107, -69, 37, -107, 124, -69, 37, -144, 49, -151, -49, -151, -37, -144, 124, -101, 124, -117, 132, -117, 132, -101, 149, -101, 149, -151, 155, -151, 155, -115, 357, -85, 357, -149, 229, -151, 299, -149, 229, -115, 299, -75, 213, -21, 347, -75, 347, -59, 299, -21, 213, -5, 349, -59, 349, -47, 370, -35, 370, -59, 351, -35, 299, -5, 308, -5, 308, 11, 204, 11, 331, 101, 149, -21, 149, -69, 132, -69, 132, -53, 124, -53, 107, -61, 98, -61, 5, -94, 5, -85, -4, -85, -4, -77, -44, -77, -44, -85, -53, -85, -53, -94, -44, -44, -44, -46, -27, -46, -43, -21, -27, -47, -21, -47, -21, -46, -4, -46, -4, -44, -43, -5, 93, -43, 43, -5, 52, -5, 88, 11, 88, 24, -91, 18, -91, 11, -52, 11, -52, -5, -107, -21, -107, -69, -67, -44, -238, -85, -238, -98, -149, -101, -306, -98, -306, -85, -309, -85, -309, -59, -306, -59, -238, -43, -238, -59, -213, -5, -140, -53, -140, -21, -203, 11, -140, 11, -140, 17, -181, 17, 85, 105, -116, 91, -139, 61, -139, 59, -116, 59, 97, 97, 97, 105, -116, 53, -107, 53, -107, 46, -101, 46, -101, 53, 235, 107, 181, 102, 140, 91, 117, 61, 117, 59, 140, 59, 277, 107, 140, 53, 149, 53, 149, 11, 204, -5, 366, 43, 366, 37, 367, 37, 367, 19, 337, 19, 337, 37, 338, 37, 338, 43, 337, 43, 370, 151, 370, 133, 373, 133, 347, 133, 349, 133, 277, 133, 347, 107, 235, 133, 238, 133, 238, 146, 181, 149, 274, 133, 149, 139, 155, 139, 155, 149, 155, 102, 155, 108, 149, 108, 149, 107, 140, 107, 116, 91, 116, 97, 85, 107, 84, 107, 84, 149, 107, 149, 107, 151, -107, 151, -107, 107, -116, 107, -181, 151, -331, 151, -331, 107, -350, 107, -350, 101, -347, 101, -347, 61, -308, -5, -149, -123, -132, -101, -132, -117, -126, -117, -123, -101, -107, -151, -95, -151, -67, -94, -206, -5, -181, 61)
@@ -7865,6 +7866,12 @@ size = Vector2(929, 570)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0ix8t"]
 size = Vector2(919, 624.75)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0ylk2"]
+size = Vector2(185, 47)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ac6qn"]
+size = Vector2(210, 44)
+
 [node name="Game" type="Node2D"]
 
 [node name="GameManager" parent="." instance=ExtResource("1_ffubo")]
@@ -8281,12 +8288,39 @@ position = Vector2(187, 95)
 titleText = "UI buttons:"
 bodyText = "Use \"P\" to toggle between closing and opening your inventory.
 
-Use \"Ctrl + S\" to toggle between opening and closing the game statistics (Nerd stats)"
+Use \"Ctrl + T\" to toggle between opening and closing the game statistics (Stats for nerds)"
 
-[node name="sign_area" parent="Layout/Pathway" instance=ExtResource("16_bc0bp")]
+[node name="final sign" parent="Layout/Pathway" instance=ExtResource("16_bc0bp")]
 position = Vector2(-83, -184)
 titleText = "Enjoy!!"
 bodyText = "Kill them all, and remember to not get caught!!"
+
+[node name="Door" type="StaticBody2D" parent="Layout/Pathway"]
+position = Vector2(-30, -293)
+disable_mode = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Pathway/Door"]
+light_mask = 2
+visibility_layer = 2
+position = Vector2(4, -3.5)
+shape = SubResource("RectangleShape2D_0ylk2")
+
+[node name="Sprite2D" type="Sprite2D" parent="Layout/Pathway/Door"]
+light_mask = 2
+visibility_layer = 2
+position = Vector2(-2, -2)
+scale = Vector2(3.8125, 3.8125)
+texture = ExtResource("16_2yxn1")
+
+[node name="Door_trigger" type="Area2D" parent="Layout/Pathway"]
+position = Vector2(-36, -387)
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("16_l1dcx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Pathway/Door_trigger"]
+position = Vector2(3, 5)
+shape = SubResource("RectangleShape2D_ac6qn")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -8315,13 +8349,10 @@ scale = Vector2(5.72755, 5.72755)
 [node name="Meeting_dialogue" parent="UI" instance=ExtResource("18_vf10n")]
 visible = false
 
-[node name="interaction sign" parent="UI" instance=ExtResource("20_pq1jn")]
-visible = false
-
 [node name="Agents" type="Node" parent="."]
 
 [node name="Player" parent="." instance=ExtResource("9_807kv")]
-position = Vector2(-176, 1590)
+position = Vector2(-189, 1599)
 agent_name = "Dostee"
 inv = ExtResource("10_nh7ua")
 
@@ -8356,3 +8387,5 @@ position = Vector2(127, -34)
 
 [node name="Seat 4" type="Node2D" parent="Meeting Table"]
 position = Vector2(127, 31)
+
+[connection signal="body_entered" from="Layout/Pathway/Door_trigger" to="Layout/Pathway/Door_trigger" method="_on_body_entered"]

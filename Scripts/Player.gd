@@ -156,12 +156,3 @@ func exit_meeting_mode(meeting_table:Node2D):
 	camera.global_position = global_position
 	camera.zoom = Vector2(1,1)
 	
-
-
-
-#func _on_movement_sign_body_entered(body):
-	#movement_sign.visible=true
-#
-#
-#func _on_movement_sign_body_exited(body):
-	#movement_sign.visible=false
