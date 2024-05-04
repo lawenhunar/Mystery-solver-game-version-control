@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1m2738keddqj"
-path="res://.godot/imported/ALex_M.png-e4068d9462548d7f4e7c74839a7e0ae9.ctex"
+uid="uid://c85gma3wyfllx"
+path="res://.godot/imported/door asset.png-2d004e349d4e329392b6d6ebb728cd9c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Graphics/32x32/Characters/ALex_M.png"
-dest_files=["res://.godot/imported/ALex_M.png-e4068d9462548d7f4e7c74839a7e0ae9.ctex"]
+source_file="res://Assets/Graphics/door asset.png"
+dest_files=["res://.godot/imported/door asset.png-2d004e349d4e329392b6d6ebb728cd9c.ctex"]
 
 [params]
 
