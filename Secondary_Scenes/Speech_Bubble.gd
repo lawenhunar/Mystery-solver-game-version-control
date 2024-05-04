@@ -1,11 +1,24 @@
 extends Sprite2D
 
 @onready var speech_text : RichTextLabel = $"Speech Text"
+@onready var progress_bar : Panel = $"Progress Bar"
 
 @export var lifetime_seconds : float = 5 # Number of seconds the speech bubble will be shown
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	speech_text.text = ""
+
+func _close_bubble():
+	var tween = create_tween()
+	tween.tween_property(self, "scale",Vector2.ZERO,0.4).set_trans(Tween.TRANS_QUART)
+	tween.tween_callback(queue_free)
+
+func set_text(new_text:String) -> void:
+	speech_text.text = new_text
+	
+	var num_words : int = new_text.split(" ").size()
+	lifetime_seconds = num_words * 0.24
 	
 	var tween = create_tween()
 	var target_scale = scale
@@ -13,11 +26,8 @@ func _ready():
 	tween.tween_property(self, "scale",target_scale,0.4).set_trans(Tween.TRANS_BOUNCE)
 	
 	create_tween().tween_callback(_close_bubble).set_delay(lifetime_seconds)
-
-func _close_bubble():
-	var tween = create_tween()
-	tween.tween_property(self, "scale",Vector2.ZERO,0.4).set_trans(Tween.TRANS_QUART)
-	tween.tween_callback(queue_free)
+	var initial_size = progress_bar.size
+	create_tween().tween_property(progress_bar, "size", Vector2(0,initial_size.y), lifetime_seconds)	
 
 func set_direction(is_left:bool,is_up:bool):
 	if is_left:

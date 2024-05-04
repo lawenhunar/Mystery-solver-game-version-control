@@ -563,6 +563,12 @@ func _create_dialogue_context():
 	queries.append("Does "+agent_name+" know "+dialogue_partner.as_entity.entity_name+"'s name?")
 	return await _generate_memory_summary(queries)
 
+func _remove_name_from_response(response:String) -> String:
+	var name_index = response.find(agent_name+": ")
+	if name_index != -1:
+		response = response.erase(name_index, len(agent_name+": "))
+	return response
+
 func initiate_dialogue(partner):
 	dialogue_setup(partner)
 	
@@ -575,15 +581,11 @@ func initiate_dialogue(partner):
 	dialogue_context = await _create_dialogue_context()
 	first_dialogue_prompt += dialogue_context+"\n"
 	first_dialogue_prompt += "\n<End of context>\n"
-	first_dialogue_prompt += as_entity.description+"\n. Greet "+dialogue_partner.as_entity.entity_name+" as if you are in character as "+agent_name+"\n"
+	first_dialogue_prompt += "Greet "+dialogue_partner.as_entity.entity_name+" as if you are in character as "+agent_name+"\n"
 	first_dialogue_prompt += "If "+agent_name+" does not know "+dialogue_partner.as_entity.entity_name+"'s name, then "+agent_name+" will see "+dialogue_partner.as_entity.entity_name+" as a stranger.\n"
 	
 	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt)
-	
-	# Get rid of any header of the response if it exists
-	var name_index = first_dialogue.find(agent_name+": ")
-	if name_index != -1:
-		first_dialogue = first_dialogue.erase(name_index, len(agent_name+": "))
+	first_dialogue = _remove_name_from_response(first_dialogue)
 	
 	conversation_panel.find_child("Label").text += agent_name+": "+first_dialogue+"\n\n"
 	
@@ -638,11 +640,7 @@ func receive_dialogue(partner_statement):
 		next_dialogue_prompt += "If the conversation is nearing its end or becoming repetitive, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
 
 	var next_dialogue : String = await game_manager.chat_request(next_dialogue_prompt, 0, 100)
-	
-	# Get rid of any header of the response if it exists
-	var name_index = next_dialogue.find(agent_name+": ")
-	if name_index != -1:
-		next_dialogue = next_dialogue.erase(name_index, len(agent_name+": "))
+	next_dialogue = _remove_name_from_response(next_dialogue)
 		
 	conversation_panel.find_child("Label").text += agent_name+": "+next_dialogue+"\n\n"
 	
@@ -698,6 +696,26 @@ func end_dialogue():
 	_add_memory(full_dialogue)
 	can_trigger = true
 
+func initiate_group_discussion():
+	var first_dialogue_prompt = agent_summary+"\n"
+	first_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
+	first_dialogue_prompt += agent_name+" spotted someone die and is now in a group meeting with the all suspects to figure out who the killer is."
+	first_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	first_dialogue_prompt += "\n<Start of context>\n"
+	var queries : Array[String] = []
+	queries.append("Who was the last person that died?")
+	queries.append("Does "+agent_name+" suspect anyone of being the killer?")
+	queries.append("What clues does "+agent_name+" know about the related murder")
+	first_dialogue_prompt += await _generate_memory_summary(queries)
+	first_dialogue_prompt += "\n<End of context>\n"
+	first_dialogue_prompt += "Initiate the group conversation as if you are in character as "+agent_name+"\n"
+	first_dialogue_prompt += "Remeber, anyone could be the killer, so don't be too trusting or gullable."
+	
+	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt)
+	first_dialogue = _remove_name_from_response(first_dialogue)
+	
+	game_manager.add_group_message(first_dialogue, self)
+
 func _interact_with_nearby_entities():
 	var nearby_entities = interaction_zone.get_overlapping_bodies()
 	var contains_destination : bool = false
@@ -735,6 +753,7 @@ func _interact_with_nearby_entities():
 	elif body.is_in_group("Agent"):
 		if !body.is_alive:
 			_end_navigation()
+			game_manager.setup_meeting_dialogue(self)
 			return
 		body.dialogue_setup(self)
 		initiate_dialogue(body)

@@ -212,7 +212,7 @@ func get_item_action(item):
 func set_item_action_from_nodes(item,action):
 	item.as_entity.set_action(action)
 
-func setup_meeting_dialogue():
+func setup_meeting_dialogue(initiater:CharacterBody2D=null):
 	disable_all_UI()
 	meeting_dialogue.visible = true
 	
@@ -234,10 +234,14 @@ func setup_meeting_dialogue():
 	
 	# Randomly put all the alive characters into seats
 	for character in alive_characters:
-		var random_seat = available_seats.pick_random()		
+		if initiater == null:
+			initiater = character
+		var random_seat = available_seats.pick_random()	
 		character.enter_meeting_mode(random_seat)
 		character.z_index = int(_map(character.global_position.y, extreme_values.min_y, extreme_values.max_y, 5,6))
 		available_seats.erase(random_seat)
+	
+	await initiater.initiate_group_discussion()
 
 func end_meeting_dialogue():
 	player.exit_meeting_mode(meeting_table)
@@ -254,10 +258,10 @@ func _add_speech_bubble(speech_text:String, speaker:Node2D):
 	var new_bubble = speech_bubble.instantiate()
 	speaker.add_child(new_bubble)
 	
-	new_bubble.speech_text.text = speech_text
+	new_bubble.set_text(speech_text)
 	var is_left : bool = speaker.global_position.x<meeting_table.global_position.x
 	var is_up : bool = speaker.global_position.y>meeting_table.global_position.y
-	new_bubble.set_direction(is_left,is_up)
+	new_bubble.set_direction(is_left, is_up)
 
 func _map(value, in_min, in_max, out_min, out_max):
 	if in_min == in_max:
