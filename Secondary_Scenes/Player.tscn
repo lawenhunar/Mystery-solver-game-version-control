@@ -67,3 +67,12 @@ text = "I | K"
 label_settings = SubResource("LabelSettings_3jul1")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Info Label" type="Label" parent="."]
+offset_left = -21.0
+offset_top = -93.0
+offset_right = 19.0
+offset_bottom = -48.0
+theme_override_font_sizes/font_size = 31
+text = "1"
+horizontal_alignment = 1

@@ -2,7 +2,7 @@ extends CanvasLayer
 
 @onready var game_manager : Node = get_node("/root/Game/GameManager")
 
-@onready var body_found = $"Body Found"
+@onready var body_found : Label = $"Body Found"
 
 var openBool:bool
 @onready var chat_box : TextEdit = $"Chat Box"
@@ -24,8 +24,10 @@ func _process(delta):
 		body_found.visible=false
 		openBool=false
 		chat_box.visible=true
-		await get_tree().create_timer(35).timeout
+		await get_tree().create_timer(1).timeout
 		chat_box.visible=false
+		
+		game_manager.setup_voting_process()
 		await get_tree().create_timer(10).timeout
 		visible=false
 		game_manager.end_meeting_dialogue()

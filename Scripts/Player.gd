@@ -7,6 +7,7 @@ extends CharacterBody2D
 @export var agent_name : String
 @export var animation_texture : Texture
 @onready var animated_sprite_2d = $AnimatedSprite2D
+@onready var info_label : Label = $"Info Label"
 var previous_velocity : Vector2
 var damping_factor : float = 0.9
 
@@ -31,6 +32,7 @@ var is_in_meeting : bool
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)
+	info_label.visible = false
 	cause_of_kill="Choked"
 
 func _physics_process(_delta):
@@ -151,5 +153,8 @@ func exit_meeting_mode(meeting_table:Node2D):
 	velocity = Vector2.ZERO
 	camera.global_position = global_position
 	camera.zoom = Vector2(1,1)
-	
+
+func set_info_text(new_text:String) -> void:
+	info_label.visible = true
+	info_label.text = new_text
 

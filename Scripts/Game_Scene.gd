@@ -5,6 +5,7 @@ extends Game_Manager
 @onready var player = get_node("/root/Game/Player")
 @onready var agents_root = get_node("/root/Game/Agents")
 @onready var agent_scene = preload("res://Secondary_Scenes/Agent.tscn")
+var alive_characters : Array[Node]
 
 @onready var dialogue_panel = get_node("/root/Game/UI/Dialogue Panel")
 var current_agent
@@ -217,7 +218,8 @@ func setup_meeting_dialogue(initiater:CharacterBody2D=null):
 	meeting_dialogue.visible = true
 	
 	# Get a list of the agents that are still alive
-	var alive_characters = agents_root.get_children()
+	alive_characters.clear()
+	alive_characters = agents_root.get_children()
 	for i in range(alive_characters.size()-1,-1,-1):
 		var agent = alive_characters[i]
 		if !agent.is_alive:
@@ -243,6 +245,40 @@ func setup_meeting_dialogue(initiater:CharacterBody2D=null):
 	
 	await initiater.initiate_group_discussion()
 
+var voting_results : Dictionary
+
+func voting_subroutine(agent:Node)->void:
+	var vote : String = await agent.perform_voting()
+
+	# Add the new vote to the existing tally of votes
+	if voting_results.has(vote):
+		voting_results[vote] += 1
+	else:
+		voting_results[vote] = 1
+	
+	for result in voting_results.keys():
+		for character in alive_characters:
+			if result == character.agent_name:
+				character.set_info_text(str(voting_results[result]))
+				break
+
+func setup_voting_process():
+	voting_results.clear()
+	for character in alive_characters:
+		character.set_info_text("0")
+		
+		if character.global_position.x < meeting_table.global_position.x:
+			character.info_label.position.x = 30
+		else:
+			character.info_label.position.x = -70
+		character.info_label.position.y = 0
+		
+		if character.is_in_group("Player"):
+			continue
+		
+		voting_subroutine(character)
+	
+
 func end_meeting_dialogue():
 	player.exit_meeting_mode(meeting_table)
 
@@ -253,6 +289,12 @@ func end_meeting_dialogue():
 
 func add_group_message(new_message:String, speaker:Node2D=player):
 	_add_speech_bubble(new_message, speaker)
+	
+	for agent in agents_root.get_children():
+		if !agent.is_alive or agent == speaker:
+			continue
+		
+		agent.receive_group_discussion(new_message, speaker)
 
 func _add_speech_bubble(speech_text:String, speaker:Node2D):
 	var new_bubble = speech_bubble.instantiate()
@@ -267,4 +309,3 @@ func _map(value, in_min, in_max, out_min, out_max):
 	if in_min == in_max:
 		return out_max
 	return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-	
