@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bh4hbpep8x4mu" path="res://Assets/Graphics/Speech_Bubble.png" id="1_81xj8"]
 [ext_resource type="FontFile" uid="uid://bmr3debnqv0rs" path="res://Assets/Fonts/RobotoMono-Regular.ttf" id="2_btin4"]
-[ext_resource type="Script" path="res://Secondary_Scenes/Speech_Bubble.gd" id="2_uc3o4"]
+[ext_resource type="Script" path="res://Scripts/Speech_Bubble.gd" id="2_uc3o4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vg5oj"]
 bg_color = Color(0.533333, 0.827451, 0.517647, 1)

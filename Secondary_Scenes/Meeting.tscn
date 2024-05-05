@@ -39,4 +39,25 @@ text = "DEAD BODY FOUND!!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Voting Container" type="ScrollContainer" parent="."]
+offset_left = 433.0
+offset_top = 45.0
+offset_right = 709.0
+offset_bottom = 444.0
+size_flags_horizontal = 4
+size_flags_vertical = 6
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Voting Container"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="Voting Container/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 41
+text = "Vote (or skip)"
+horizontal_alignment = 1
+
 [connection signal="text_changed" from="Chat Box" to="." method="_on_text_edit_text_changed"]

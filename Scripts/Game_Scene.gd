@@ -215,7 +215,7 @@ func set_item_action_from_nodes(item,action):
 
 func setup_meeting_dialogue(initiater:CharacterBody2D=null):
 	disable_all_UI()
-	meeting_dialogue.visible = true
+	meeting_dialogue.start_meeting()
 	
 	# Get a list of the agents that are still alive
 	alive_characters.clear()
@@ -249,12 +249,14 @@ var voting_results : Dictionary
 
 func voting_subroutine(agent:Node)->void:
 	var vote : String = await agent.perform_voting()
+	add_vote(vote)
 
+func add_vote(vote_name:String):
 	# Add the new vote to the existing tally of votes
-	if voting_results.has(vote):
-		voting_results[vote] += 1
+	if voting_results.has(vote_name):
+		voting_results[vote_name] += 1
 	else:
-		voting_results[vote] = 1
+		voting_results[vote_name] = 1
 	
 	for result in voting_results.keys():
 		for character in alive_characters:
@@ -277,7 +279,12 @@ func setup_voting_process():
 			continue
 		
 		voting_subroutine(character)
-	
+
+func end_voting_process() -> void:
+	for character in alive_characters:
+		character.info_label.visible = false
+		character.info_label.position.x = 0
+		character.info_label.position.y = -21
 
 func end_meeting_dialogue():
 	player.exit_meeting_mode(meeting_table)
@@ -288,6 +295,9 @@ func end_meeting_dialogue():
 		agent.exit_meeting_mode(meeting_table)
 
 func add_group_message(new_message:String, speaker:Node2D=player):
+	if !voting_results.is_empty():
+		return
+
 	_add_speech_bubble(new_message, speaker)
 	
 	for agent in agents_root.get_children():
