@@ -3,15 +3,16 @@ extends CanvasLayer
 @onready var game_manager : Node = get_node("/root/Game/GameManager")
 
 @onready var body_found : Label = $"Body Found"
-@onready var voting_container : ScrollContainer = $"Voting Container"
-@onready var v_box_container : VBoxContainer = $"Voting Container/VBoxContainer"
+@onready var voting_title : Label = $"Voting Title"
+@onready var voting_container : ScrollContainer = $"Voting Title/Voting Container"
+@onready var v_box_container : VBoxContainer = $"Voting Title/Voting Container/VBoxContainer"
 @onready var vote_button = preload("res://Secondary_Scenes/Vote_Button.tscn")
 @onready var chat_box : TextEdit = $"Chat Box"
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	voting_container.visible = false
+	voting_title.visible = false
 
 func start_meeting():
 	visible = true
@@ -24,7 +25,7 @@ func start_meeting():
 	
 	game_manager.setup_voting_process()
 	
-	voting_container.visible = true
+	voting_title.visible = true
 	voting_container.mouse_filter = Control.MOUSE_FILTER_PASS
 	v_box_container.mouse_filter = Control.MOUSE_FILTER_PASS
 	for character in game_manager.alive_characters:
@@ -48,15 +49,11 @@ func start_meeting():
 	var selected_index : int = -1
 	var i : int = 0
 	for agent_button in v_box_container.get_children():
-		if !(agent_button is Button):
-			continue
 		if agent_button.button_pressed:
 			selected_index = i
 			
 		i+=1
 	for agent_button in v_box_container.get_children():
-		if agent_button != Button:
-			continue
 		agent_button.queue_free()
 
 	if selected_index == -1:
@@ -68,10 +65,7 @@ func start_meeting():
 	game_manager.end_meeting_dialogue()
 	
 func _disable_other_buttons(current, buttons_root):
-	for button in buttons_root.get_children():
-		if !(button is Button):
-			continue
-		
+	for button in buttons_root.get_children():		
 		button.button_pressed = false
 	current.button_pressed = true
 
