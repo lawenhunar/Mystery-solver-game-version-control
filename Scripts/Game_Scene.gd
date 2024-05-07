@@ -215,7 +215,7 @@ func get_item_action(item):
 func set_item_action_from_nodes(item,action):
 	item.as_entity.set_action(action)
 
-func setup_meeting_dialogue(initiater:CharacterBody2D=null):
+func setup_meeting_dialogue(initiater:CharacterBody2D):
 	disable_all_UI()
 	meeting_dialogue.start_meeting()
 	all_speech_bubbles.clear()
@@ -245,8 +245,6 @@ func setup_meeting_dialogue(initiater:CharacterBody2D=null):
 	
 	# Randomly put all the alive characters into seats
 	for character in alive_characters:
-		if initiater == null:
-			initiater = character
 		var random_seat = available_seats.pick_random()	
 		character.enter_meeting_mode(random_seat)
 		character.z_index = int(_map(character.global_position.y, extreme_values.min_y, extreme_values.max_y, 5,6))
@@ -298,6 +296,8 @@ func setup_voting_process():
 	
 	# Close all speech bubbles
 	for speech_bubble in all_speech_bubbles:
+		if speech_bubble == null:
+			continue
 		speech_bubble.close_bubble()
 
 func end_meeting_dialogue(final_vote:String) -> void:

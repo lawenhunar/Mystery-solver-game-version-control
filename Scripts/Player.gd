@@ -129,8 +129,6 @@ func _input(_event):
 			
 			if game_manager.agents_root.get_child_count() == 2:
 				print("WIN GAME")
-			else:
-				game_manager.setup_meeting_dialogue()
 
 func collect(item):
 	inv.insert(item)

@@ -148,16 +148,16 @@ func _animate():
 
 func kill_agent(method_of_killing):
 	as_entity.set_action("lying dead on the floor, unattended and in need of attention, killed by being choked")
-	print(method_of_killing)
 	_end_navigation()
 	is_alive = false
 	if facing_direction.x < 0:
 		animated_sprite_2d.animation = "dead right"
 	else:
 		animated_sprite_2d.animation = "dead left"
-	#print(agent_name+"is dead")
 
 func _set_destination(chosen_node):
+	if chosen_node == null:
+		return
 	previous_destination = destination
 	destination = chosen_node
 
@@ -408,7 +408,11 @@ func _observe():
 		
 		# If someone was already interacting with the destination item, find a similar item to interact with
 		if entity_node == destination and new_entity.interactable != null and new_entity.interactable != as_entity:
-			_end_navigation()
+			if entity_node.is_in_group("Agent"):
+				if entity_node.is_alive:
+					_end_navigation()
+			else:
+				_end_navigation()
 			
 			# The name of the target item without the number
 			var destination_name : String = " ".join(entity_node.get_name().split(" ").slice(0, -1))
@@ -442,9 +446,6 @@ func _observe():
 			
 		# Add the new observation to the list
 		new_observations.append(new_entity.copy())
-		if entity_node.is_in_group("Agent"):
-			if !entity_node.is_alive:
-				print(new_entity.description)
 		_add_memory(new_entity.description)
 
 func _react():
@@ -717,14 +718,18 @@ func end_dialogue():
 func initiate_group_discussion():
 	var first_dialogue_prompt = agent_summary+"\n"
 	first_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
-	first_dialogue_prompt += agent_name+" spotted someone die and is now in a group meeting with the all suspects to figure out who the killer is."
-	first_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	first_dialogue_prompt += agent_name+" spotted someone die and is now in a group meeting with all the suspects to figure out who the killer is. "
+	first_dialogue_prompt += "Here is what we know about the dead body: "
+	for agent in game_manager.agents_root.get_children():
+		if !agent.is_alive:
+			first_dialogue_prompt += agent.as_entity.description
+			break
+	first_dialogue_prompt += "\nAssume "+agent_name+" only knows the following information:\n"
 	first_dialogue_prompt += "\n<Start of context>\n"
 	dialogue_context = await _create_group_discussion_context()
 	first_dialogue_prompt += dialogue_context+"\n"
 	first_dialogue_prompt += "\n<End of context>\n"
 	first_dialogue_prompt += "Initiate the group conversation as if you are in character as "+agent_name+"\n"
-	first_dialogue_prompt += "Remeber, anyone could be the killer, so don't be too trusting or gullable."
 	
 	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt, 0, 100)
 	first_dialogue = _remove_name_from_response(first_dialogue)
@@ -746,6 +751,7 @@ func receive_group_discussion(partner_statement:String, partner:Node2D):
 		next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
 	next_dialogue_prompt += "<End of convo>\n"
 	
+	# Append the relevant context
 	next_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
 	next_dialogue_prompt += "\n<Start of context>\n"
 	if dialogue_context == "":
@@ -755,9 +761,8 @@ func receive_group_discussion(partner_statement:String, partner:Node2D):
 		next_dialogue_prompt += await _generate_memory_summary([partner_statement])
 	next_dialogue_prompt += "\n<End of context>\n"
 	
-	next_dialogue_prompt += "If "+agent_name+" has something worth adding to the conversation, respond to "+partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"
+	next_dialogue_prompt += "If "+agent_name+" is aware of a clue or has a question that helps the convo reach a conclusion, respond to "+partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"
 	next_dialogue_prompt += "If the relevant context does not provide any new clues or insight to the convo, respond to this prompt with the folloing tag: [nothing]"
-	next_dialogue_prompt += "Remeber, anyone could be the killer, so don't be too trusting or gullable."
 	
 	var next_dialogue = await game_manager.chat_request(next_dialogue_prompt, 0, 100)
 	
@@ -793,7 +798,6 @@ func perform_voting() -> String:
 		vote_prompt += agent.agent_name+"\n"
 	vote_prompt += "<End of suspect names>\n"
 	vote_prompt += "If you think there's not enough information to convict someone of the murder, respond with [Skip]. "
-	vote_prompt += "Remeber, anyone could be the killer, so don't be too trusting or gullable.\n"
 	vote_prompt += "Respond only with either [Skip] or the suspect name, nothing else."
 	
 	var vote = await game_manager.chat_request(vote_prompt, 0, 5)

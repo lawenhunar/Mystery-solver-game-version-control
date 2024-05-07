@@ -80,6 +80,7 @@ func start_meeting():
 	voting_title.visible = false
 	if !is_unique or winning_vote == "[Skip]":
 		voting_results.text = "No one has been\neliminated."
+		winning_vote = "[Skip]"
 	else:
 		voting_results.text = winning_vote+" has been arrested\nfor investigation!"
 	await get_tree().create_timer(5).timeout
