@@ -23,9 +23,8 @@ func _process(_delta):
 
 func _input(event):
 	if event is InputEventKey and event.pressed:
-		if event.keycode == KEY_S:
-			if event.ctrl_pressed:
-				stats_label.get_parent().visible = !stats_label.get_parent().visible
+		if Input.is_action_pressed("toggle game stats"):
+			stats_label.get_parent().visible = !stats_label.get_parent().visible
 
 func _update_time():
 	prev_update_time = Time.get_unix_time_from_system()

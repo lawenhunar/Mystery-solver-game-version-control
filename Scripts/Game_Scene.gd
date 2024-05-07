@@ -48,7 +48,7 @@ var weekday_conversions = {
 }
 
 func _ready():
-	in_game_time = Time.get_unix_time_from_datetime_string("2024-03-11T08:00:00")
+	in_game_time = Time.get_unix_time_from_datetime_string("2024-03-11T010:00:00")
 	dialogue_panel.visible = false
 	item_panel.visible = false
 	meeting_dialogue.visible=false

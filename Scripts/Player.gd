@@ -29,6 +29,9 @@ var closest_entity : Node2D
 var cause_of_kill:String
 var is_in_meeting : bool
 
+@onready var movement_sign = $"../Layout/Pathway/Movement sign/movement sign"
+
+
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)
@@ -52,13 +55,13 @@ func _physics_process(_delta):
 		return
 	
 	var acceleration : Vector2 = Vector2.ZERO
-	if Input.is_key_pressed(KEY_LEFT):
+	if Input.is_action_pressed("Move_left"):
 		acceleration.x -=1
-	if Input.is_key_pressed(KEY_RIGHT):
+	if Input.is_action_pressed("Move_right"):
 		acceleration.x +=1
-	if Input.is_key_pressed(KEY_UP):
+	if Input.is_action_pressed("Move_up"):
 		acceleration.y -=1
-	if Input.is_key_pressed(KEY_DOWN):
+	if Input.is_action_pressed("Move_down"):
 		acceleration.y +=1
 	
 	# If the player hasn't pressed any movement buttons, slow down to a halt
@@ -155,8 +158,7 @@ func exit_meeting_mode(meeting_table:Node2D):
 	velocity = Vector2.ZERO
 	camera.global_position = global_position
 	camera.zoom = Vector2(1,1)
-
+ 
 func set_info_text(new_text:String) -> void:
 	info_label.visible = true
 	info_label.text = new_text
-
