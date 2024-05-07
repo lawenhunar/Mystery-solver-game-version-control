@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://c027saa4nx5cf"]
+[gd_scene load_steps=5 format=3 uid="uid://diltu48yhsqnu"]
 
 [ext_resource type="Texture2D" uid="uid://c671x0ufkt7xb" path="res://Assets/Graphics/computer-icons-encapsulated-postscript-clip-art-play-again-4f81a033603416f1691a78e07faacf7a.png" id="1_0yhvj"]
 [ext_resource type="Script" path="res://Scripts/end_game_UI.gd" id="1_7y5tm"]
