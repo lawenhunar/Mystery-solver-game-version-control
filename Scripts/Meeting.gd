@@ -11,12 +11,9 @@ extends CanvasLayer
 @onready var chat_box : TextEdit = $"Chat Box"
 
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	voting_title.visible = false
-
 func start_meeting():
 	visible = true
+	voting_title.visible = false
 	voting_results.visible = false
 	
 	body_found.visible=true

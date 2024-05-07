@@ -23,7 +23,7 @@
 [ext_resource type="Resource" uid="uid://bln7wl6orci1t" path="res://Resources/poison.tres" id="13_syory"]
 [ext_resource type="Resource" uid="uid://bwhjrrc2we7av" path="res://Resources/coffee_mug.tres" id="14_i10yy"]
 [ext_resource type="Texture2D" uid="uid://c85gma3wyfllx" path="res://Assets/Graphics/door asset.png" id="16_2yxn1"]
-[ext_resource type="PackedScene" uid="uid://b2igj5pwxc2ru" path="res://Secondary_Scenes/sign.tscn" id="16_bc0bp"]
+[ext_resource type="PackedScene" path="res://Secondary_Scenes/sign.tscn" id="16_bc0bp"]
 [ext_resource type="Script" path="res://Scripts/Door_trigger.gd" id="16_l1dcx"]
 [ext_resource type="PackedScene" uid="uid://bnsm7y6apkfdl" path="res://Secondary_Scenes/Meeting.tscn" id="18_vf10n"]
 [ext_resource type="Texture2D" uid="uid://g6v8mtm5cno" path="res://Assets/Graphics/light asset.png" id="19_25kie"]

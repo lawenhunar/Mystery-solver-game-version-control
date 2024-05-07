@@ -29,8 +29,6 @@ var closest_entity : Node2D
 var cause_of_kill:String
 var is_in_meeting : bool
 
-@onready var movement_sign = $"../Layout/Pathway/Movement sign/movement sign"
-
 
 
 func _ready():
@@ -130,8 +128,12 @@ func _input(_event):
 		if closest_entity.is_in_group("Agent"):
 			closest_entity.kill_agent(cause_of_kill)
 			
-			if game_manager.agents_root.get_child_count() == 2:
-				print("WIN GAME")
+			var num_alive : int = 0
+			for agent in game_manager.agents_root.get_children():
+				if agent.is_alive:
+					num_alive += 1
+			if num_alive == 1:
+				game_manager.win_game()
 
 func collect(item):
 	inv.insert(item)

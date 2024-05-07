@@ -467,6 +467,8 @@ func _react():
 	# There could be multiple observations of the same entity, so generate summaries only for unique entities, not each observation
 	var unique_new_nodes : Array[Node] = []
 	for entity in new_observations:
+		if entity.as_node == null:
+			continue
 		if !(entity.as_node in unique_new_nodes):
 			unique_new_nodes.append(entity.as_node)
 	

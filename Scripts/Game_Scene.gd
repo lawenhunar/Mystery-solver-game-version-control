@@ -302,7 +302,7 @@ func setup_voting_process():
 
 func end_meeting_dialogue(final_vote:String) -> void:
 	if final_vote == player.as_entity.entity_name:
-		print("LOSE GAME")
+		lose_game()
 
 	for i in range(agents_root.get_child_count()-1,-1,-1):
 		var agent = agents_root.get_child(i)
@@ -310,7 +310,7 @@ func end_meeting_dialogue(final_vote:String) -> void:
 		if !agent.is_alive or agent.agent_name == final_vote:
 			agent.queue_free()
 	if agents_root.get_child_count() == 1:
-		print("WIN GAME")
+		win_game()
 	
 	meeting_table.visible = false
 	for character in alive_characters:
@@ -345,3 +345,9 @@ func _map(value, in_min, in_max, out_min, out_max):
 	if in_min == in_max:
 		return out_max
 	return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+func win_game():
+	get_tree().change_scene_to_file("res://Main_Scenes/winning_scene.tscn")
+
+func lose_game():
+	get_tree().change_scene_to_file("res://Main_Scenes/losing_scene.tscn")
