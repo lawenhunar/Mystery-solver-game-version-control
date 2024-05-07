@@ -6,6 +6,7 @@ extends Game_Manager
 @onready var agents_root = get_node("/root/Game/Agents")
 @onready var agent_scene = preload("res://Secondary_Scenes/Agent.tscn")
 var alive_characters : Array[Node]
+var all_speech_bubbles : Array
 
 @onready var dialogue_panel = get_node("/root/Game/UI/Dialogue Panel")
 var current_agent
@@ -51,6 +52,7 @@ func _ready():
 	dialogue_panel.visible = false
 	item_panel.visible = false
 	meeting_dialogue.visible=false
+	meeting_table.visible = false
 	
 	# Create all the agents using the information generated in the setup scene
 	for info in DataTransfer.agent_infos:
@@ -216,6 +218,7 @@ func set_item_action_from_nodes(item,action):
 func setup_meeting_dialogue(initiater:CharacterBody2D=null):
 	disable_all_UI()
 	meeting_dialogue.start_meeting()
+	all_speech_bubbles.clear()
 	
 	# Get a list of the agents that are still alive
 	alive_characters.clear()
@@ -230,7 +233,13 @@ func setup_meeting_dialogue(initiater:CharacterBody2D=null):
 	# Get a list of the available seets at the meeting table
 	var available_seats : Array[Node] = meeting_table.get_children()
 	var extreme_values : Dictionary = {"min_y":1.79769e308, "max_y":-1.79769e308}
-	for seat in available_seats:
+	for i in range(available_seats.size()-1,-1,-1):
+		var seat = available_seats[i]
+		
+		if seat is Label:
+			available_seats.erase(seat)
+			continue
+		
 		extreme_values.min_y = min(extreme_values.min_y, seat.global_position.y)
 		extreme_values.max_y = max(extreme_values.max_y, seat.global_position.y)
 	
@@ -252,11 +261,16 @@ func voting_subroutine(agent:Node)->void:
 	add_vote(vote)
 
 func add_vote(vote_name:String):
+	if meeting_dialogue.visible == false:
+		return
 	# Add the new vote to the existing tally of votes
 	if voting_results.has(vote_name):
 		voting_results[vote_name] += 1
 	else:
 		voting_results[vote_name] = 1
+	
+	if vote_name == "[Skip]":
+		meeting_table.get_child(0).text = str(voting_results[vote_name])+" Skips"
 	
 	for result in voting_results.keys():
 		for character in alive_characters:
@@ -266,33 +280,44 @@ func add_vote(vote_name:String):
 
 func setup_voting_process():
 	voting_results.clear()
+	meeting_table.visible = true
+	meeting_table.get_child(0).text = "0 Skips"
 	for character in alive_characters:
 		character.set_info_text("0")
 		
 		if character.global_position.x < meeting_table.global_position.x:
-			character.info_label.position.x = 30
+			character.info_label.position.x = 40
 		else:
-			character.info_label.position.x = -70
-		character.info_label.position.y = 0
+			character.info_label.position.x = -60
+		character.info_label.position.y = -10
 		
 		if character.is_in_group("Player"):
 			continue
 		
 		voting_subroutine(character)
+	
+	# Close all speech bubbles
+	for speech_bubble in all_speech_bubbles:
+		speech_bubble.close_bubble()
 
-func end_voting_process() -> void:
+func end_meeting_dialogue(final_vote:String) -> void:
+	if final_vote == player.as_entity.entity_name:
+		print("LOSE GAME")
+
+	for i in range(agents_root.get_child_count()-1,-1,-1):
+		var agent = agents_root.get_child(i)
+		
+		if !agent.is_alive or agent.agent_name == final_vote:
+			agent.queue_free()
+	if agents_root.get_child_count() == 1:
+		print("WIN GAME")
+	
+	meeting_table.visible = false
 	for character in alive_characters:
 		character.info_label.visible = false
 		character.info_label.position.x = 0
 		character.info_label.position.y = -21
-
-func end_meeting_dialogue():
-	player.exit_meeting_mode(meeting_table)
-
-	for agent in agents_root.get_children():
-		if !agent.is_alive:
-			continue
-		agent.exit_meeting_mode(meeting_table)
+		character.exit_meeting_mode(meeting_table)
 
 func add_group_message(new_message:String, speaker:Node2D=player):
 	if !voting_results.is_empty():
@@ -309,6 +334,7 @@ func add_group_message(new_message:String, speaker:Node2D=player):
 func _add_speech_bubble(speech_text:String, speaker:Node2D):
 	var new_bubble = speech_bubble.instantiate()
 	speaker.add_child(new_bubble)
+	all_speech_bubbles.append(new_bubble)
 	
 	new_bubble.set_text(speech_text)
 	var is_left : bool = speaker.global_position.x<meeting_table.global_position.x

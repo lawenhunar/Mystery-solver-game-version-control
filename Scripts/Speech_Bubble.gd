@@ -9,7 +9,7 @@ extends Sprite2D
 func _ready():
 	speech_text.text = ""
 
-func _close_bubble():
+func close_bubble():
 	var tween = create_tween()
 	tween.tween_property(self, "scale",Vector2.ZERO,0.4).set_trans(Tween.TRANS_QUART)
 	tween.tween_callback(queue_free)
@@ -25,7 +25,7 @@ func set_text(new_text:String) -> void:
 	scale = Vector2.ZERO
 	tween.tween_property(self, "scale",target_scale,0.4).set_trans(Tween.TRANS_BOUNCE)
 	
-	create_tween().tween_callback(_close_bubble).set_delay(lifetime_seconds)
+	create_tween().tween_callback(close_bubble).set_delay(lifetime_seconds)
 	var initial_size = progress_bar.size
 	create_tween().tween_property(progress_bar, "size", Vector2(0,initial_size.y), lifetime_seconds)	
 

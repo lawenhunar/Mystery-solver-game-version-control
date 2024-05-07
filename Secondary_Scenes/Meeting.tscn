@@ -49,6 +49,7 @@ text = "Vote (or skip)"
 horizontal_alignment = 1
 
 [node name="Voting Container" type="ScrollContainer" parent="Voting Title"]
+layout_mode = 0
 offset_left = 63.0
 offset_top = 67.0
 offset_right = 192.0
@@ -62,5 +63,15 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
+
+[node name="Voting Results" type="Label" parent="."]
+offset_left = 341.0
+offset_top = 120.0
+offset_right = 823.0
+offset_bottom = 237.0
+theme_override_font_sizes/font_size = 41
+text = "John has been arressted
+for investigation!"
+horizontal_alignment = 1
 
 [connection signal="text_changed" from="Chat Box" to="." method="_on_text_edit_text_changed"]

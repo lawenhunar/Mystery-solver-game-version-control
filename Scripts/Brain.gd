@@ -870,12 +870,16 @@ func enter_meeting_mode(given_seat:Node2D) -> void:
 	
 
 func exit_meeting_mode(meeting_table:Node2D):
+	if !is_alive:
+		return
+
 	_end_navigation()
 	z_index = 5
 	global_position += (global_position-meeting_table.global_position)*0.8
 	velocity = Vector2.ZERO
 	collision_shape_2D.disabled = false
 	is_in_meeting = false
+	new_observations.clear()
 
 func set_info_text(new_text:String) -> void:
 	info_label.visible = true

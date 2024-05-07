@@ -7,6 +7,7 @@ extends CanvasLayer
 @onready var voting_container : ScrollContainer = $"Voting Title/Voting Container"
 @onready var v_box_container : VBoxContainer = $"Voting Title/Voting Container/VBoxContainer"
 @onready var vote_button = preload("res://Secondary_Scenes/Vote_Button.tscn")
+@onready var voting_results : Label = $"Voting Results"
 @onready var chat_box : TextEdit = $"Chat Box"
 
 
@@ -16,11 +17,13 @@ func _ready():
 
 func start_meeting():
 	visible = true
+	voting_results.visible = false
+	
 	body_found.visible=true
-	#await get_tree().create_timer(3).timeout
+	await get_tree().create_timer(3).timeout
 	body_found.visible=false
 	chat_box.visible=true
-	await get_tree().create_timer(1).timeout
+	await get_tree().create_timer(60).timeout
 	chat_box.visible=false
 	
 	game_manager.setup_voting_process()
@@ -60,9 +63,29 @@ func start_meeting():
 		game_manager.add_vote("[Skip]")
 	else:
 		game_manager.add_vote(game_manager.alive_characters[selected_index].agent_name)
+	
+	var record_score : int = 0
+	var winning_vote : String = ""
+	var is_unique : bool
+	for vote in game_manager.voting_results.keys():
+		var score = game_manager.voting_results[vote]
+		if score > record_score:
+			record_score = score
+			is_unique = true
+			winning_vote = vote
+		elif score == record_score:
+			is_unique = false
+	
+	voting_results.visible = true
+	voting_title.visible = false
+	if !is_unique or winning_vote == "[Skip]":
+		voting_results.text = "No one has been\neliminated."
+	else:
+		voting_results.text = winning_vote+" has been arrested\nfor investigation!"
 	await get_tree().create_timer(5).timeout
+
 	visible=false
-	game_manager.end_meeting_dialogue()
+	game_manager.end_meeting_dialogue(winning_vote)
 	
 func _disable_other_buttons(current, buttons_root):
 	for button in buttons_root.get_children():		

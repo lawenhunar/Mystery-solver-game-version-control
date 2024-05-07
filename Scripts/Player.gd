@@ -126,7 +126,11 @@ func _input(_event):
 	if Input.is_key_pressed(KEY_K) && closest_entity != null:
 		if closest_entity.is_in_group("Agent"):
 			closest_entity.kill_agent(cause_of_kill)
-			game_manager.setup_meeting_dialogue()
+			
+			if game_manager.agents_root.get_child_count() == 2:
+				print("WIN GAME")
+			else:
+				game_manager.setup_meeting_dialogue()
 
 func collect(item):
 	inv.insert(item)
