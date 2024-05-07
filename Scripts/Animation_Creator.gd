@@ -11,7 +11,7 @@ func _ready():
 	var directions = ["right", "up", "left", "down"]
 	
 	if get_parent().is_in_group("Agent"):
-		get_parent().icon = ImageTexture.create_from_image(_get_image_region(0, 3))
+		get_parent().icon = ImageTexture.create_from_image(_get_image_region(0, 3, 0.3, 0.7))
 	
 	# Idle and running animations
 	for i in 2:
@@ -48,8 +48,9 @@ func _create_animation(animation_name:String, starting_location:Vector2i, animat
 		var frame_texture = ImageTexture.create_from_image(_get_image_region(starting_location.y,starting_location.x+f))
 		frames.add_frame(animation_name, frame_texture)
 
-func _get_image_region(row, column) -> Image:
-	var frame_position = Vector2(column * frame_size.x, row * frame_size.y)
-	var region = Rect2i(frame_position, frame_size)
+func _get_image_region(row, column, offset_y=0, offset_height=1) -> Image:
+	var frame_position = Vector2(column * frame_size.x, (row+offset_y) * frame_size.y)
+	var cutout_size = Vector2(frame_size.x,frame_size.y*offset_height)
+	var region = Rect2i(frame_position, cutout_size)
 	var image_region = texture_image.get_region(region)
 	return image_region

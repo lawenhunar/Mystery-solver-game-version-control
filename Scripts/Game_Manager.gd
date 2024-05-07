@@ -45,7 +45,13 @@ func _send_chat_request(prompt, token_count, get_tokens=false):
 	var request = HTTPRequest.new()
 	add_child(request)
 	
-	var response : Dictionary = await Chat_API.new(token_count).send_request(prompt, request, get_tokens)
+	var response = await Chat_API.new(token_count).send_request(prompt, request, get_tokens)
+	
+	if response == null:
+		print("Chat GPT API produced [null]")
+		print(prompt)
+		return "[Ignore this text]"
+	
 	if !response.has("usage"):
 		print("Chat GPT API failed: ", response)
 		print(prompt)

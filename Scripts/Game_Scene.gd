@@ -5,6 +5,8 @@ extends Game_Manager
 @onready var player = get_node("/root/Game/Player")
 @onready var agents_root = get_node("/root/Game/Agents")
 @onready var agent_scene = preload("res://Secondary_Scenes/Agent.tscn")
+var alive_characters : Array[Node]
+var all_speech_bubbles : Array
 
 @onready var dialogue_panel = get_node("/root/Game/UI/Dialogue Panel")
 var current_agent
@@ -16,6 +18,7 @@ var current_item
 
 @onready var meeting_dialogue = $"../UI/Meeting_dialogue"
 @onready var meeting_table = $"../Meeting Table"
+var speech_bubble = preload("res://Secondary_Scenes/Speech_Bubble.tscn")
 
 var in_game_time
 
@@ -49,6 +52,7 @@ func _ready():
 	dialogue_panel.visible = false
 	item_panel.visible = false
 	meeting_dialogue.visible=false
+	meeting_table.visible = false
 	
 	# Create all the agents using the information generated in the setup scene
 	for info in DataTransfer.agent_infos:
@@ -173,10 +177,20 @@ func send_dialogue_text(new_text):
 	current_agent.receive_dialogue(new_text)
 
 func exit_dialogue ():
+	if current_agent == null:
+		return
+		
 	current_agent.end_dialogue()
 	current_agent = null
 	dialogue_panel.visible = false
 	player.as_entity.set_action("is idle")
+
+func disable_all_UI():
+	close_item_panel()
+	exit_dialogue()
+	for agent in agents_root.get_children():
+		agent.conversation_panel.visible = false
+	inv_ui.visible = false
 
 func is_UI_active():
 	return dialogue_panel.visible or item_panel.visible or meeting_dialogue.visible
@@ -186,9 +200,11 @@ func setup_item_panel(item):
 	item_panel.initialize_with_item(item)
 
 func close_item_panel():
+	if current_item == null:
+		return
 	current_item.as_entity.set_interactable(null)
 	current_item = null
-	player.as_entity.set_action("idle")
+	player.as_entity.set_action("is idle")
 
 func set_item_action(action):
 	current_item.as_entity.set_action(action)
@@ -199,11 +215,14 @@ func get_item_action(item):
 func set_item_action_from_nodes(item,action):
 	item.as_entity.set_action(action)
 
-func setup_meeting_dialogue():
-	meeting_dialogue.visible = true
+func setup_meeting_dialogue(initiater:CharacterBody2D):
+	disable_all_UI()
+	meeting_dialogue.start_meeting()
+	all_speech_bubbles.clear()
 	
 	# Get a list of the agents that are still alive
-	var alive_characters = agents_root.get_children()
+	alive_characters.clear()
+	alive_characters = agents_root.get_children()
 	for i in range(alive_characters.size()-1,-1,-1):
 		var agent = alive_characters[i]
 		if !agent.is_alive:
@@ -214,28 +233,115 @@ func setup_meeting_dialogue():
 	# Get a list of the available seets at the meeting table
 	var available_seats : Array[Node] = meeting_table.get_children()
 	var extreme_values : Dictionary = {"min_y":1.79769e308, "max_y":-1.79769e308}
-	for seat in available_seats:
+	for i in range(available_seats.size()-1,-1,-1):
+		var seat = available_seats[i]
+		
+		if seat is Label:
+			available_seats.erase(seat)
+			continue
+		
 		extreme_values.min_y = min(extreme_values.min_y, seat.global_position.y)
 		extreme_values.max_y = max(extreme_values.max_y, seat.global_position.y)
 	
 	# Randomly put all the alive characters into seats
 	for character in alive_characters:
-		var random_seat = available_seats.pick_random()		
+		var random_seat = available_seats.pick_random()	
 		character.enter_meeting_mode(random_seat)
 		character.z_index = int(_map(character.global_position.y, extreme_values.min_y, extreme_values.max_y, 5,6))
 		available_seats.erase(random_seat)
+	
+	await initiater.initiate_group_discussion()
 
-func end_meeting_dialogue():
-	player.exit_meeting_mode(meeting_table)
+var voting_results : Dictionary
 
-	for agent in agents_root.get_children():
-		if !agent.is_alive:
-			continue
-		agent.exit_meeting_mode(meeting_table)
+func voting_subroutine(agent:Node)->void:
+	var vote : String = await agent.perform_voting()
+	add_vote(vote)
+
+func add_vote(vote_name:String):
+	if meeting_dialogue.visible == false:
+		return
+	# Add the new vote to the existing tally of votes
+	if voting_results.has(vote_name):
+		voting_results[vote_name] += 1
+	else:
+		voting_results[vote_name] = 1
+	
+	if vote_name == "[Skip]":
+		meeting_table.get_child(0).text = str(voting_results[vote_name])+" Skips"
+	
+	for result in voting_results.keys():
+		for character in alive_characters:
+			if result == character.agent_name:
+				character.set_info_text(str(voting_results[result]))
+				break
+
+func setup_voting_process():
+	voting_results.clear()
+	meeting_table.visible = true
+	meeting_table.get_child(0).text = "0 Skips"
+	for character in alive_characters:
+		character.set_info_text("0")
 		
+		if character.global_position.x < meeting_table.global_position.x:
+			character.info_label.position.x = 40
+		else:
+			character.info_label.position.x = -60
+		character.info_label.position.y = -10
+		
+		if character.is_in_group("Player"):
+			continue
+		
+		voting_subroutine(character)
+	
+	# Close all speech bubbles
+	for speech_bubble in all_speech_bubbles:
+		if speech_bubble == null:
+			continue
+		speech_bubble.close_bubble()
+
+func end_meeting_dialogue(final_vote:String) -> void:
+	if final_vote == player.as_entity.entity_name:
+		print("LOSE GAME")
+
+	for i in range(agents_root.get_child_count()-1,-1,-1):
+		var agent = agents_root.get_child(i)
+		
+		if !agent.is_alive or agent.agent_name == final_vote:
+			agent.queue_free()
+	if agents_root.get_child_count() == 1:
+		print("WIN GAME")
+	
+	meeting_table.visible = false
+	for character in alive_characters:
+		character.info_label.visible = false
+		character.info_label.position.x = 0
+		character.info_label.position.y = -21
+		character.exit_meeting_mode(meeting_table)
+
+func add_group_message(new_message:String, speaker:Node2D=player):
+	if !voting_results.is_empty():
+		return
+
+	_add_speech_bubble(new_message, speaker)
+	
+	for agent in agents_root.get_children():
+		if !agent.is_alive or agent == speaker:
+			continue
+		
+		agent.receive_group_discussion(new_message, speaker)
+
+func _add_speech_bubble(speech_text:String, speaker:Node2D):
+	var new_bubble = speech_bubble.instantiate()
+	speaker.add_child(new_bubble)
+	all_speech_bubbles.append(new_bubble)
+	
+	new_bubble.set_text(speech_text)
+	var is_left : bool = speaker.global_position.x<meeting_table.global_position.x
+	var is_up : bool = speaker.global_position.y>meeting_table.global_position.y
+	new_bubble.set_direction(is_left, is_up)
 
 func _map(value, in_min, in_max, out_min, out_max):
 	if in_min == in_max:
 		return out_max
 	return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-	

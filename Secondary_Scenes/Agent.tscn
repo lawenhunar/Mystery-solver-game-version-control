@@ -50,6 +50,7 @@ path_postprocessing = 1
 avoidance_enabled = true
 radius = 0.01
 max_neighbors = 1
+debug_enabled = true
 
 [node name="Interaction Zone" type="Area2D" parent="."]
 scale = Vector2(0.8, 0.8)
@@ -78,5 +79,15 @@ Agent: Hello this is a sample text
 Agent: Hello this is a sample text
 
 "
+
+[node name="Info Label" type="Label" parent="."]
+offset_left = -13.0
+offset_top = -93.0
+offset_right = 150.0
+offset_bottom = 297.0
+scale = Vector2(0.133017, 0.133017)
+theme_override_font_sizes/font_size = 286
+text = "1"
+horizontal_alignment = 1
 
 [connection signal="velocity_computed" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_velocity_computed"]

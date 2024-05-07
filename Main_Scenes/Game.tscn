@@ -8376,6 +8376,18 @@ item = ExtResource("14_i10yy")
 [node name="Meeting Table" type="Node2D" parent="."]
 position = Vector2(-86, -285)
 
+[node name="Skip Label" type="Label" parent="Meeting Table"]
+z_index = 1
+offset_left = -36.0
+offset_top = 69.0
+offset_right = 1170.0
+offset_bottom = 561.0
+scale = Vector2(0.0637524, 0.0637524)
+theme_override_font_sizes/font_size = 361
+text = "3 Skips"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Seat 1" type="Node2D" parent="Meeting Table"]
 position = Vector2(-122, -34)
 

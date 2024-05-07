@@ -3,6 +3,7 @@ extends CharacterBody2D
 var game_manager : Node
 var concurrency_handler : ConcurrencyHandler
 var collision_shape_2D : CollisionShape2D
+var info_label : Label
 
 var icon : Texture
 var animation_texture : Texture
@@ -58,6 +59,7 @@ func _initialize_children():
 	interaction_zone = $"Interaction Zone"
 	conversation_panel = $"Conversation Panel"
 	collision_shape_2D = $"CollisionShape2D"
+	info_label = $"Info Label"
 
 func setup_intial_values(info, starting_location):
 	_initialize_children()
@@ -74,6 +76,8 @@ func setup_intial_values(info, starting_location):
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is planning out the day", null)
 	game_manager.can_record = true
 	conversation_panel.visible = false
+	info_label.text = ""
+	info_label.visible = false
 
 	for content in info.history.split(";"):
 		_add_memory(content.strip_edges(), true)
@@ -98,6 +102,9 @@ func _physics_process(delta):
 		_observe()
 	_check_reflection()
 	_check_trigger()
+	
+	if !is_alive or is_in_meeting:
+		return
 	
 	_animate()
 
@@ -133,7 +140,7 @@ func _navigate(delta):
 
 func _animate():
 	var directions = ["up", "right", "down", "left"]
-	if velocity != Vector2.ZERO:
+	if velocity != Vector2.ZERO and velocity != null:
 		animated_sprite_2d.animation = "run "+directions[round(velocity.angle()/(PI/2))+1]
 		facing_direction = velocity
 	else:
@@ -141,16 +148,16 @@ func _animate():
 
 func kill_agent(method_of_killing):
 	as_entity.set_action("lying dead on the floor, unattended and in need of attention, killed by being choked")
-	print(method_of_killing)
 	_end_navigation()
 	is_alive = false
 	if facing_direction.x < 0:
 		animated_sprite_2d.animation = "dead right"
 	else:
 		animated_sprite_2d.animation = "dead left"
-	#print(agent_name+"is dead")
 
 func _set_destination(chosen_node):
+	if chosen_node == null:
+		return
 	previous_destination = destination
 	destination = chosen_node
 
@@ -334,12 +341,12 @@ func _trigger_brain():
 	@warning_ignore("narrowing_conversion")
 	time_since_last_trigger = Time.get_unix_time_from_system()
 	
-	if dialogue_partner != null:
+	if dialogue_partner != null or !is_alive:
 		return
 	
 	var reaction = await _react()
 	
-	if dialogue_partner != null:
+	if dialogue_partner != null or !is_alive:
 		return
 		
 	var reaction_parts = reaction.split("|")
@@ -361,6 +368,10 @@ func _trigger_brain():
 				break
 	else:
 		await _pick_location()	
+	
+	if !is_alive:
+		return
+	
 	as_entity.set_interactable(null)
 	as_entity.set_action(new_action)
 
@@ -397,7 +408,11 @@ func _observe():
 		
 		# If someone was already interacting with the destination item, find a similar item to interact with
 		if entity_node == destination and new_entity.interactable != null and new_entity.interactable != as_entity:
-			_end_navigation()
+			if entity_node.is_in_group("Agent"):
+				if entity_node.is_alive:
+					_end_navigation()
+			else:
+				_end_navigation()
 			
 			# The name of the target item without the number
 			var destination_name : String = " ".join(entity_node.get_name().split(" ").slice(0, -1))
@@ -431,9 +446,6 @@ func _observe():
 			
 		# Add the new observation to the list
 		new_observations.append(new_entity.copy())
-		if entity_node.is_in_group("Agent"):
-			if !entity_node.is_alive:
-				print(new_entity.description)
 		_add_memory(new_entity.description)
 
 func _react():
@@ -563,6 +575,19 @@ func _create_dialogue_context():
 	queries.append("Does "+agent_name+" know "+dialogue_partner.as_entity.entity_name+"'s name?")
 	return await _generate_memory_summary(queries)
 
+func _create_group_discussion_context():
+	var queries : Array[String] = []
+	queries.append("Who was the last person that died?")
+	queries.append("Does "+agent_name+" suspect anyone of being the killer?")
+	queries.append("What clues does "+agent_name+" know about the related murder")
+	return await _generate_memory_summary(queries)
+
+func _remove_name_from_response(response:String) -> String:
+	var name_index = response.find(agent_name+": ")
+	if name_index != -1:
+		response = response.erase(name_index, len(agent_name+": "))
+	return response
+
 func initiate_dialogue(partner):
 	dialogue_setup(partner)
 	
@@ -575,15 +600,11 @@ func initiate_dialogue(partner):
 	dialogue_context = await _create_dialogue_context()
 	first_dialogue_prompt += dialogue_context+"\n"
 	first_dialogue_prompt += "\n<End of context>\n"
-	first_dialogue_prompt += as_entity.description+"\n. Greet "+dialogue_partner.as_entity.entity_name+" as if you are in character as "+agent_name+"\n"
+	first_dialogue_prompt += "Greet "+dialogue_partner.as_entity.entity_name+" as if you are in character as "+agent_name+"\n"
 	first_dialogue_prompt += "If "+agent_name+" does not know "+dialogue_partner.as_entity.entity_name+"'s name, then "+agent_name+" will see "+dialogue_partner.as_entity.entity_name+" as a stranger.\n"
 	
-	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt)
-	
-	# Get rid of any header of the response if it exists
-	var name_index = first_dialogue.find(agent_name+": ")
-	if name_index != -1:
-		first_dialogue = first_dialogue.erase(name_index, len(agent_name+": "))
+	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt, 0, 100)
+	first_dialogue = _remove_name_from_response(first_dialogue)
 	
 	conversation_panel.find_child("Label").text += agent_name+": "+first_dialogue+"\n\n"
 	
@@ -630,19 +651,15 @@ func receive_dialogue(partner_statement):
 	for line in dialogue_history:
 		next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
 	next_dialogue_prompt += "<End of convo>\n"
-	next_dialogue_prompt += "Respond to "+dialogue_partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"
-		
+	
+	next_dialogue_prompt += "Respond to "+dialogue_partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"	
 	next_dialogue_prompt += "If "+agent_name+" does not know "+dialogue_partner.as_entity.entity_name+"'s name, then "+agent_name+" will see "+dialogue_partner.as_entity.entity_name+" as a stranger.\n"
 	
 	if dialogue_partner.is_in_group("Agent"):
 		next_dialogue_prompt += "If the conversation is nearing its end or becoming repetitive, say one final remark and include the closing tag [end]. For example:\n Okay bye then. [end]"
 
 	var next_dialogue : String = await game_manager.chat_request(next_dialogue_prompt, 0, 100)
-	
-	# Get rid of any header of the response if it exists
-	var name_index = next_dialogue.find(agent_name+": ")
-	if name_index != -1:
-		next_dialogue = next_dialogue.erase(name_index, len(agent_name+": "))
+	next_dialogue = _remove_name_from_response(next_dialogue)
 		
 	conversation_panel.find_child("Label").text += agent_name+": "+next_dialogue+"\n\n"
 	
@@ -698,6 +715,94 @@ func end_dialogue():
 	_add_memory(full_dialogue)
 	can_trigger = true
 
+func initiate_group_discussion():
+	var first_dialogue_prompt = agent_summary+"\n"
+	first_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
+	first_dialogue_prompt += agent_name+" spotted someone die and is now in a group meeting with all the suspects to figure out who the killer is. "
+	first_dialogue_prompt += "Here is what we know about the dead body: "
+	for agent in game_manager.agents_root.get_children():
+		if !agent.is_alive:
+			first_dialogue_prompt += agent.as_entity.description
+			break
+	first_dialogue_prompt += "\nAssume "+agent_name+" only knows the following information:\n"
+	first_dialogue_prompt += "\n<Start of context>\n"
+	dialogue_context = await _create_group_discussion_context()
+	first_dialogue_prompt += dialogue_context+"\n"
+	first_dialogue_prompt += "\n<End of context>\n"
+	first_dialogue_prompt += "Initiate the group conversation as if you are in character as "+agent_name+"\n"
+	
+	var first_dialogue = await game_manager.chat_request(first_dialogue_prompt, 0, 100)
+	first_dialogue = _remove_name_from_response(first_dialogue)
+	
+	dialogue_history.append({"agent":agent_name, "statement":first_dialogue})
+	game_manager.add_group_message(first_dialogue, self)
+
+func receive_group_discussion(partner_statement:String, partner:Node2D):
+	dialogue_history.append({"agent":partner.agent_name, "statement":partner_statement})
+	
+	var next_dialogue_prompt = agent_summary+"\n"
+	next_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
+	next_dialogue_prompt += agent_name+" is in a group discussion to figure out who the killer is of a recent murder.\n"
+	
+	# Append the dialogue history
+	next_dialogue_prompt += "\nHere is the conversation that's going on right now:\n"
+	next_dialogue_prompt += "<Start of convo>\n"
+	for line in dialogue_history:
+		next_dialogue_prompt += line["agent"] + ": " + line["statement"]+"\n"
+	next_dialogue_prompt += "<End of convo>\n"
+	
+	# Append the relevant context
+	next_dialogue_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	next_dialogue_prompt += "\n<Start of context>\n"
+	if dialogue_context == "":
+		dialogue_context = await _create_group_discussion_context()
+	next_dialogue_prompt += dialogue_context+"\n"
+	if partner_statement != "":
+		next_dialogue_prompt += await _generate_memory_summary([partner_statement])
+	next_dialogue_prompt += "\n<End of context>\n"
+	
+	next_dialogue_prompt += "If "+agent_name+" is aware of a clue or has a question that helps the convo reach a conclusion, respond to "+partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"
+	next_dialogue_prompt += "If the relevant context does not provide any new clues or insight to the convo, respond to this prompt with the folloing tag: [nothing]"
+	
+	var next_dialogue = await game_manager.chat_request(next_dialogue_prompt, 0, 100)
+	
+	if "[nothing]" in next_dialogue:
+		return
+	
+	next_dialogue = _remove_name_from_response(next_dialogue)
+	
+	dialogue_history.append({"agent":agent_name, "statement":next_dialogue})
+	game_manager.add_group_message(next_dialogue, self)
+
+func perform_voting() -> String:
+	var vote_prompt = agent_summary+"\n"
+	vote_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
+	vote_prompt += agent_name+" just had a group meeting to discuss who the killer of a recent murder is. Here is the full conversation:\n"
+	
+	# Append the dialogue history
+	vote_prompt += "<Start of convo>\n"
+	var full_history : String = ""
+	for line in dialogue_history:
+		full_history += line["agent"] + ": " + line["statement"]+"\n"
+	vote_prompt += full_history+"<End of convo>\n"
+	
+	vote_prompt += "Assume "+agent_name+" only knows the following information:\n"
+	vote_prompt += "\n<Start of context>\n"
+	vote_prompt += await _generate_memory_summary([full_history])
+	vote_prompt += "\n<End of context>\n"
+	vote_prompt += "It is time to vote for the killer. Considering all you know about the context and the given conversation, pick one of the following suspects:\n"
+	vote_prompt += "<Start of suspect names>\n"
+	for agent in game_manager.alive_characters:
+		if agent.agent_name == agent_name:
+			continue
+		vote_prompt += agent.agent_name+"\n"
+	vote_prompt += "<End of suspect names>\n"
+	vote_prompt += "If you think there's not enough information to convict someone of the murder, respond with [Skip]. "
+	vote_prompt += "Respond only with either [Skip] or the suspect name, nothing else."
+	
+	var vote = await game_manager.chat_request(vote_prompt, 0, 5)
+	return vote
+
 func _interact_with_nearby_entities():
 	var nearby_entities = interaction_zone.get_overlapping_bodies()
 	var contains_destination : bool = false
@@ -710,7 +815,7 @@ func _interact_with_nearby_entities():
 			
 		# If the nearby object is a dead agent, you can't interact with them so move onto the next one
 		if current_entity.is_in_group("Agent"):
-			if !current_entity.can_be_interacted_wtih():
+			if current_entity.dialogue_partner != null:
 				nearby_entities.erase(current_entity)
 				continue
 
@@ -727,14 +832,13 @@ func _interact_with_nearby_entities():
 	as_entity.set_interactable(body.as_entity)
 	
 	facing_direction = body.global_position - global_position
-	
 	if body.is_in_group("Player"):
 		game_manager.enter_new_dialogue(self)
 		initiate_dialogue(body)	
 	
 	elif body.is_in_group("Agent"):
 		if !body.is_alive:
-			_end_navigation()
+			game_manager.setup_meeting_dialogue(self)
 			return
 		body.dialogue_setup(self)
 		initiate_dialogue(body)
@@ -765,14 +869,25 @@ func enter_meeting_mode(given_seat:Node2D) -> void:
 		animated_sprite_2d.animation = "sit left"
 	else:
 		animated_sprite_2d.animation = "sit right"
+	
 	animated_sprite_2d.frame = randi_range(0,6)
+	
 
 func exit_meeting_mode(meeting_table:Node2D):
+	if !is_alive:
+		return
+
+	_end_navigation()
 	z_index = 5
 	global_position += (global_position-meeting_table.global_position)*0.8
 	velocity = Vector2.ZERO
 	collision_shape_2D.disabled = false
 	is_in_meeting = false
+	new_observations.clear()
+
+func set_info_text(new_text:String) -> void:
+	info_label.visible = true
+	info_label.text = new_text
 
 
 
