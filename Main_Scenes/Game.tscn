@@ -7984,6 +7984,18 @@ actions_string = "on;off"
 
 [node name="Light" parent="Layout/Mansion/Library/Lamp" instance=ExtResource("8_04oo2")]
 
+[node name="Standing Zone 1" type="Area2D" parent="Layout/Mansion/Library"]
+position = Vector2(177.124, 25.7095)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Mansion/Library/Standing Zone 1"]
+shape = SubResource("RectangleShape2D_aipeb")
+
+[node name="Standing Zone 2" type="Area2D" parent="Layout/Mansion/Library"]
+position = Vector2(-172.422, 23.7318)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Layout/Mansion/Library/Standing Zone 2"]
+shape = SubResource("RectangleShape2D_aipeb")
+
 [node name="Kitchen" type="Area2D" parent="Layout/Mansion"]
 position = Vector2(-255, -81)
 scale = Vector2(0.320001, 0.280001)
