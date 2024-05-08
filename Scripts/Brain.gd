@@ -846,7 +846,7 @@ func _interact_with_nearby_entities():
 	
 	elif body.is_in_group("Agent"):
 		if !body.is_alive:
-			game_manager.setup_meeting_dialogue(self)
+			game_manager.setup_meeting_dialogue(self, body)
 			return
 		body.dialogue_setup(self)
 		initiate_dialogue(body)

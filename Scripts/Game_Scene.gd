@@ -215,9 +215,9 @@ func get_item_action(item):
 func set_item_action_from_nodes(item,action):
 	item.as_entity.set_action(action)
 
-func setup_meeting_dialogue(initiater:CharacterBody2D):
+func setup_meeting_dialogue(initiater:CharacterBody2D, dead_body):
 	disable_all_UI()
-	meeting_dialogue.start_meeting()
+	meeting_dialogue.start_meeting(dead_body)
 	all_speech_bubbles.clear()
 	
 	# Get a list of the agents that are still alive

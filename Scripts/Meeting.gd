@@ -2,7 +2,7 @@ extends CanvasLayer
 
 @onready var game_manager : Node = get_node("/root/Game/GameManager")
 
-@onready var body_found : Label = $"Body Found"
+@onready var body_found : Panel = $"Body Found"
 @onready var voting_title : Label = $"Voting Title"
 @onready var voting_container : ScrollContainer = $"Voting Title/Voting Container"
 @onready var v_box_container : VBoxContainer = $"Voting Title/Voting Container/VBoxContainer"
@@ -11,12 +11,13 @@ extends CanvasLayer
 @onready var chat_box : TextEdit = $"Chat Box"
 
 
-func start_meeting():
+func start_meeting(dead_body):
 	visible = true
 	voting_title.visible = false
 	voting_results.visible = false
 	
 	body_found.visible=true
+	body_found.get_child(0).texture = dead_body.animated_sprite_2d.sprite_frames.get_frame_texture("dead left",0)
 	await get_tree().create_timer(3).timeout
 	body_found.visible=false
 	chat_box.visible=true
