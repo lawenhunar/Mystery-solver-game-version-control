@@ -127,6 +127,8 @@ func _input(_event):
 	if Input.is_key_pressed(KEY_K) && closest_entity != null:
 		if closest_entity.is_in_group("Agent"):
 			closest_entity.kill_agent(cause_of_kill)
+			as_entity.set_action(cause_of_kill+" someone")
+			create_tween().tween_callback(reset_action).set_delay(1)
 			
 			var num_alive : int = 0
 			for agent in game_manager.agents_root.get_children():
@@ -134,6 +136,10 @@ func _input(_event):
 					num_alive += 1
 			if num_alive == 1:
 				game_manager.win_game()
+
+
+func reset_action():
+	as_entity.set_action("is idle")
 
 func collect(item):
 	inv.insert(item)
