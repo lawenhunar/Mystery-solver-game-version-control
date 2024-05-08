@@ -48,6 +48,7 @@ var num_insights_per_reflection_question : int = 3
 
 var is_alive : bool = true
 var is_in_meeting : bool
+var has_received_discussion : bool
 
 var conversation_panel
 
@@ -742,6 +743,10 @@ func initiate_group_discussion():
 func receive_group_discussion(partner_statement:String, partner:Node2D):
 	dialogue_history.append({"agent":partner.agent_name, "statement":partner_statement})
 	
+	if has_received_discussion:
+		return
+	
+	has_received_discussion = true
 	var next_dialogue_prompt = agent_summary+"\n"
 	next_dialogue_prompt += "It is "+game_manager.get_current_datetime_string()+"\n"
 	next_dialogue_prompt += agent_name+" is in a group discussion to figure out who the killer is of a recent murder.\n"
@@ -762,6 +767,7 @@ func receive_group_discussion(partner_statement:String, partner:Node2D):
 	if partner_statement != "":
 		next_dialogue_prompt += await _generate_memory_summary([partner_statement])
 	next_dialogue_prompt += "\n<End of context>\n"
+	has_received_discussion = false
 	
 	next_dialogue_prompt += "If "+agent_name+" is aware of a clue or has a question that helps the convo reach a conclusion, respond to "+partner.agent_name+"'s last remark as if you are in character as "+agent_name+"\n"
 	next_dialogue_prompt += "If the relevant context does not provide any new clues or insight to the convo, respond to this prompt with the folloing tag: [nothing]"
@@ -840,7 +846,7 @@ func _interact_with_nearby_entities():
 	
 	elif body.is_in_group("Agent"):
 		if !body.is_alive:
-			game_manager.setup_meeting_dialogue(self)
+			game_manager.setup_meeting_dialogue(self, body)
 			return
 		body.dialogue_setup(self)
 		initiate_dialogue(body)

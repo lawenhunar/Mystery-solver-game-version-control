@@ -48,7 +48,7 @@ var weekday_conversions = {
 }
 
 func _ready():
-	in_game_time = Time.get_unix_time_from_datetime_string("2024-03-11T010:00:00")
+	in_game_time = Time.get_unix_time_from_datetime_string("2024-03-11T08:45:00")
 	dialogue_panel.visible = false
 	item_panel.visible = false
 	meeting_dialogue.visible=false
@@ -215,9 +215,9 @@ func get_item_action(item):
 func set_item_action_from_nodes(item,action):
 	item.as_entity.set_action(action)
 
-func setup_meeting_dialogue(initiater:CharacterBody2D):
+func setup_meeting_dialogue(initiater:CharacterBody2D, dead_body):
 	disable_all_UI()
-	meeting_dialogue.start_meeting()
+	meeting_dialogue.start_meeting(dead_body)
 	all_speech_bubbles.clear()
 	
 	# Get a list of the agents that are still alive
@@ -304,12 +304,15 @@ func end_meeting_dialogue(final_vote:String) -> void:
 	if final_vote == player.as_entity.entity_name:
 		lose_game()
 
+	var num_alive : int = 0
 	for i in range(agents_root.get_child_count()-1,-1,-1):
 		var agent = agents_root.get_child(i)
 		
 		if !agent.is_alive or agent.agent_name == final_vote:
 			agent.queue_free()
-	if agents_root.get_child_count() == 1:
+		else:
+			num_alive += 1
+	if num_alive == 1:
 		win_game()
 	
 	meeting_table.visible = false

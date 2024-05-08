@@ -64,23 +64,14 @@ offset_bottom = 2.29599
 theme_override_font_sizes/normal_font_size = 25
 text = "Dialogue goes here"
 
-[node name="Talk Button" type="Button" parent="."]
-layout_mode = 0
-offset_left = 715.0
-offset_top = 390.0
-offset_right = 772.0
-offset_bottom = 443.0
-theme_override_font_sizes/font_size = 20
-text = "Talk"
-
 [node name="Leave Button" type="Button" parent="."]
 layout_mode = 0
-offset_left = 788.0
+offset_left = 726.0
 offset_top = 392.0
 offset_right = 853.0
 offset_bottom = 443.0
 theme_override_font_sizes/font_size = 20
 text = "Leave"
 
-[connection signal="pressed" from="Talk Button" to="." method="_on_talk_button_pressed"]
+[connection signal="text_changed" from="Player Input Box" to="." method="_on_player_input_box_text_changed"]
 [connection signal="pressed" from="Leave Button" to="." method="_on_leave_button_pressed"]
