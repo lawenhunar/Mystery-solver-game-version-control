@@ -8383,15 +8383,15 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Seat 1" type="Node2D" parent="Meeting Table"]
-position = Vector2(-122, -34)
+position = Vector2(-122, -24)
 
 [node name="Seat 2" type="Node2D" parent="Meeting Table"]
-position = Vector2(-122, 31)
+position = Vector2(-122, 41)
 
 [node name="Seat 3" type="Node2D" parent="Meeting Table"]
-position = Vector2(127, -34)
+position = Vector2(127, -24)
 
 [node name="Seat 4" type="Node2D" parent="Meeting Table"]
-position = Vector2(127, 31)
+position = Vector2(127, 41)
 
 [connection signal="body_entered" from="Layout/Pathway/Door_trigger" to="Layout/Pathway/Door_trigger" method="_on_body_entered"]

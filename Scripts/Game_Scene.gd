@@ -304,12 +304,15 @@ func end_meeting_dialogue(final_vote:String) -> void:
 	if final_vote == player.as_entity.entity_name:
 		lose_game()
 
+	var num_alive : int = 0
 	for i in range(agents_root.get_child_count()-1,-1,-1):
 		var agent = agents_root.get_child(i)
 		
 		if !agent.is_alive or agent.agent_name == final_vote:
 			agent.queue_free()
-	if agents_root.get_child_count() == 1:
+		else:
+			num_alive += 1
+	if num_alive == 1:
 		win_game()
 	
 	meeting_table.visible = false
