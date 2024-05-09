@@ -19,6 +19,12 @@ config/icon="res://Assets/Graphics/icon.svg"
 
 DataTransfer="*res://Scripts/Data_Transfer.gd"
 
+[display]
+
+window/size/mode=4
+window/stretch/mode="viewport"
+window/stretch/aspect="expand"
+
 [input]
 
 interact={

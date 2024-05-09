@@ -155,6 +155,9 @@ func kill_agent(method_of_killing):
 		animated_sprite_2d.animation = "dead right"
 	else:
 		animated_sprite_2d.animation = "dead left"
+	#player.kill_enabled=false
+	#await get_tree().create_timer(10).timeout
+	#player.kill_enabled=true
 
 func _set_destination(chosen_node):
 	if chosen_node == null:

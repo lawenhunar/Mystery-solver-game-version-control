@@ -29,12 +29,18 @@ var closest_entity : Node2D
 var cause_of_kill:String
 var is_in_meeting : bool
 
-
+var kill_enabled: bool
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)
 	info_label.visible = false
 	cause_of_kill="Choked"
+	
+	
+	#kill cooldown at the beginning
+	#kill_enabled=false
+	#await get_tree().create_timer(20).timeout
+	#kill_enabled=true
 
 func _physics_process(_delta):
 	if is_in_meeting:
@@ -124,10 +130,16 @@ func _input(_event):
 			as_entity.set_action("interacting with "+closest_entity.as_entity.entity_name)
 			as_entity.set_interactable(closest_entity.as_entity)
 			closest_entity.as_entity.set_interactable(as_entity)
-	if Input.is_key_pressed(KEY_K) && closest_entity != null:
+	if Input.is_key_pressed(KEY_K) && closest_entity != null &&kill_enabled:
 		if closest_entity.is_in_group("Agent"):
 			closest_entity.kill_agent(cause_of_kill)
 			as_entity.set_action(cause_of_kill+" someone")
+			
+			#kill cooldown here:
+			#kill_enabled=false
+			#await get_tree().create_timer(10).timeout
+			#kill_enabled=true
+			
 			create_tween().tween_callback(reset_action).set_delay(1)
 			
 			var num_alive : int = 0
