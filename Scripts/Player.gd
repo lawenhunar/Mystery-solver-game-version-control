@@ -29,7 +29,7 @@ var closest_entity : Node2D
 var cause_of_kill:String
 var is_in_meeting : bool
 
-var kill_enabled: bool
+var kill_enabled: bool = true
 
 func _ready():
 	as_entity = Entity.new(self, agent_name, game_manager.get_location(global_position), "is idle", null)

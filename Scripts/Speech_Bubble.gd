@@ -18,7 +18,7 @@ func set_text(new_text:String) -> void:
 	speech_text.text = new_text
 	
 	var num_words : int = new_text.split(" ").size()
-	lifetime_seconds = num_words * 0.24
+	lifetime_seconds = max(2,num_words * 0.24)
 	
 	var tween = create_tween()
 	var target_scale = scale
