@@ -70,6 +70,7 @@ func disable_button():
 
 func enable_textbox():
 	name_textbox.visible = true
+	name_textbox.grab_focus()
 
 func disable_textbox():
 	name_textbox.visible = false

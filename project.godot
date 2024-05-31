@@ -21,7 +21,7 @@ DataTransfer="*res://Scripts/Data_Transfer.gd"
 
 [display]
 
-window/size/mode=4
+window/size/mode=2
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 

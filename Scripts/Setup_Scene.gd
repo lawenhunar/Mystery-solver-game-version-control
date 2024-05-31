@@ -49,6 +49,10 @@ func _character_selected(selected_node):
 
 # Called once the player has entered their name into the text box
 func _character_name_entered(text):
+	# If no character name has been entered, don't accept the name submission
+	if text.strip_edges() == "":
+		return
+		
 	instruction_label.text = "Generating the Other Characters"
 	selected_character.set_name_text(text)
 	selected_character.disable_textbox()
